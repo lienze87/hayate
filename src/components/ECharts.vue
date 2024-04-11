@@ -26,6 +26,9 @@
     () => props.options,
     () => {
       initChart(props.options);
+    },
+    {
+      deep: true,
     }
   );
 

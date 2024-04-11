@@ -3,38 +3,11 @@
   import Editor from "./components/Editor.vue";
   import { ref, computed } from "vue";
 
-  const dataList = ref([
-    {
-      label: "Mon",
-      value: 150,
-    },
-    {
-      label: "Tue",
-      value: 230,
-    },
-    {
-      label: "Wed",
-      value: 224,
-    },
-    {
-      label: "Thu",
-      value: 218,
-    },
-    {
-      label: "Fri",
-      value: 135,
-    },
-    {
-      label: "Sat",
-      value: 147,
-    },
-    {
-      label: "Sun",
-      value: 260,
-    },
-  ]);
+  const eChartsRef = ref();
 
-  const seriesType = [
+  const categoryList = ref(["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]);
+
+  const seriesTypeList = [
     {
       label: "折线图",
       value: "line",
@@ -52,43 +25,54 @@
   const config = ref({
     title: {
       show: false,
-      text: "",
+      text: "图表标题",
     },
-    xAxis: {
-      data: "",
+    tooltip: {
+      trigger: "axis",
     },
-    yAxis: {},
+    legend: {
+      show: false,
+      type: "plain",
+    },
+    xAxis: { type: "category", data: [] },
+    yAxis: { type: "value" },
   });
 
-  const series = ref({
-    type: "line",
-    data: "",
+  const seriesType = ref("line");
+  const series = ref([
+    {
+      id: 1,
+      name: "Email",
+      type: "line",
+      data: [120, 132, 101, 134, 90, 230, 210],
+    },
+    {
+      id: 2,
+      name: "Phone",
+      type: "line",
+      data: [320, 332, 301, 334, 390, 330, 320],
+    },
+  ]);
+
+  const dataList = computed(() => {
+    return series.value.map((group) => {
+      let data: any = {};
+      categoryList.value.forEach((category, index) => {
+        data[category] = group.data[index];
+      });
+
+      return data;
+    });
   });
 
   const options = computed(() => {
-    let categoryData: string[] = [];
-    let lineData: string | number[] = [];
-    if (dataList.value.length > 0) {
-      dataList.value.forEach((item) => {
-        categoryData.push(item.label);
-        lineData.push(item.value);
-      });
-    }
+    config.value.xAxis.data = categoryList.value;
 
     return {
-      xAxis: {
-        type: "category",
-        data: categoryData,
-      },
-      yAxis: {
-        type: "value",
-      },
-      series: [
-        {
-          data: lineData,
-          type: series.value.type,
-        },
-      ],
+      ...config.value,
+      series: series.value.map((serie) => {
+        return { ...serie, type: seriesType.value };
+      }),
     };
   });
 
@@ -102,45 +86,61 @@
 <template>
   <div id="main-content">
     <div class="charts-container">
-      <ECharts :options="options" />
+      <ECharts ref="eChartsRef" :options="options" />
     </div>
     <div class="options-container">
       <el-tabs v-model="activeTab">
+        <el-tab-pane label="数据" name="data"></el-tab-pane>
         <el-tab-pane label="表单" name="form"></el-tab-pane>
         <el-tab-pane label="文本" name="editor"></el-tab-pane>
       </el-tabs>
-      <el-form v-show="activeTab === 'form'" :model="config" label-width="auto">
-        <el-form-item label="图表类型">
-          <el-select v-model="series.type" placeholder="请选择">
-            <el-option
-              v-for="item in seriesType"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="图表标题">
-          <el-switch v-model="config.title.show"></el-switch>
-        </el-form-item>
-        <div>
-          <p>xAxis</p>
-          <el-form-item label="数据">
+      <el-table v-show="activeTab === 'data'" :data="dataList">
+        <el-table-column
+          v-for="category in categoryList"
+          :key="category"
+          :prop="category"
+          :label="category">
+        </el-table-column>
+      </el-table>
+      <div v-show="activeTab === 'form'" class="options-form">
+        <el-form :model="config" label-width="auto">
+          <el-form-item label="标题">
+            <el-switch v-model="config.title.show"></el-switch>
             <el-input
-              v-model="config.xAxis.data"
-              placeholder="请输入数据，以，隔开"></el-input>
+              v-if="config.title.show"
+              v-model="config.title.text"
+              placeholder="请输入标题"></el-input>
           </el-form-item>
-        </div>
-        <div>
-          <p>yAxis</p>
-          <el-form-item label="数据">
-            <el-input v-model="config.xAxis.data"></el-input>
+          <el-form-item label="图例">
+            <el-switch v-model="config.legend.show"></el-switch>
           </el-form-item>
-        </div>
-        <el-form-item label="series"> </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="onSubmit">确定</el-button>
-        </el-form-item>
-      </el-form>
+          <el-form-item label="图表类型">
+            <el-select v-model="seriesType" placeholder="请选择">
+              <el-option
+                v-for="item in seriesTypeList"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value" />
+            </el-select>
+          </el-form-item>
+          <div>
+            <p>series</p>
+            <div v-for="group in series" :key="group.id">
+              <el-form-item label="集合名称">
+                <el-input
+                  v-model="group.name"
+                  placeholder="请输入集合名称"></el-input>
+              </el-form-item>
+
+              <el-divider />
+            </div>
+          </div>
+          <el-form-item>
+            <el-button type="primary" @click="onSubmit">确定</el-button>
+          </el-form-item>
+        </el-form>
+      </div>
+
       <Editor v-show="activeTab === 'editor'" :options="options" />
     </div>
   </div>
@@ -155,6 +155,6 @@
     height: 100%;
   }
   .options-container {
-    width: 300px;
+    width: 500px;
   }
 </style>
