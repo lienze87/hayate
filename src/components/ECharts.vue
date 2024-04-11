@@ -1,4 +1,4 @@
-<script setup>
+<script lang="ts" setup>
   import * as echarts from "echarts";
   import { onMounted, watch } from "vue";
 
@@ -9,9 +9,9 @@
     },
   });
 
-  let myChart = null;
+  let myChart: any = null;
 
-  function initChart(options) {
+  function initChart(options: any) {
     if (myChart !== null) {
       myChart.setOption(options);
       return;
@@ -38,7 +38,7 @@
   <div id="main-chart"></div>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
   #main-chart {
     width: 640px;
     height: 480px;
