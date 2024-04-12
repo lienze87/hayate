@@ -5,8 +5,6 @@
 
   const eChartsRef = ref();
 
-  const categoryList = ref(["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]);
-
   const seriesTypeList = [
     {
       label: "折线图",
@@ -20,6 +18,10 @@
       label: "散点图",
       value: "scatter",
     },
+    {
+      label: "饼图",
+      value: "pie",
+    },
   ];
 
   const config = ref({
@@ -28,34 +30,32 @@
       text: "图表标题",
     },
     tooltip: {
-      trigger: "axis",
+      trigger: "item",
     },
     legend: {
-      show: false,
-      type: "plain",
+      show: true,
     },
-    xAxis: { type: "category", data: [] },
-    yAxis: { type: "value" },
   });
 
   const seriesType = ref("line");
-  const series = ref([
+  const lineSmooth = ref(false);
+  const categoryList = ref(["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]);
+
+  const seriesData = ref([
     {
       id: 1,
       name: "Email",
-      type: "line",
       data: [120, 132, 101, 134, 90, 230, 210],
     },
     {
       id: 2,
       name: "Phone",
-      type: "line",
       data: [320, 332, 301, 334, 390, 330, 320],
     },
   ]);
 
   const dataList = computed(() => {
-    return series.value.map((group) => {
+    return seriesData.value.map((group) => {
       let data: any = {};
       categoryList.value.forEach((category, index) => {
         data[category] = group.data[index];
@@ -66,12 +66,28 @@
   });
 
   const options = computed(() => {
-    config.value.xAxis.data = categoryList.value;
-
     return {
       ...config.value,
-      series: series.value.map((serie) => {
-        return { ...serie, type: seriesType.value };
+      xAxis: {
+        show: seriesType.value === "pie" ? false : true,
+        type: "category",
+        data: categoryList.value,
+      },
+      yAxis: { show: seriesType.value === "pie" ? false : true, type: "value" },
+      series: seriesData.value.map((serie) => {
+        if (seriesType.value === "pie") {
+          return {
+            ...serie,
+            type: seriesType.value,
+            data: categoryList.value.map((category, index) => {
+              return { name: category, value: serie.data[index] };
+            }),
+          };
+        } else if (seriesType.value === "line") {
+          return { ...serie, type: seriesType.value, smooth: lineSmooth.value };
+        } else {
+          return { ...serie, type: seriesType.value };
+        }
       }),
     };
   });
@@ -123,9 +139,12 @@
                 :value="item.value" />
             </el-select>
           </el-form-item>
+          <el-form-item v-if="seriesType === 'line'" label="平滑曲线">
+            <el-switch v-model="lineSmooth"></el-switch>
+          </el-form-item>
           <div>
             <p>series</p>
-            <div v-for="group in series" :key="group.id">
+            <div v-for="group in seriesData" :key="group.id">
               <el-form-item label="集合名称">
                 <el-input
                   v-model="group.name"

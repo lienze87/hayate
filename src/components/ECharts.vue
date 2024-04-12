@@ -19,7 +19,7 @@
 
     let container = document.getElementById("main-chart");
     myChart = echarts.init(container);
-    myChart.setOption(options);
+    myChart.setOption(options, true);
   }
 
   watch(
