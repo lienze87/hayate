@@ -24,6 +24,35 @@
     },
   ];
 
+  const dataset = ref([
+    {
+      id: 1,
+      name: "Email",
+      values: [
+        { name: "Mon", value: 120 },
+        { name: "Tue", value: 132 },
+        { name: "Wed", value: 101 },
+        { name: "Thu", value: 134 },
+        { name: "Fri", value: 90 },
+        { name: "Sat", value: 130 },
+        { name: "Sun", value: 110 },
+      ],
+    },
+    {
+      id: 2,
+      name: "Phone",
+      values: [
+        { name: "Mon", value: 220 },
+        { name: "Tue", value: 232 },
+        { name: "Wed", value: 201 },
+        { name: "Thu", value: 234 },
+        { name: "Fri", value: 290 },
+        { name: "Sat", value: 230 },
+        { name: "Sun", value: 210 },
+      ],
+    },
+  ]);
+
   const config = ref({
     title: {
       show: false,
@@ -35,30 +64,29 @@
     legend: {
       show: true,
     },
+    xAxis: {
+      show: true,
+      type: "category",
+      data: [],
+    },
+    yAxis: { show: true, type: "value" },
   });
 
   const seriesType = ref("line");
-  const lineSmooth = ref(false);
-  const categoryList = ref(["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]);
+  const lineConfig = ref({
+    smooth: false,
+  });
 
-  const seriesData = ref([
-    {
-      id: 1,
-      name: "Email",
-      data: [120, 132, 101, 134, 90, 230, 210],
-    },
-    {
-      id: 2,
-      name: "Phone",
-      data: [320, 332, 301, 334, 390, 330, 320],
-    },
-  ]);
+  const categoryList = computed(() => {
+    return dataset.value[0].values.map((ele) => ele.name);
+  });
 
   const dataList = computed(() => {
-    return seriesData.value.map((group) => {
+    return dataset.value.map((group) => {
       let data: any = {};
-      categoryList.value.forEach((category, index) => {
-        data[category] = group.data[index];
+
+      group.values.forEach((item) => {
+        data[item.name] = item.value;
       });
 
       return data;
@@ -66,27 +94,33 @@
   });
 
   const options = computed(() => {
+    if (seriesType.value === "pie") {
+      config.value.xAxis.show = false;
+      config.value.yAxis.show = false;
+    } else {
+      config.value.xAxis.show = true;
+      config.value.yAxis.show = true;
+    }
+    config.value.xAxis.data = categoryList.value;
     return {
       ...config.value,
-      xAxis: {
-        show: seriesType.value === "pie" ? false : true,
-        type: "category",
-        data: categoryList.value,
-      },
-      yAxis: { show: seriesType.value === "pie" ? false : true, type: "value" },
-      series: seriesData.value.map((serie) => {
+      series: dataset.value.map((item) => {
+        const valueList = item.values.map((ele) => ele.value);
         if (seriesType.value === "pie") {
           return {
-            ...serie,
+            name: item.name,
             type: seriesType.value,
-            data: categoryList.value.map((category, index) => {
-              return { name: category, value: serie.data[index] };
-            }),
+            data: item.values,
           };
         } else if (seriesType.value === "line") {
-          return { ...serie, type: seriesType.value, smooth: lineSmooth.value };
+          return {
+            name: item.name,
+            type: seriesType.value,
+            data: valueList,
+            ...lineConfig.value,
+          };
         } else {
-          return { ...serie, type: seriesType.value };
+          return { name: item.name, type: seriesType.value, data: valueList };
         }
       }),
     };
@@ -140,11 +174,11 @@
             </el-select>
           </el-form-item>
           <el-form-item v-if="seriesType === 'line'" label="平滑曲线">
-            <el-switch v-model="lineSmooth"></el-switch>
+            <el-switch v-model="lineConfig.smooth"></el-switch>
           </el-form-item>
           <div>
             <p>series</p>
-            <div v-for="group in seriesData" :key="group.id">
+            <div v-for="group in dataset" :key="group.id">
               <el-form-item label="集合名称">
                 <el-input
                   v-model="group.name"
