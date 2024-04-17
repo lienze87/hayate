@@ -7,20 +7,54 @@
 
   const seriesTypeList = [
     {
-      label: "折线图",
+      name: "折线图",
       value: "line",
     },
     {
-      label: "柱状图",
+      name: "柱状图",
       value: "bar",
     },
     {
-      label: "散点图",
+      name: "散点图",
       value: "scatter",
     },
     {
-      label: "饼图",
+      name: "饼图",
       value: "pie",
+    },
+  ];
+
+  const xAxisTypeList = [
+    {
+      name: "数值轴",
+      value: "value",
+    },
+    {
+      name: "类目轴",
+      value: "category",
+    },
+    {
+      name: "时间轴",
+      value: "time",
+    },
+    {
+      name: "对数轴",
+      value: "log",
+    },
+  ];
+
+  const tooltipTriggerList = [
+    {
+      name: "数据项图形",
+      value: "item",
+    },
+    {
+      name: "坐标轴",
+      value: "axis",
+    },
+    {
+      name: "不触发",
+      value: "none",
     },
   ];
 
@@ -38,35 +72,53 @@
         { name: "Sun", value: 110 },
       ],
     },
-    {
-      id: 2,
-      name: "Phone",
-      values: [
-        { name: "Mon", value: 220 },
-        { name: "Tue", value: 232 },
-        { name: "Wed", value: 201 },
-        { name: "Thu", value: 234 },
-        { name: "Fri", value: 290 },
-        { name: "Sat", value: 230 },
-        { name: "Sun", value: 210 },
-      ],
-    },
+    // {
+    //   id: 2,
+    //   name: "Phone",
+    //   values: [
+    //     { name: "Mon", value: 220 },
+    //     { name: "Tue", value: 232 },
+    //     { name: "Wed", value: 201 },
+    //     { name: "Thu", value: 234 },
+    //     { name: "Fri", value: 290 },
+    //     { name: "Sat", value: 230 },
+    //     { name: "Sun", value: 210 },
+    //   ],
+    // },
   ]);
 
   const config = ref({
     title: {
       show: false,
       text: "图表标题",
+      left: "auto",
+      top: "auto",
+      right: "auto",
+      bottom: "auto",
     },
     tooltip: {
+      show: true,
       trigger: "item",
+    },
+    grid: {
+      show: true,
+      left: "10%",
+      top: 60,
+      right: "10%",
+      bottom: 60,
+      containLabel: false,
     },
     legend: {
       show: true,
+      left: "auto",
+      top: "auto",
+      right: "auto",
+      bottom: "auto",
     },
     xAxis: {
       show: true,
       type: "category",
+      boundaryGap: false,
       data: [],
     },
     yAxis: { show: true, type: "value" },
@@ -75,6 +127,7 @@
   const seriesType = ref("line");
   const lineConfig = ref({
     smooth: false,
+    areaStyle: { enable: true },
   });
 
   const categoryList = computed(() => {
@@ -97,9 +150,11 @@
     if (seriesType.value === "pie") {
       config.value.xAxis.show = false;
       config.value.yAxis.show = false;
+      config.value.grid.show = false;
     } else {
       config.value.xAxis.show = true;
       config.value.yAxis.show = true;
+      config.value.grid.show = true;
     }
     config.value.xAxis.data = categoryList.value;
     return {
@@ -113,11 +168,16 @@
             data: item.values,
           };
         } else if (seriesType.value === "line") {
+          let tempConf = { ...lineConfig.value };
+          if (!tempConf.areaStyle.enable) {
+            tempConf.areaStyle = undefined;
+          }
+
           return {
             name: item.name,
             type: seriesType.value,
             data: valueList,
-            ...lineConfig.value,
+            ...tempConf,
           };
         } else {
           return { name: item.name, type: seriesType.value, data: valueList };
@@ -127,10 +187,6 @@
   });
 
   const activeTab = ref("form");
-
-  const onSubmit = () => {
-    console.log("submit");
-  };
 </script>
 
 <template>
@@ -154,6 +210,15 @@
       </el-table>
       <div v-show="activeTab === 'form'" class="options-form">
         <el-form :model="config" label-width="auto">
+          <el-form-item label="图表类型">
+            <el-select v-model="seriesType" placeholder="请选择">
+              <el-option
+                v-for="item in seriesTypeList"
+                :key="item.value"
+                :label="item.name"
+                :value="item.value" />
+            </el-select>
+          </el-form-item>
           <el-form-item label="标题">
             <el-switch v-model="config.title.show"></el-switch>
             <el-input
@@ -164,19 +229,65 @@
           <el-form-item label="图例">
             <el-switch v-model="config.legend.show"></el-switch>
           </el-form-item>
-          <el-form-item label="图表类型">
-            <el-select v-model="seriesType" placeholder="请选择">
-              <el-option
-                v-for="item in seriesTypeList"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value" />
-            </el-select>
-          </el-form-item>
-          <el-form-item v-if="seriesType === 'line'" label="平滑曲线">
-            <el-switch v-model="lineConfig.smooth"></el-switch>
-          </el-form-item>
-          <div>
+          <div class="config-group">
+            <p>提示框</p>
+            <el-form-item label="启用">
+              <el-switch v-model="config.tooltip.show"></el-switch>
+            </el-form-item>
+            <el-form-item label="触发类型">
+              <el-select v-model="config.tooltip.trigger" placeholder="请选择">
+                <el-option
+                  v-for="item in tooltipTriggerList"
+                  :key="item.value"
+                  :label="item.name"
+                  :value="item.value" />
+              </el-select>
+            </el-form-item>
+          </div>
+          <div class="config-group">
+            <p>网格</p>
+            <el-form-item label="left">
+              <el-input v-model="config.grid.left"></el-input>
+            </el-form-item>
+            <el-form-item label="top">
+              <el-input v-model="config.grid.top"></el-input>
+            </el-form-item>
+            <el-form-item label="right">
+              <el-input v-model="config.grid.right"></el-input>
+            </el-form-item>
+            <el-form-item label="bottom">
+              <el-input v-model="config.grid.bottom"></el-input>
+            </el-form-item>
+            <el-form-item label="包含刻度标签">
+              <el-switch v-model="config.grid.containLabel"></el-switch>
+            </el-form-item>
+          </div>
+          <div class="config-group">
+            <p>xAxis</p>
+            <el-form-item label="类型">
+              <el-select v-model="config.xAxis.type" placeholder="请选择">
+                <el-option
+                  v-for="item in xAxisTypeList"
+                  :key="item.value"
+                  :label="item.name"
+                  :value="item.value" />
+              </el-select>
+            </el-form-item>
+            <el-form-item label="刻度居中 ">
+              <el-switch v-model="config.xAxis.boundaryGap"></el-switch>
+            </el-form-item>
+          </div>
+          <div v-if="seriesType === 'line'" class="config-group">
+            <p>line</p>
+            <el-form-item label="平滑曲线">
+              <el-switch v-model="lineConfig.smooth"></el-switch>
+            </el-form-item>
+            <p>区域填充</p>
+            <el-form-item label="启用">
+              <el-switch v-model="lineConfig.areaStyle.enable"></el-switch>
+            </el-form-item>
+          </div>
+          <div class="config-group">
             <p>series</p>
             <div v-for="group in dataset" :key="group.id">
               <el-form-item label="集合名称">
@@ -184,16 +295,11 @@
                   v-model="group.name"
                   placeholder="请输入集合名称"></el-input>
               </el-form-item>
-
               <el-divider />
             </div>
           </div>
-          <el-form-item>
-            <el-button type="primary" @click="onSubmit">确定</el-button>
-          </el-form-item>
         </el-form>
       </div>
-
       <Editor v-show="activeTab === 'editor'" :options="options" />
     </div>
   </div>
@@ -207,7 +313,12 @@
     width: 100%;
     height: 100%;
   }
+  .charts-container {
+    padding: 2rem;
+  }
   .options-container {
     width: 500px;
+    max-height: 600px;
+    overflow: auto;
   }
 </style>
