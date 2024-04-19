@@ -11,7 +11,8 @@
   "dependencies": {
     "echarts": "^5.5.0",
     "element-plus": "^2.6.3",
-    "vue": "^3.4.21"
+    "vue": "^3.4.21",
+    "vue-router": "^4.3.2"
   },
   "devDependencies": {
     "@types/echarts": "^4.9.22",
