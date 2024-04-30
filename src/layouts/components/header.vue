@@ -1,5 +1,5 @@
 <template>
-  <div class="page-header">Vue应用</div>
+  <div class="page-header">Vue</div>
 </template>
 
 <script setup lang="ts"></script>
@@ -9,6 +9,6 @@
     height: 100%;
     line-height: 60px;
     font-size: 32px;
-    background-color: #d6d6d6;
+    border-bottom: 1px solid #d6d6d6;
   }
 </style>
