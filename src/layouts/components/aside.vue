@@ -17,11 +17,15 @@
   import { computed } from "vue";
   const menuList = [
     {
-      name: "Chart",
+      name: "图表",
       path: "/charts",
     },
     {
-      name: "Note",
+      name: "画板",
+      path: "/board",
+    },
+    {
+      name: "笔记",
       path: "/note",
     },
   ];
@@ -45,5 +49,9 @@
   .page-aside {
     padding: 20px 0;
     height: calc(100vh - 100px);
+
+    :deep(.is-active) {
+      background-color: rgba(64, 158, 255, 0.1);
+    }
   }
 </style>
