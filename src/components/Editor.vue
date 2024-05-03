@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-  import * as echarts from "echarts";
   import { computed } from "vue";
 
   const props = defineProps({
@@ -48,33 +47,62 @@
       console.log(val);
     },
   });
+
+  function handleCopy(str: string) {
+    const type = "text/plain";
+    const blob = new Blob([str], { type });
+    const data = [new ClipboardItem({ [type]: blob })];
+
+    navigator.clipboard.write(data).then(
+      () => {
+        console.log("已复制到剪贴板");
+      },
+      () => {
+        console.log("复制失败，请稍后重试");
+      }
+    );
+  }
+
+  const onCopy = () => {
+    const text = JSON.stringify(props.options);
+    handleCopy(text);
+  };
 </script>
 
 <template>
-  <div id="main-editor" v-html="config"></div>
+  <div class="main-editor">
+    <div class="action-bar">
+      <el-button type="primary" @click="onCopy">复制</el-button>
+    </div>
+    <div class="editor-content" v-html="config"></div>
+  </div>
 </template>
 
 <style lang="scss" scoped>
-  #main-editor {
-    padding: 20px 10px;
-    color: #f2f2f2;
-    word-break: break-word;
-    border-radius: 4px;
-    background-color: #263238;
-    .key {
-      color: #f07178;
-    }
-    .number {
-      color: #2c99ce;
-    }
-    .string {
-      color: #2c99ce;
-    }
-    .boolean {
-      color: #d8cb33;
-    }
-    .null {
-      color: #f72c5b;
+  .main-editor {
+    width: 800px;
+
+    .editor-content {
+      padding: 20px 10px;
+      color: #f2f2f2;
+      border-radius: 4px;
+      background-color: #263238;
+      word-break: break-all;
+      .key {
+        color: #f07178;
+      }
+      .number {
+        color: #2c99ce;
+      }
+      .string {
+        color: #2c99ce;
+      }
+      .boolean {
+        color: #d8cb33;
+      }
+      .null {
+        color: #f72c5b;
+      }
     }
   }
 </style>
