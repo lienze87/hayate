@@ -1,31 +1,18 @@
 <template>
   <div class="white-board">
     <div class="action-bar">
-      <el-button type="primary" @click="handlePreview">生成图片</el-button>
       <el-button type="danger" @click="handleReset">重置</el-button>
+      <span>使用鼠标进行绘制</span>
     </div>
     <div class="white-board-content" ref="myWhiteBoard"></div>
-    <div class="image-list">
-      <el-image
-        ref="imgPreviewer"
-        :src="state.url"
-        :preview-src-list="[state.url]">
-        <template #error>
-          <span>暂无内容</span>
-        </template>
-      </el-image>
-    </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-  import { onMounted, ref, reactive } from "vue";
+  import { onMounted, ref } from "vue";
 
-  const state = reactive({
-    url: "",
-  });
   const myWhiteBoard = ref();
-  const imgPreviewer = ref();
+
   const myCanvas: HTMLCanvasElement = document.createElement("canvas");
   myCanvas.id = "my-canvas";
   let ctx: CanvasRenderingContext2D | null = null;
@@ -56,7 +43,7 @@
 
     let isDown = false;
     let canvasX, canvasY;
-    ctx.lineWidth = 4;
+    ctx.lineWidth = 2;
 
     const mouseDraw = {
       mousedown: function (evt: MouseEvent) {
@@ -150,14 +137,6 @@
     if (!ctx) return;
     ctx.fillStyle = "#fff";
     ctx.fillRect(0, 0, myCanvas.width, myCanvas.height);
-    state.url = "";
-  };
-
-  const handlePreview = () => {
-    if (!ctx) return;
-    // 默认png/base64
-    let imgUrl = myCanvas.toDataURL();
-    state.url = imgUrl;
   };
 
   const getCanvasContent = () => {
@@ -173,7 +152,6 @@
 
 <style lang="scss" scoped>
   .white-board {
-    margin: 10px;
     width: fit-content;
 
     .action-bar {

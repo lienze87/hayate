@@ -33,7 +33,7 @@
       </el-form>
       <div class="my-board" ref="myBoard"></div>
     </div>
-    <div>
+    <div class="white-board">
       <WhiteBoard />
     </div>
   </div>
@@ -127,6 +127,7 @@
       ctx = myCanvas.getContext("2d");
       ctx.font = `${FONT_SIZE}px serif`;
     }
+    onSubmit();
   });
 </script>
 <style scoped>
