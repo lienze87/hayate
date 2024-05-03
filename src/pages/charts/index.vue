@@ -7,16 +7,44 @@
       <el-tabs v-model="activeTab">
         <el-tab-pane label="数据" name="data"></el-tab-pane>
         <el-tab-pane label="表单" name="form"></el-tab-pane>
-        <el-tab-pane label="文本" name="editor"></el-tab-pane>
+        <el-tab-pane label="配置" name="editor"></el-tab-pane>
       </el-tabs>
-      <el-table v-show="activeTab === 'data'" :data="dataList">
-        <el-table-column
-          v-for="category in categoryList"
-          :key="category"
-          :prop="category"
-          :label="category">
-        </el-table-column>
-      </el-table>
+      <div v-show="activeTab === 'data'" class="option-table">
+        <div class="action_bar">
+          <el-button type="primary" @click="handleAddData">新增</el-button>
+        </div>
+        <el-table :data="dataList">
+          <el-table-column type="index" width="50" />
+          <el-table-column
+            v-for="category in categoryList"
+            :key="category"
+            :prop="category"
+            :label="category">
+            <template #default="scope">
+              <div v-if="editId === scope.row.id">
+                <el-input v-model="scope.row[category]"></el-input>
+              </div>
+              <span v-else>{{ scope.row[category] }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="操作">
+            <template #default="scope">
+              <el-button
+                v-if="editId === scope.row.id"
+                type="primary"
+                @click="handleConfirmData(scope.row)">
+                确定
+              </el-button>
+              <el-button
+                v-else
+                type="success"
+                @click="handleEditData(scope.row)">
+                修改
+              </el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
       <div v-show="activeTab === 'form'" class="options-form">
         <el-form :model="config" label-width="auto">
           <el-form-item label="图表类型">
@@ -55,18 +83,20 @@
           </div>
           <div class="config-group">
             <p>网格</p>
-            <el-form-item label="left">
-              <el-input v-model="config.grid.left"></el-input>
-            </el-form-item>
-            <el-form-item label="top">
-              <el-input v-model="config.grid.top"></el-input>
-            </el-form-item>
-            <el-form-item label="right">
-              <el-input v-model="config.grid.right"></el-input>
-            </el-form-item>
-            <el-form-item label="bottom">
-              <el-input v-model="config.grid.bottom"></el-input>
-            </el-form-item>
+            <div class="form-item-inline">
+              <el-form-item label="left">
+                <el-input v-model="config.grid.left"></el-input>
+              </el-form-item>
+              <el-form-item label="top">
+                <el-input v-model="config.grid.top"></el-input>
+              </el-form-item>
+              <el-form-item label="right">
+                <el-input v-model="config.grid.right"></el-input>
+              </el-form-item>
+              <el-form-item label="bottom">
+                <el-input v-model="config.grid.bottom"></el-input>
+              </el-form-item>
+            </div>
             <el-form-item label="包含刻度标签">
               <el-switch v-model="config.grid.containLabel"></el-switch>
             </el-form-item>
@@ -76,7 +106,7 @@
             <el-form-item label="类型">
               <el-select v-model="config.xAxis.type" placeholder="请选择">
                 <el-option
-                  v-for="item in xAxisTypeList"
+                  v-for="item in axisTypeList"
                   :key="item.value"
                   :label="item.name"
                   :value="item.value" />
@@ -84,6 +114,18 @@
             </el-form-item>
             <el-form-item label="刻度居中 ">
               <el-switch v-model="config.xAxis.boundaryGap"></el-switch>
+            </el-form-item>
+          </div>
+          <div class="config-group">
+            <p>yAxis</p>
+            <el-form-item label="类型">
+              <el-select v-model="config.yAxis.type" placeholder="请选择">
+                <el-option
+                  v-for="item in axisTypeList"
+                  :key="item.value"
+                  :label="item.name"
+                  :value="item.value" />
+              </el-select>
             </el-form-item>
           </div>
           <div v-if="seriesType === 'line'" class="config-group">
@@ -117,7 +159,7 @@
 <script lang="ts" setup>
   import ECharts from "@/components/ECharts.vue";
   import Editor from "@/components/Editor.vue";
-  import { ref, computed } from "vue";
+  import { ref, computed, nextTick } from "vue";
 
   const eChartsRef = ref();
 
@@ -140,7 +182,7 @@
     },
   ];
 
-  const xAxisTypeList = [
+  const axisTypeList = [
     {
       name: "数值轴",
       value: "value",
@@ -188,20 +230,21 @@
         { name: "Sun", value: 110 },
       ],
     },
-    // {
-    //   id: 2,
-    //   name: "Phone",
-    //   values: [
-    //     { name: "Mon", value: 220 },
-    //     { name: "Tue", value: 232 },
-    //     { name: "Wed", value: 201 },
-    //     { name: "Thu", value: 234 },
-    //     { name: "Fri", value: 290 },
-    //     { name: "Sat", value: 230 },
-    //     { name: "Sun", value: 210 },
-    //   ],
-    // },
+    {
+      id: 2,
+      name: "Phone",
+      values: [
+        { name: "Mon", value: 220 },
+        { name: "Tue", value: 232 },
+        { name: "Wed", value: 201 },
+        { name: "Thu", value: 234 },
+        { name: "Fri", value: 290 },
+        { name: "Sat", value: 230 },
+        { name: "Sun", value: 210 },
+      ],
+    },
   ]);
+  const editId = ref(0);
 
   const config = ref({
     title: {
@@ -243,7 +286,7 @@
   const seriesType = ref("line");
   const lineConfig = ref({
     smooth: false,
-    areaStyle: { enable: true },
+    areaStyle: { enable: false },
   });
 
   const categoryList = computed(() => {
@@ -252,7 +295,7 @@
 
   const dataList = computed(() => {
     return dataset.value.map((group) => {
-      let data: any = {};
+      let data: any = { id: group.id };
 
       group.values.forEach((item) => {
         data[item.name] = item.value;
@@ -261,6 +304,37 @@
       return data;
     });
   });
+
+  const handleAddData = () => {
+    const id = Date.now();
+    dataset.value.push({
+      id,
+      name: "Name",
+      values: categoryList.value.map((category: string) => {
+        return { name: category, value: 0 };
+      }),
+    });
+    nextTick(() => {
+      editId.value = id;
+    });
+  };
+
+  const handleEditData = (row: any) => {
+    editId.value = row.id;
+  };
+
+  const handleConfirmData = (row: any) => {
+    const targetIndex = dataset.value.findIndex(
+      (ele: any) => ele.id === editId.value
+    );
+    dataset.value.splice(targetIndex, 1, {
+      ...dataset.value[targetIndex],
+      values: categoryList.value.map((category: string) => {
+        return { name: category, value: Number(row[category]) };
+      }),
+    });
+    editId.value = 0;
+  };
 
   const options = computed(() => {
     if (seriesType.value === "pie") {
@@ -305,7 +379,7 @@
   const activeTab = ref("form");
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
   .main-content {
     display: flex;
     justify-content: space-around;
@@ -322,5 +396,13 @@
     flex-shrink: 0;
     max-height: 100%;
     overflow: auto;
+  }
+
+  .form-item-inline {
+    display: flex;
+    justify-content: space-around;
+  }
+  .options-form {
+    width: 80%;
   }
 </style>
