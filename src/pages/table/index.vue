@@ -79,6 +79,29 @@
   const dataList = ref([]);
   const editId = ref("");
 
+  // 01:12+12 -> 1*60*24+12*24+12
+  // 1691 -> 01:10+11
+  function translateTime(param: string | number) {
+    if (typeof param === "string") {
+      const reg = /^[0-9]{2}\:[0-9]{2}\+[0-9]{1,2}$/;
+      if (!reg.test(param)) {
+        throw new Error("格式错误");
+      }
+      let minutes = parseInt(param.split(":")[0]) * 60 * 24;
+      let seconds = parseInt(param.split(":")[1].split("+")[0]) * 24;
+      let frames = parseInt(param.split(":")[1].split("+")[1]);
+
+      return minutes + seconds + frames;
+    }
+
+    if (typeof param === "number") {
+      let minutes = Math.floor(param / (60 * 24));
+      let seconds = Math.floor((param % (60 * 24)) / 24);
+      let frames = param % 24;
+      return `${("0" + minutes).slice(-2)}:${("0" + seconds).slice(-2)}+${frames}`;
+    }
+  }
+
   const handleAddData = () => {
     dataList.value.push({
       uuid: "0",
@@ -102,6 +125,8 @@
     try {
       const data = {
         ...row,
+        startIndex: row.start ? translateTime(row.start) : 0,
+        endIndex: row.end ? translateTime(row.end) : 0,
         uuid: randomHex(),
       };
       if (row.uuid === "0") {
