@@ -25,6 +25,10 @@
       path: "/board",
     },
     {
+      name: "表格",
+      path: "/table",
+    },
+    {
       name: "笔记",
       path: "/note",
     },

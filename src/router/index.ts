@@ -26,6 +26,14 @@ const routeList = [
         },
       },
       {
+        path: "/table",
+        name: "Table",
+        component: () => import("@/pages/table/index.vue"),
+        meta: {
+          title: "表格",
+        },
+      },
+      {
         path: "/note",
         name: "Note",
         component: () => import("@/pages/note/index.vue"),
