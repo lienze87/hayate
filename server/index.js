@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
 import { Sequelize, Model, DataTypes } from "sequelize";
+import { cutVideoByTime } from "./video.js";
 
 const app = express();
 const port = 3005;
@@ -80,6 +81,10 @@ app.delete("/frames/:id", async (req, res) => {
 
 app.get("/video", async (req, res) => {
   const videoPath = `./public/Sousou_no_Frieren_S01E${req.query.episode || "01"}.mp4`;
+  if (!fs.existsSync(videoPath)) {
+    res.status(404).json({ message: "video not found" });
+    return;
+  }
   const videoStat = fs.statSync(videoPath);
   const videoSize = videoStat.size;
 
@@ -109,6 +114,29 @@ app.get("/video", async (req, res) => {
     const videoStream = fs.createReadStream(videoPath);
     videoStream.pipe(res);
   }
+});
+
+app.get("/video/:id", async (req, res) => {
+  const frame = await Frames.findByPk(req.params.id);
+
+  const inputFileName = `Sousou_no_Frieren_S01E${("0" + frame.episode).slice(-2)}.mp4`;
+  const basePath = `C:/Users/Administrator/Videos/${inputFileName}`;
+
+  const resultFileName = `S01E${("0" + frame.episode).slice(-2)}%${frame.startIndex}-${frame.endIndex}.mp4`;
+  const videoPath = `./public/${resultFileName}`;
+  if (!fs.existsSync(videoPath)) {
+    await cutVideoByTime(frame.start, frame.end, basePath, videoPath);
+  }
+  const videoStat = fs.statSync(videoPath);
+  const videoSize = videoStat.size;
+
+  const headers = {
+    "Content-Length": videoSize,
+    "Content-Type": "video/mp4",
+  };
+  res.writeHead(200, headers);
+  const videoStream = fs.createReadStream(videoPath);
+  videoStream.pipe(res);
 });
 
 app.listen(port, () => {

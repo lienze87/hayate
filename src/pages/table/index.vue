@@ -72,7 +72,11 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-dialog v-model="dialogVisible" title="视频预览" width="600">
+    <el-dialog
+      v-model="dialogVisible"
+      title="视频预览"
+      width="600"
+      destroy-on-close>
       <video controls width="568">
         <source :src="previewVideoUrl" type="video/mp4" />
       </video>
@@ -89,26 +93,26 @@
   const dataList = ref([]);
   const editId = ref("");
 
-  // 01:12+12 -> 1*60*24+12*24+12
-  // 1691 -> 01:10+11
+  // 00:01:12 -> 1*60+12
   function translateTime(param: string | number) {
     if (typeof param === "string") {
-      const reg = /^[0-9]{2}\:[0-9]{2}\+[0-9]{1,2}$/;
+      const reg = /^[0-9]{2}\:[0-9]{2}\:[0-9]{2}$/;
       if (!reg.test(param)) {
         throw new Error("格式错误");
       }
-      let minutes = parseInt(param.split(":")[0]) * 60 * 24;
-      let seconds = parseInt(param.split(":")[1].split("+")[0]) * 24;
-      let frames = parseInt(param.split(":")[1].split("+")[1]);
+      let hours = parseInt(param.split(":")[0]) * 60 * 60;
+      let minutes = parseInt(param.split(":")[1]) * 60;
+      let seconds = parseInt(param.split(":")[2]);
 
-      return minutes + seconds + frames;
+      return hours + minutes + seconds;
     }
 
     if (typeof param === "number") {
-      let minutes = Math.floor(param / (60 * 24));
-      let seconds = Math.floor((param % (60 * 24)) / 24);
-      let frames = param % 24;
-      return `${("0" + minutes).slice(-2)}:${("0" + seconds).slice(-2)}+${frames}`;
+      let hours = Math.floor(param / (60 * 60));
+      let minutes = Math.floor((param % 3600) / 60);
+      let seconds = Math.floor(param % 60);
+
+      return `${("0" + hours).slice(-2)}:${("0" + minutes).slice(-2)}:${("0" + seconds).slice(-2)}`;
     }
   }
 
@@ -136,7 +140,7 @@
   const handlePreviewData = (row: any) => {
     // const fileName = `Sousou_no_Frieren_S01E${("0" + row.episode).slice(-2)}.mp4`;
     // previewVideoUrl.value = `http://localhost:3005/${fileName}`;
-    previewVideoUrl.value = `http://localhost:3005/video?episode=${("0" + row.episode).slice(-2)}`;
+    previewVideoUrl.value = `http://localhost:3005/video/${row.id}`;
     dialogVisible.value = true;
   };
 
