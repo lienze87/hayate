@@ -53,7 +53,7 @@
           <span v-else>{{ scope.row.describe }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作">
+      <el-table-column label="操作" width="180">
         <template #default="scope">
           <el-button
             v-if="editId === scope.row.id"
@@ -61,12 +61,22 @@
             @click="handleConfirmData(scope.row)">
             确定
           </el-button>
-          <el-button v-else type="success" @click="handleEditData(scope.row)">
-            修改
-          </el-button>
+          <div v-else>
+            <el-button type="success" @click="handleEditData(scope.row)">
+              修改
+            </el-button>
+            <el-button type="primary" @click="handlePreviewData(scope.row)">
+              查看
+            </el-button>
+          </div>
         </template>
       </el-table-column>
     </el-table>
+    <el-dialog v-model="dialogVisible" title="视频预览" width="600">
+      <video controls width="568">
+        <source :src="previewVideoUrl" type="video/mp4" />
+      </video>
+    </el-dialog>
   </div>
 </template>
 
@@ -119,6 +129,15 @@
 
   const handleEditData = (row: any) => {
     editId.value = row.id;
+  };
+
+  const dialogVisible = ref(false);
+  const previewVideoUrl = ref("");
+  const handlePreviewData = (row: any) => {
+    // const fileName = `Sousou_no_Frieren_S01E${("0" + row.episode).slice(-2)}.mp4`;
+    // previewVideoUrl.value = `http://localhost:3005/${fileName}`;
+    previewVideoUrl.value = `http://localhost:3005/video?episode=${("0" + row.episode).slice(-2)}`;
+    dialogVisible.value = true;
   };
 
   const handleConfirmData = async (row: any) => {

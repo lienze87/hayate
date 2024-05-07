@@ -1,3 +1,4 @@
+import fs from "fs";
 import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
@@ -17,13 +18,17 @@ class Frames extends Model {}
 Frames.init(
   {
     uuid: DataTypes.STRING,
-    episode: DataTypes.NUMBER,
+    // uuid: {
+    //   type: DataTypes.UUID,
+    //   defaultValue: DataTypes.UUIDV4,
+    // },
+    episode: DataTypes.INTEGER,
     name: DataTypes.STRING,
     start: DataTypes.STRING,
-    startIndex: DataTypes.NUMBER,
+    startIndex: DataTypes.INTEGER,
     end: DataTypes.STRING,
-    endIndex: DataTypes.NUMBER,
-    frames: DataTypes.NUMBER,
+    endIndex: DataTypes.INTEGER,
+    frames: DataTypes.INTEGER,
     describe: DataTypes.STRING,
   },
   { sequelize, modelName: "frames" }
@@ -70,6 +75,39 @@ app.delete("/frames/:id", async (req, res) => {
     res.json({ message: "Frames deleted" });
   } else {
     res.status(404).json({ message: "Frames not found" });
+  }
+});
+
+app.get("/video", async (req, res) => {
+  const videoPath = `./public/Sousou_no_Frieren_S01E${req.query.episode || "01"}.mp4`;
+  const videoStat = fs.statSync(videoPath);
+  const videoSize = videoStat.size;
+
+  const videoRange = req.headers.range;
+  if (videoRange) {
+    const parts = videoRange.replace(/bytes=/, "").split("-");
+    const start = parseInt(parts[0], 10);
+    const end = parts[1] ? parseInt(parts[1], 10) : videoSize - 1;
+    const chunksize = end - start + 1;
+
+    const headers = {
+      "Content-Range": `bytes ${start}-${end}/${videoSize}`,
+      "Accept-Ranges": "bytes",
+      "Content-Length": chunksize,
+      "Content-Type": "video/mp4",
+    };
+    res.writeHead(206, headers);
+
+    const videoStream = fs.createReadStream(videoPath, { start, end });
+    videoStream.pipe(res);
+  } else {
+    const headers = {
+      "Content-Length": videoSize,
+      "Content-Type": "video/mp4",
+    };
+    res.writeHead(200, headers);
+    const videoStream = fs.createReadStream(videoPath);
+    videoStream.pipe(res);
   }
 });
 
