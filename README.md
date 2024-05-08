@@ -10,7 +10,7 @@
 
 # Server
 
-使用Express+Sequelize(a promise-based Node.js ORM tool)+sqlite3构建
+使用Express+[Sequelize](https://sequelize.org/docs/v6/)(a promise-based Node.js ORM tool)+sqlite3构建
 
 ## frames
 
