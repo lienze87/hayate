@@ -80,7 +80,9 @@ app.delete("/frames/:id", async (req, res) => {
 });
 
 app.get("/video", async (req, res) => {
-  const videoPath = `./public/Sousou_no_Frieren_S01E${req.query.episode || "01"}.mp4`;
+  const inputFileName = `Sousou_no_Frieren_S01E${("0" + req.query.episode || "01").slice(-2)}.mp4`;
+  const videoPath = `C:/Users/Administrator/Videos/${inputFileName}`;
+
   if (!fs.existsSync(videoPath)) {
     res.status(404).json({ message: "video not found" });
     return;
