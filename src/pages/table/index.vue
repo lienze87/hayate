@@ -77,9 +77,11 @@
       title="视频预览"
       width="600"
       destroy-on-close>
-      <video controls width="568">
+      <video ref="videoRef" controls width="568">
         <source :src="previewVideoUrl" type="video/mp4" />
       </video>
+      <p>{{ videoInfo }}</p>
+      <canvas ref="canvasRef" width="568" height="320"></canvas>
     </el-dialog>
   </div>
 </template>
@@ -137,12 +139,82 @@
 
   const dialogVisible = ref(false);
   const previewVideoUrl = ref("");
+  const videoRef = ref<HTMLVideoElement>();
+  const canvasRef = ref<HTMLCanvasElement>();
+  const videoInfo = ref("");
+  const frameList = ref([]);
+
   const handlePreviewData = (row: any) => {
-    // const fileName = `Sousou_no_Frieren_S01E${("0" + row.episode).slice(-2)}.mp4`;
-    // previewVideoUrl.value = `http://localhost:3005/${fileName}`;
     previewVideoUrl.value = `http://localhost:3005/video/${row.id}`;
     dialogVisible.value = true;
+    nextTick(() => {
+      handleVideoToCanvas();
+      // getFrameList();
+    });
   };
+
+  async function handleVideoToCanvas() {
+    const canvas = canvasRef.value;
+    const video = videoRef.value;
+    const ctx = canvas.getContext("2d");
+
+    // 每帧执行
+    if ("requestVideoFrameCallback" in HTMLVideoElement.prototype) {
+      let paintCount = 0;
+
+      const updateCanvas = async () => {
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const bitmap = await createImageBitmap(video);
+
+        frameList.value.push(bitmap);
+
+        videoInfo.value = `当前帧数: ${++paintCount}`;
+        // Re-register the callback to run on the next frame
+        video.requestVideoFrameCallback(updateCanvas);
+      };
+      video.requestVideoFrameCallback(updateCanvas);
+    } else {
+      video.addEventListener("timeupdate", () => {
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      });
+    }
+
+    video.play();
+    video.addEventListener("ended", () => {
+      console.log(frameList.value);
+    });
+  }
+
+  // 存在跨域问题
+  async function getFrameList() {
+    const video = videoRef.value;
+
+    if (window.MediaStreamTrackProcessor) {
+      await video.play();
+      const track = await video.captureStream().getVideoTracks()[0];
+      const processor = new MediaStreamTrackProcessor(track);
+      const reader = processor.readable.getReader();
+      readChunk();
+
+      function readChunk() {
+        reader
+          .read()
+          .then(async ({ done, value }: { done: boolean; value: any }) => {
+            if (value) {
+              const bitmap = await createImageBitmap(value);
+              frameList.value.push(bitmap);
+
+              value.close();
+            }
+            if (!done) {
+              readChunk();
+            }
+          });
+      }
+    } else {
+      console.error("your browser doesn't support this API yet");
+    }
+  }
 
   const handleConfirmData = async (row: any) => {
     try {

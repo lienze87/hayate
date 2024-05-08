@@ -38,11 +38,12 @@ Frames.init(
 // Sync models with database
 sequelize.sync();
 
+app.use(cors());
+
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 app.use(express.static("public"));
-app.use(cors());
 
 app.get("/frames", async (req, res) => {
   const frames = await Frames.findAll();
