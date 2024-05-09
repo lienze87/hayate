@@ -40,7 +40,12 @@ async function execCommand(command) {
 }
 
 // 按时间截取视频
-export async function cutVideoByTime(begin, end, inputFileName, outFileName) {
+export async function extractVideoByTime(
+  begin,
+  end,
+  inputFileName,
+  outFileName
+) {
   // 如果结果文件存在，就删除文件
   if (fs.existsSync(outFileName)) {
     fs.unlinkSync(outFileName);
@@ -58,7 +63,7 @@ export async function cutVideoByTime(begin, end, inputFileName, outFileName) {
 //    1          3          3 x 1/75 = 0.04
 //    2          6          6 x 1/75 = 0.08
 //    3          9          9 x 1/75 = 0.12
-function cutVideoByFrame(begin, end, inputFileName, outFileName) {
+function extractVideoByFrames(begin, end, inputFileName, outFileName) {
   // 如果结果文件存在，就删除文件
   if (fs.existsSync(outFileName)) {
     fs.unlinkSync(outFileName);
@@ -69,9 +74,17 @@ function cutVideoByFrame(begin, end, inputFileName, outFileName) {
   );
 }
 
-// // 由视频导出指定帧图片
-export function exportVideoToImage(fileName) {
+// 由视频导出指定范围帧图片
+export function extractImageByFrames(begin, end, inputFileName, outFolderName) {
+  // select="between(t\\,2\\,5)" 选择第2-5秒
+  // select="between(n\\,2\\,5)" 选择第2-5帧
+  // select="eq(n\\,100)+eq(n\\,184)" 导出指定的第100帧和第184帧
+
+  if (!fs.existsSync(outFolderName)) {
+    fs.mkdirSync(outFolderName);
+  }
+
   execCommand(
-    `ffmpeg -i ${fileName} -vf select="between(t\\,2\\,5)" -vsync 0 ./public/${fileName.split(".mp4")[0]}-image%2d.png`
+    `ffmpeg -i ${inputFileName} -vf select="between(n\\,${begin}\\,${end})" -frame_pts 1 -vsync 0 ${outFolderName}/frames%d.png`
   );
 }

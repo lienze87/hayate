@@ -3,7 +3,7 @@ import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
 import { Sequelize, Model, DataTypes } from "sequelize";
-import { cutVideoByTime } from "./video.js";
+import { extractVideoByTime } from "./video.js";
 
 const app = express();
 const port = 3005;
@@ -128,7 +128,7 @@ app.get("/video/:id", async (req, res) => {
   const resultFileName = `S01E${("0" + frame.episode).slice(-2)}%${frame.startIndex}-${frame.endIndex}.mp4`;
   const videoPath = `./public/${resultFileName}`;
   if (!fs.existsSync(videoPath)) {
-    await cutVideoByTime(frame.start, frame.end, basePath, videoPath);
+    await extractVideoByTime(frame.start, frame.end, basePath, videoPath);
   }
   const videoStat = fs.statSync(videoPath);
   const videoSize = videoStat.size;
