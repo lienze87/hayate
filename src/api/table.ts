@@ -31,3 +31,23 @@ export function deleteData(id: string) {
     url: `/frames/${id}`,
   });
 }
+
+export function addDataImage(params: any) {
+  return request.post<any>({
+    url: "/images",
+    data: params,
+  });
+}
+
+export function updateDataImage(params: any) {
+  return request.put<any>({
+    url: `/images/${params.id}`,
+    data: params,
+  });
+}
+
+export function getDataImageDetail(id: string) {
+  return request.get<any>({
+    url: `/images/${id}`,
+  });
+}

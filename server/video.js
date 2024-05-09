@@ -12,6 +12,20 @@ function printProgress(string) {
   process.stdout.write(string);
 }
 
+function emptyDir(filePath) {
+  const files = fs.readdirSync(filePath); //读取该文件夹
+  files.forEach((file) => {
+    const nextFilePath = `${filePath}/${file}`;
+    const states = fs.statSync(nextFilePath);
+    if (states.isDirectory()) {
+      emptyDir(nextFilePath);
+    } else {
+      fs.unlinkSync(nextFilePath);
+      console.log(`删除文件 ${nextFilePath} 成功`);
+    }
+  });
+}
+
 async function execCommand(command) {
   let count = 0;
   const timer = setInterval(() => {
@@ -75,16 +89,23 @@ function extractVideoByFrames(begin, end, inputFileName, outFileName) {
 }
 
 // 由视频导出指定范围帧图片
-export function extractImageByFrames(begin, end, inputFileName, outFolderName) {
+export async function extractImageByFrames(
+  begin,
+  end,
+  inputFileName,
+  outFolderName
+) {
   // select="between(t\\,2\\,5)" 选择第2-5秒
   // select="between(n\\,2\\,5)" 选择第2-5帧
   // select="eq(n\\,100)+eq(n\\,184)" 导出指定的第100帧和第184帧
 
-  if (!fs.existsSync(outFolderName)) {
+  if (fs.existsSync(outFolderName)) {
+    emptyDir(outFolderName);
+  } else {
     fs.mkdirSync(outFolderName);
   }
 
-  execCommand(
-    `ffmpeg -i ${inputFileName} -vf select="between(n\\,${begin}\\,${end})" -frame_pts 1 -vsync 0 ${outFolderName}/frames%d.png`
+  await execCommand(
+    `ffmpeg -i ${inputFileName} -vf select="between(n\\,${begin}\\,${end})" -frame_pts 1 -vsync 0 ${outFolderName}/frames%2d.png`
   );
 }

@@ -3,7 +3,7 @@ import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
 import { Sequelize, Model, DataTypes } from "sequelize";
-import { extractVideoByTime } from "./video.js";
+import { extractVideoByTime, extractImageByFrames } from "./video.js";
 
 const app = express();
 const port = 3005;
@@ -35,6 +35,23 @@ Frames.init(
   { sequelize, modelName: "frames" }
 );
 
+class Images extends Model {}
+Images.init(
+  {
+    uuid: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+    },
+    parentId: DataTypes.INTEGER,
+    folderPath: DataTypes.STRING,
+    videoPath: DataTypes.STRING,
+    begin: DataTypes.INTEGER,
+    end: DataTypes.INTEGER,
+    describe: DataTypes.STRING,
+  },
+  { sequelize, modelName: "images" }
+);
+
 // Sync models with database
 sequelize.sync();
 
@@ -52,7 +69,13 @@ app.get("/frames", async (req, res) => {
 
 app.get("/frames/:id", async (req, res) => {
   const frame = await Frames.findByPk(req.params.id);
-  res.json(frame);
+  const imagesList = await Images.findAll({
+    attributes: ["id", "uuid", "parentId", "begin", "end", "describe"],
+    where: {
+      parentId: frame.id,
+    },
+  });
+  res.json({ ...frame.dataValues, imagesList });
 });
 
 app.post("/frames", async (req, res) => {
@@ -125,11 +148,12 @@ app.get("/video/:id", async (req, res) => {
   const inputFileName = `Sousou_no_Frieren_S01E${("0" + frame.episode).slice(-2)}.mp4`;
   const basePath = `C:/Users/Administrator/Videos/${inputFileName}`;
 
-  const resultFileName = `S01E${("0" + frame.episode).slice(-2)}%${frame.startIndex}-${frame.endIndex}.mp4`;
+  const resultFileName = `S01E${("0" + frame.episode).slice(-2)}-${frame.startIndex}-${frame.endIndex}.mp4`;
   const videoPath = `./public/${resultFileName}`;
   if (!fs.existsSync(videoPath)) {
     await extractVideoByTime(frame.start, frame.end, basePath, videoPath);
   }
+
   const videoStat = fs.statSync(videoPath);
   const videoSize = videoStat.size;
 
@@ -142,6 +166,65 @@ app.get("/video/:id", async (req, res) => {
   videoStream.pipe(res);
 });
 
+app.get("/images/:id", async (req, res) => {
+  const images = await Images.findByPk(req.params.id);
+  if (images) {
+    const filePath = images.folderPath;
+    const fileList = fs
+      .readdirSync(filePath)
+      .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+      .map((file) => {
+        return `${filePath}/${file}`;
+      });
+
+    res.json(fileList);
+  } else {
+    res.status(404).json({ message: "Images not found" });
+  }
+});
+
+app.post("/images", async (req, res) => {
+  const frame = await Frames.findByPk(req.body.parentId);
+
+  const resultFileName = `S01E${("0" + frame.episode).slice(-2)}-${frame.startIndex}-${frame.endIndex}`;
+  const videoPath = `./public/${resultFileName}.mp4`;
+
+  const folderPath = `./public/${resultFileName}`;
+  await extractImageByFrames(
+    req.body.begin,
+    req.body.end,
+    videoPath,
+    folderPath
+  );
+  await Images.create({
+    parentId: req.body.parentId,
+    folderPath: folderPath,
+    videoPath: videoPath,
+    begin: req.body.begin,
+    end: req.body.end,
+    describe: req.body.describe,
+  });
+  res.json({ message: "success" });
+});
+
+app.put("/images/:id", async (req, res) => {
+  const images = await Images.findByPk(req.params.id);
+  if (images) {
+    if (images.begin !== req.body.begin || images.end !== req.body.end) {
+      await extractImageByFrames(
+        req.body.begin,
+        req.body.end,
+        images.videoPath,
+        images.folderPath
+      );
+    }
+    await images.update(req.body);
+    res.json(images);
+  } else {
+    res.status(404).json({ message: "Images not found" });
+  }
+});
+
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
+  console.log(`Example app listening on: http://localhost:${port}`);
 });
