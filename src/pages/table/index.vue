@@ -7,7 +7,7 @@
       <el-table-column type="index" width="50" />
       <el-table-column prop="episode" label="集数">
         <template #default="scope">
-          <div v-if="editId === scope.row.id">
+          <div v-if="editId === scope.row.uuid">
             <el-input v-model="scope.row.episode"></el-input>
           </div>
           <span v-else>{{ scope.row.episode }}</span>
@@ -15,7 +15,7 @@
       </el-table-column>
       <el-table-column prop="name" label="名称">
         <template #default="scope">
-          <div v-if="editId === scope.row.id">
+          <div v-if="editId === scope.row.uuid">
             <el-input v-model="scope.row.name"></el-input>
           </div>
           <span v-else>{{ scope.row.name }}</span>
@@ -23,7 +23,7 @@
       </el-table-column>
       <el-table-column prop="start" label="起始帧">
         <template #default="scope">
-          <div v-if="editId === scope.row.id">
+          <div v-if="editId === scope.row.uuid">
             <el-input v-model="scope.row.start"></el-input>
           </div>
           <span v-else>{{ scope.row.start }}</span>
@@ -31,7 +31,7 @@
       </el-table-column>
       <el-table-column prop="end" label="结束帧">
         <template #default="scope">
-          <div v-if="editId === scope.row.id">
+          <div v-if="editId === scope.row.uuid">
             <el-input v-model="scope.row.end"></el-input>
           </div>
           <span v-else>{{ scope.row.end }}</span>
@@ -39,7 +39,7 @@
       </el-table-column>
       <el-table-column prop="frames" label="帧数">
         <template #default="scope">
-          <div v-if="editId === scope.row.id">
+          <div v-if="editId === scope.row.uuid">
             <el-input v-model="scope.row.frames"></el-input>
           </div>
           <span v-else>{{ scope.row.frames }}</span>
@@ -47,16 +47,16 @@
       </el-table-column>
       <el-table-column prop="describe" label="描述">
         <template #default="scope">
-          <div v-if="editId === scope.row.id">
+          <div v-if="editId === scope.row.uuid">
             <el-input v-model="scope.row.describe"></el-input>
           </div>
           <span v-else>{{ scope.row.describe }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="180">
+      <el-table-column label="操作" width="250">
         <template #default="scope">
           <el-button
-            v-if="editId === scope.row.id"
+            v-if="editId === scope.row.uuid"
             type="primary"
             @click="handleConfirmData(scope.row)">
             确定
@@ -68,20 +68,81 @@
             <el-button type="primary" @click="handlePreviewData(scope.row)">
               查看
             </el-button>
+            <el-button type="primary" @click="handleExtractData(scope.row)">
+              截取
+            </el-button>
           </div>
         </template>
       </el-table-column>
     </el-table>
     <el-dialog
-      v-model="dialogVisible"
+      v-model="videoDialogVisible"
       title="视频预览"
       width="600"
       destroy-on-close>
-      <video ref="videoRef" controls width="568">
-        <source :src="previewVideoUrl" type="video/mp4" />
-      </video>
-      <p>{{ videoInfo }}</p>
-      <canvas ref="canvasRef" width="568" height="320"></canvas>
+      <div class="dialog-container">
+        <el-collapse v-model="videoDialogActiveNames">
+          <el-collapse-item title="视频" name="video">
+            <div class="dialog-video">
+              <video ref="videoRef" controls width="568">
+                <source :src="previewVideoUrl" type="video/mp4" />
+              </video>
+            </div>
+          </el-collapse-item>
+          <el-collapse-item title="画板" name="canvas">
+            <div class="dialog-canvas">
+              <span>当前帧数:</span>
+              <el-input-number
+                v-model="videoInfo.currentFrame"
+                :min="0"
+                :max="videoInfo.framesCount"
+                :step="1"
+                @change="handleFrameChange"></el-input-number>
+              <span>/{{ videoInfo.framesCount }}</span>
+            </div>
+            <el-divider />
+            <canvas ref="canvasRef" width="568" height="320"></canvas>
+          </el-collapse-item>
+        </el-collapse>
+      </div>
+    </el-dialog>
+    <el-dialog
+      v-model="imageDialogVisible"
+      title="图像预览"
+      width="600"
+      destroy-on-close>
+      <div class="dialog-container">
+        <div class="dialog-form">
+          <el-form :inline="true" :model="imageData" class="form-inline">
+            <el-form-item label="起始帧">
+              <el-input-number
+                v-model="imageData.begin"
+                :step="1"></el-input-number>
+            </el-form-item>
+            <el-form-item label="结束帧">
+              <el-input-number
+                v-model="imageData.end"
+                :step="1"></el-input-number>
+            </el-form-item>
+            <el-form-item label="描述">
+              <el-input v-model="imageData.describe"></el-input>
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" @click="handleSubmitImage"
+                >提交</el-button
+              >
+            </el-form-item>
+          </el-form>
+        </div>
+        <el-divider />
+        <div class="dialog-images">
+          <el-image
+            :src="imageList[0]"
+            :preview-src-list="imageList"
+            style="margin-right: 10px; width: 100px"
+            fit="contain" />
+        </div>
+      </div>
     </el-dialog>
   </div>
 </template>
@@ -89,7 +150,15 @@
 <script lang="ts" setup>
   import { ref, onMounted, nextTick } from "vue";
   import { ElMessage } from "element-plus";
-  import { getDataList, addData, updateData } from "@/api/table";
+  import {
+    getDataList,
+    getDataDetail,
+    addData,
+    updateData,
+    addDataImage,
+    updateDataImage,
+    getDataImageDetail,
+  } from "@/api/table";
   import { randomHex } from "@/utils";
 
   const dataList = ref([]);
@@ -123,8 +192,8 @@
       uuid: "0",
       episode: 1,
       name: "",
-      start: "0",
-      end: "0",
+      start: "00:00:00",
+      end: "00:00:00",
       frames: 0,
       describe: "",
     });
@@ -134,19 +203,21 @@
   };
 
   const handleEditData = (row: any) => {
-    editId.value = row.id;
+    editId.value = row.uuid;
   };
 
-  const dialogVisible = ref(false);
+  const videoDialogVisible = ref(false);
+  const videoDialogActiveNames = ref("video");
   const previewVideoUrl = ref("");
   const videoRef = ref<HTMLVideoElement>();
   const canvasRef = ref<HTMLCanvasElement>();
-  const videoInfo = ref("");
+  const videoInfo = ref({ framesCount: 0, currentFrame: 0 });
+
   const frameList = ref([]);
 
   const handlePreviewData = (row: any) => {
     previewVideoUrl.value = `http://localhost:3005/video/${row.id}`;
-    dialogVisible.value = true;
+    videoDialogVisible.value = true;
     nextTick(() => {
       handleVideoToCanvas();
       // getFrameList();
@@ -168,7 +239,7 @@
 
         frameList.value.push(bitmap);
 
-        videoInfo.value = `当前帧数: ${++paintCount}`;
+        videoInfo.value.framesCount = ++paintCount;
         // Re-register the callback to run on the next frame
         video.requestVideoFrameCallback(updateCanvas);
       };
@@ -185,13 +256,31 @@
     });
   }
 
+  const handleFrameChange = () => {
+    const canvas = canvasRef.value;
+    const ctx = canvas.getContext("2d");
+    if (videoInfo.value.framesCount === 0) {
+    }
+    if (frameList.value[videoInfo.value.currentFrame]) {
+      ctx.drawImage(
+        frameList.value[videoInfo.value.currentFrame],
+        0,
+        0,
+        canvas.width,
+        canvas.height
+      );
+    }
+  };
+
   // 存在跨域问题
   async function getFrameList() {
     const video = videoRef.value;
-
+    // @ts-ignore
     if (window.MediaStreamTrackProcessor) {
       await video.play();
+      // @ts-ignore
       const track = await video.captureStream().getVideoTracks()[0];
+      // @ts-ignore
       const processor = new MediaStreamTrackProcessor(track);
       const reader = processor.readable.getReader();
       readChunk();
@@ -215,6 +304,52 @@
       console.error("your browser doesn't support this API yet");
     }
   }
+
+  const imageDialogVisible = ref(false);
+  const imageList = ref([]);
+  const imageData = ref({
+    uuid: "0",
+    parentId: 0,
+    begin: 0,
+    end: 1,
+    describe: "",
+  });
+
+  const handleExtractData = async (row: any) => {
+    try {
+      const result = await getDataDetail(row.id);
+      imageData.value.parentId = row.id;
+      const images = result.imagesList.length > 0 ? result.imagesList[0] : {};
+
+      if (images) {
+        imageData.value = images;
+        let pathResult = await getDataImageDetail(images.id);
+        imageList.value = pathResult.map(
+          (ele: string) =>
+            `http://localhost:3005/${ele.replace("./public/", "")}`
+        );
+      }
+
+      imageDialogVisible.value = true;
+    } catch (e) {
+      ElMessage.error(e.message);
+    }
+  };
+  const handleSubmitImage = async () => {
+    try {
+      if (imageData.value.uuid === "0") {
+        await addDataImage(imageData.value);
+        ElMessage.success("新增成功");
+      } else {
+        await updateDataImage(imageData.value);
+        ElMessage.success("更新成功");
+      }
+
+      imageDialogVisible.value = false;
+    } catch (e) {
+      ElMessage.error(e.message);
+    }
+  };
 
   const handleConfirmData = async (row: any) => {
     try {
@@ -263,5 +398,15 @@
     align-items: flex-start;
     width: 100%;
     height: calc(100vh - 100px);
+  }
+  .dialog-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  .dialog-images {
+    max-height: 250px;
+    overflow-y: auto;
   }
 </style>
