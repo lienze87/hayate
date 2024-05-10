@@ -309,7 +309,7 @@
   const imageList = ref([]);
   const imageData = ref({
     uuid: "0",
-    parentId: 0,
+    frameId: 0,
     begin: 0,
     end: 1,
     describe: "",
@@ -318,8 +318,8 @@
   const handleExtractData = async (row: any) => {
     try {
       const result = await getDataDetail(row.id);
-      imageData.value.parentId = row.id;
-      const images = result.imagesList.length > 0 ? result.imagesList[0] : {};
+      imageData.value.frameId = row.id;
+      const images = result.images.length > 0 ? result.images[0] : null;
 
       if (images) {
         imageData.value = images;

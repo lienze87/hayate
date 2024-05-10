@@ -42,7 +42,6 @@ Images.init(
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
     },
-    parentId: DataTypes.INTEGER,
     folderPath: DataTypes.STRING,
     videoPath: DataTypes.STRING,
     begin: DataTypes.INTEGER,
@@ -51,6 +50,11 @@ Images.init(
   },
   { sequelize, modelName: "images" }
 );
+
+// 关系一对多
+Frames.hasMany(Images);
+// 自动插入外键 frameId
+Images.belongsTo(Frames);
 
 // Sync models with database
 sequelize.sync();
@@ -63,19 +67,23 @@ app.use(bodyParser.json());
 app.use(express.static("public"));
 
 app.get("/frames", async (req, res) => {
-  const frames = await Frames.findAll();
+  const frames = await Frames.findAll({
+    include: { model: Images },
+  });
   res.json(frames);
 });
 
 app.get("/frames/:id", async (req, res) => {
   const frame = await Frames.findByPk(req.params.id);
-  const imagesList = await Images.findAll({
-    attributes: ["id", "uuid", "parentId", "begin", "end", "describe"],
-    where: {
-      parentId: frame.id,
-    },
-  });
-  res.json({ ...frame.dataValues, imagesList });
+  // const imagesList = await Images.findAll({
+  //   attributes: ["id", "uuid", "frameId", "begin", "end", "describe"],
+  //   where: {
+  //     frameId: frame.id,
+  //   },
+  // });
+  // getImages为sequelize自动生成的方法
+  const images = await frame.getImages();
+  res.json({ ...frame.dataValues, images });
 });
 
 app.post("/frames", async (req, res) => {
@@ -184,7 +192,7 @@ app.get("/images/:id", async (req, res) => {
 });
 
 app.post("/images", async (req, res) => {
-  const frame = await Frames.findByPk(req.body.parentId);
+  const frame = await Frames.findByPk(req.body.frameId);
 
   const resultFileName = `S01E${("0" + frame.episode).slice(-2)}-${frame.startIndex}-${frame.endIndex}`;
   const videoPath = `./public/${resultFileName}.mp4`;
@@ -197,7 +205,7 @@ app.post("/images", async (req, res) => {
     folderPath
   );
   await Images.create({
-    parentId: req.body.parentId,
+    frameId: req.body.frameId,
     folderPath: folderPath,
     videoPath: videoPath,
     begin: req.body.begin,
