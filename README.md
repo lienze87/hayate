@@ -52,3 +52,13 @@ Frames.init(
 | ----------------- | ------ | ---------------------------- |
 | /video?episode=01 | get    | 查询完整视频                 |
 | /video/:id        | get    | 查询id对应的frames的截取视频 |
+
+## images
+
+#### 路由表
+
+| Path        | Method | Describe         |
+| ----------- | ------ | ---------------- |
+| /images/:id | get    | 查询图片帧组信息 |
+| /images     | post   | 新增图片帧组     |
+| /images/:id | put    | 更新图片帧组     |
