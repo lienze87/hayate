@@ -12,6 +12,10 @@
 # Server
 
 使用Express+[Sequelize](https://sequelize.org/docs/v6/)(a promise-based Node.js ORM tool)+sqlite3构建
+```bash
+ cd .\server\
+ yarn dev
+```
 
 ## frames
 
