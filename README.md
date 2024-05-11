@@ -6,7 +6,8 @@
 
 - [Echarts图表配置](./src/pages/charts/index.vue)
 - [canvas绘制](./src/pages/board/index.vue)
-- [视频截取](./src/pages/table/index.vue)
+- [视频截取](./src/pages/video/index.vue)
+- [笔记](./src/pages/note/index.vue)
 
 # Server
 
@@ -20,7 +21,11 @@
 class Frames extends Model {}
 Frames.init(
   {
-    uuid: DataTypes.STRING,
+    uuid: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      allowNull: false,
+    },
     episode: DataTypes.INTEGER,
     name: DataTypes.STRING,
     start: DataTypes.STRING,
@@ -62,3 +67,15 @@ Frames.init(
 | /images/:id | get    | 查询图片帧组信息 |
 | /images     | post   | 新增图片帧组     |
 | /images/:id | put    | 更新图片帧组     |
+
+## notes
+
+#### 路由表
+
+| Path       | Method | Describe |
+| ---------- | ------ | -------- |
+| /notes     | get    | 查询列表 |
+| /notes/:id | get    | 查询详情 |
+| /notes     | post   | 新增数据 |
+| /notes/:id | put    | 更新数据 |
+| /notes/:id | delete | 删除数据 |
