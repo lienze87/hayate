@@ -1,7 +1,8 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Layout from "@/layouts/index.vue";
+import type { RouteRecordRaw } from "vue-router";
 
-const routeList = [
+const routeList: RouteRecordRaw[] = [
   {
     path: "/",
     name: "Home",
@@ -42,6 +43,12 @@ const routeList = [
         },
       },
     ],
+  },
+  {
+    path: "/background",
+    name: "Background",
+    component: () => import("@/pages/backgroundColor/index.vue"),
+    meta: { title: "背景板" },
   },
 ];
 
