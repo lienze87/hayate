@@ -16,13 +16,15 @@ const sequelize = new Sequelize({
 
 // Define Frames model
 class Frames extends Model {}
+// 第二个参数可以传入{ sequelize, paranoid: true, modelName: "frames" }
+// paranoid：true表示软删除
 Frames.init(
   {
-    uuid: DataTypes.STRING,
-    // uuid: {
-    //   type: DataTypes.UUID,
-    //   defaultValue: DataTypes.UUIDV4,
-    // },
+    uuid: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      allowNull: false,
+    },
     episode: DataTypes.INTEGER,
     name: DataTypes.STRING,
     start: DataTypes.STRING,
@@ -41,6 +43,7 @@ Images.init(
     uuid: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
+      allowNull: false,
     },
     folderPath: DataTypes.STRING,
     videoPath: DataTypes.STRING,
@@ -55,6 +58,22 @@ Images.init(
 Frames.hasMany(Images);
 // 自动插入外键 frameId
 Images.belongsTo(Frames);
+
+class Notes extends Model {}
+Notes.init(
+  {
+    uuid: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      allowNull: false,
+    },
+    title: DataTypes.STRING,
+    subtitle: DataTypes.STRING,
+    context: DataTypes.TEXT,
+    describe: DataTypes.STRING,
+  },
+  { sequelize, modelName: "notes" }
+);
 
 // Sync models with database
 sequelize.sync();
@@ -230,6 +249,42 @@ app.put("/images/:id", async (req, res) => {
     res.json(images);
   } else {
     res.status(404).json({ message: "Images not found" });
+  }
+});
+
+app.get("/notes", async (req, res) => {
+  const notes = await Notes.findAll();
+  res.json(notes);
+});
+
+app.get("/notes/:id", async (req, res) => {
+  const note = await Frames.findByPk(req.params.id);
+
+  res.json(note);
+});
+
+app.post("/notes", async (req, res) => {
+  const note = await Notes.create(req.body);
+  res.json(note);
+});
+
+app.put("/notes/:id", async (req, res) => {
+  const note = await Notes.findByPk(req.params.id);
+  if (note) {
+    await note.update(req.body);
+    res.json(note);
+  } else {
+    res.status(404).json({ message: "Notes not found" });
+  }
+});
+
+app.delete("/notes/:id", async (req, res) => {
+  const note = await Notes.findByPk(req.params.id);
+  if (note) {
+    await note.destroy();
+    res.json({ message: "Notes deleted" });
+  } else {
+    res.status(404).json({ message: "Notes not found" });
   }
 });
 
