@@ -26,11 +26,11 @@ const routeList = [
         },
       },
       {
-        path: "/table",
-        name: "Table",
-        component: () => import("@/pages/table/index.vue"),
+        path: "/video",
+        name: "Video",
+        component: () => import("@/pages/video/index.vue"),
         meta: {
-          title: "表格",
+          title: "视频",
         },
       },
       {

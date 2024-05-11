@@ -1,7 +1,7 @@
 <template>
   <div class="main-content">
     <div class="action_bar">
-      <el-button type="primary" @click="handleAddData">新增</el-button>
+      <el-button type="primary" plain @click="handleAddData">新增</el-button>
     </div>
     <el-table :data="dataList">
       <el-table-column type="index" width="50" />
@@ -66,9 +66,9 @@
               修改
             </el-button>
             <el-button type="primary" @click="handlePreviewData(scope.row)">
-              查看
+              详情
             </el-button>
-            <el-button type="primary" @click="handleExtractData(scope.row)">
+            <el-button type="warning" @click="handleExtractData(scope.row)">
               截取
             </el-button>
           </div>
@@ -128,9 +128,9 @@
               <el-input v-model="imageData.describe"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="handleSubmitImage"
-                >提交</el-button
-              >
+              <el-button type="primary" @click="handleSubmitImage">
+                提交
+              </el-button>
             </el-form-item>
           </el-form>
         </div>
@@ -158,7 +158,7 @@
     addDataImage,
     updateDataImage,
     getDataImageDetail,
-  } from "@/api/table";
+  } from "@/api/video";
   import { randomHex } from "@/utils";
 
   const dataList = ref([]);
@@ -338,7 +338,7 @@
   const handleSubmitImage = async () => {
     try {
       if (imageData.value.uuid === "0") {
-        await addDataImage(imageData.value);
+        await addDataImage({ ...imageData.value, uuid: undefined });
         ElMessage.success("新增成功");
       } else {
         await updateDataImage(imageData.value);
@@ -357,10 +357,9 @@
         ...row,
         startIndex: row.start ? translateTime(row.start) : 0,
         endIndex: row.end ? translateTime(row.end) : 0,
-        uuid: randomHex(),
       };
       if (row.uuid === "0") {
-        await addData(data);
+        await addData({ ...data, uuid: undefined });
         ElMessage.success("新增成功");
       } else {
         await updateData(data);

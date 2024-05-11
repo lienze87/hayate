@@ -25,8 +25,8 @@
       path: "/board",
     },
     {
-      name: "表格",
-      path: "/table",
+      name: "视频",
+      path: "/video",
     },
     {
       name: "笔记",
