@@ -76,8 +76,8 @@ Notes.init(
 );
 
 // Sync models with database
-// sequelize.sync({ alter: true }); // 在原基础上更新
-sequelize.sync({ force: true }); // 删除再更新
+sequelize.sync({ alter: true }); // 在原基础上更新
+// sequelize.sync({ force: true }); // 删除再更新
 
 app.use(cors());
 
