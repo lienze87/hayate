@@ -45,17 +45,15 @@
       <div class="content-item" v-for="row in dataList" :key="row.uuid">
         <el-card>
           <template #header>
-            <div v-if="editId === row.uuid">
-              <div class="form-item">
-                <el-input
-                  v-model="editFormData.title"
-                  placeholder="请输入"
-                  clearable />
-              </div>
+            <div v-if="editId === row.uuid" class="form-item">
+              <el-input
+                v-model="editFormData.title"
+                placeholder="请输入"
+                clearable />
             </div>
             <div class="form-inline-block" v-else>
-              <h4>{{ row.title }}</h4>
-              <div>
+              <div class="card-item-title">{{ row.title }}</div>
+              <div class="card-item-header">
                 <el-button type="success" @click="handleEditFormData(row)">
                   修改
                 </el-button>
@@ -65,7 +63,7 @@
               </div>
             </div>
           </template>
-          <div v-if="editId === row.uuid">
+          <div class="card-item-content" v-if="editId === row.uuid">
             <div class="form-item">
               <el-input
                 v-model="editFormData.context"
@@ -90,7 +88,7 @@
               </div>
             </div>
           </div>
-          <div v-else>
+          <div class="card-item-content" v-else>
             <p>{{ row.context }}</p>
           </div>
         </el-card>
@@ -215,5 +213,10 @@
     display: flex;
     justify-content: space-between;
     width: 100%;
+  }
+
+  .card-item-title {
+    font-size: 24px;
+    font-weight: 500;
   }
 </style>
