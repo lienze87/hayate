@@ -25,7 +25,7 @@ Frames.init(
       defaultValue: DataTypes.UUIDV4,
       allowNull: false,
     },
-    episode: DataTypes.INTEGER,
+    sourceName: DataTypes.STRING,
     name: DataTypes.STRING,
     start: DataTypes.STRING,
     startIndex: DataTypes.INTEGER,
@@ -76,7 +76,8 @@ Notes.init(
 );
 
 // Sync models with database
-sequelize.sync();
+// sequelize.sync({ alter: true }); // 在原基础上更新
+sequelize.sync({ force: true }); // 删除再更新
 
 app.use(cors());
 
@@ -131,8 +132,7 @@ app.delete("/frames/:id", async (req, res) => {
 });
 
 app.get("/video", async (req, res) => {
-  const inputFileName = `Sousou_no_Frieren_S01E${("0" + req.query.episode || "01").slice(-2)}.mp4`;
-  const videoPath = `C:/Users/Administrator/Videos/${inputFileName}`;
+  const videoPath = `C:/Users/Administrator/Videos/${req.query.fileName}`;
 
   if (!fs.existsSync(videoPath)) {
     res.status(404).json({ message: "video not found" });
@@ -172,10 +172,9 @@ app.get("/video", async (req, res) => {
 app.get("/video/:id", async (req, res) => {
   const frame = await Frames.findByPk(req.params.id);
 
-  const inputFileName = `Sousou_no_Frieren_S01E${("0" + frame.episode).slice(-2)}.mp4`;
-  const basePath = `C:/Users/Administrator/Videos/${inputFileName}`;
+  const basePath = `C:/Users/Administrator/Videos/${frame.sourceName}`;
 
-  const resultFileName = `S01E${("0" + frame.episode).slice(-2)}-${frame.startIndex}-${frame.endIndex}.mp4`;
+  const resultFileName = `${frame.sourceName.split(".mp4")[0]}-${frame.startIndex}-${frame.endIndex}.mp4`;
   const videoPath = `./public/${resultFileName}`;
   if (!fs.existsSync(videoPath)) {
     await extractVideoByTime(frame.start, frame.end, basePath, videoPath);
@@ -213,7 +212,7 @@ app.get("/images/:id", async (req, res) => {
 app.post("/images", async (req, res) => {
   const frame = await Frames.findByPk(req.body.frameId);
 
-  const resultFileName = `S01E${("0" + frame.episode).slice(-2)}-${frame.startIndex}-${frame.endIndex}`;
+  const resultFileName = `${frame.sourceName.split(".mp4")[0]}-${frame.startIndex}-${frame.endIndex}`;
   const videoPath = `./public/${resultFileName}.mp4`;
 
   const folderPath = `./public/${resultFileName}`;

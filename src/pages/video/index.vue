@@ -5,12 +5,12 @@
     </div>
     <el-table :data="dataList">
       <el-table-column type="index" width="50" />
-      <el-table-column prop="episode" label="集数">
+      <el-table-column prop="sourceName" label="源文件">
         <template #default="scope">
           <div v-if="editId === scope.row.uuid">
-            <el-input v-model="scope.row.episode"></el-input>
+            <el-input v-model="scope.row.sourceName"></el-input>
           </div>
-          <span v-else>{{ scope.row.episode }}</span>
+          <span v-else>{{ scope.row.sourceName }}</span>
         </template>
       </el-table-column>
       <el-table-column prop="name" label="名称">
@@ -89,7 +89,7 @@
               </video>
             </div>
           </el-collapse-item>
-          <el-collapse-item title="画板" name="canvas">
+          <el-collapse-item title="分帧查看" name="canvas">
             <div class="dialog-canvas">
               <span>当前帧数:</span>
               <el-input-number
@@ -190,7 +190,7 @@
   const handleAddData = () => {
     dataList.value.push({
       uuid: "0",
-      episode: 1,
+      sourceName: "",
       name: "",
       start: "00:00:00",
       end: "00:00:00",
@@ -252,7 +252,7 @@
 
     video.play();
     video.addEventListener("ended", () => {
-      console.log(frameList.value);
+      console.log("累计帧数：" + frameList.value.length);
     });
   }
 
@@ -403,6 +403,9 @@
     flex-direction: column;
     justify-content: space-between;
     align-items: flex-start;
+    .el-collapse {
+      width: 100%;
+    }
   }
   .dialog-images {
     max-height: 250px;
