@@ -2,14 +2,36 @@
   <div class="page-header">
     <div class="header-title">Vue</div>
     <div class="header-nav">
-      <el-link href="/background" type="primary" target="_blank">
-        纯色背景
-      </el-link>
+      <el-dropdown trigger="click">
+        <span class="el-dropdown-link">
+          Page List
+          <el-icon class="el-icon--right"><arrow-down /></el-icon>
+        </span>
+        <template #dropdown>
+          <el-dropdown-menu>
+            <el-dropdown-item v-for="item in menuList" :key="item.path">
+              <el-link :href="item.path" type="primary" target="_blank">
+                {{ item.name }} {{ item.path }}
+              </el-link>
+            </el-dropdown-item>
+          </el-dropdown-menu>
+        </template>
+      </el-dropdown>
     </div>
   </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+  import { ref } from "vue";
+  import { ArrowDown } from "@element-plus/icons-vue";
+
+  const menuList = ref([
+    {
+      name: "纯色背景",
+      path: "/background",
+    },
+  ]);
+</script>
 <style scoped>
   .page-header {
     display: flex;
@@ -24,5 +46,11 @@
   }
   .header-nav {
     display: flex;
+  }
+  .el-dropdown-link {
+    cursor: pointer;
+    color: var(--el-color-primary);
+    display: flex;
+    align-items: center;
   }
 </style>
