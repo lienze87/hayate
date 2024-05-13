@@ -108,7 +108,15 @@
             <div v-else class="circle-button" @click="handlePauseVideo">
               <VideoPause />
             </div>
-
+            <div class="action-bar">
+              <el-button type="primary" @click="handleStartDraw">
+                绘制
+              </el-button>
+              <el-button @click="handleResetDraw"> 重置 </el-button>
+              <el-button type="danger" @click="handleQuitDraw">
+                关闭绘制
+              </el-button>
+            </div>
             <div class="timeline">
               {{ videoInfo.currentTime }}/{{ videoInfo.duration }}
             </div>
@@ -128,10 +136,10 @@
             <el-input-number
               v-model="videoInfo.currentFrame"
               :min="0"
-              :max="frameList.length"
+              :max="requestFrameList.length"
               :step="1"
               @change="handleFrameChange"></el-input-number>
-            <span>/{{ frameList.length }}</span>
+            <span>/{{ requestFrameList.length }}</span>
           </div>
           <el-divider />
           <canvas ref="canvasRef" width="640" height="360"></canvas>
@@ -290,7 +298,9 @@
     ctx.lineWidth = 1;
     ctx.strokeStyle = PEN_COLOR;
     if (ctx) {
-      initCanvasDraw(videoCanvas, ctx, "transparent");
+      initCanvasDraw(videoCanvas, ctx);
+      // 将canvas背景置为透明
+      ctx.clearRect(0, 0, videoCanvas.width, videoCanvas.height);
     }
 
     requestFrameList.value = [];
@@ -307,7 +317,8 @@
     video.requestVideoFrameCallback(updateCanvas);
 
     video.addEventListener("canplay", () => {
-      getFrameList();
+      video.play();
+      // getFrameList();
     });
     video.addEventListener("play", () => {
       showPlayIcon.value = false;
@@ -327,16 +338,32 @@
     });
   };
 
+  const handleStartDraw = () => {
+    videoRef.value.pause();
+    videoCanvasRef.value.setAttribute(
+      "style",
+      "pointer-events: auto;cursor: crosshair;"
+    );
+  };
+
+  const handleResetDraw = () => {
+    const videoCanvas = videoCanvasRef.value;
+    const ctx = videoCanvas.getContext("2d");
+    ctx.clearRect(0, 0, videoCanvas.width, videoCanvas.height);
+  };
+
+  const handleQuitDraw = () => {
+    handleResetDraw();
+    videoCanvasRef.value.setAttribute("style", "pointer-events: none;");
+  };
+
   const canvasRef = ref();
   const handleFrameChange = () => {
     const canvas = canvasRef.value;
     const ctx = canvas.getContext("2d");
-    if (frameList.value.length === 0) {
-      return;
-    }
-    if (frameList.value[videoInfo.value.currentFrame]) {
+    if (requestFrameList.value[videoInfo.value.currentFrame]) {
       ctx.drawImage(
-        frameList.value[videoInfo.value.currentFrame],
+        requestFrameList.value[videoInfo.value.currentFrame].data,
         0,
         0,
         canvas.width,
@@ -344,6 +371,7 @@
       );
     }
   };
+
   async function getFrameList() {
     const video = videoRef.value;
     frameList.value = [];
@@ -507,8 +535,14 @@
         width: 32px;
         border-radius: 50%;
       }
+      .action-bar {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+      }
       .timeline {
         margin: 0 10px;
+        width: 140px;
         line-height: 40px;
       }
     }
