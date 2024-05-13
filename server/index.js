@@ -209,13 +209,33 @@ app.get("/video/:id", async (req, res) => {
   const videoStat = fs.statSync(videoPath);
   const videoSize = videoStat.size;
 
-  const headers = {
-    "Content-Length": videoSize,
-    "Content-Type": "video/mp4",
-  };
-  res.writeHead(200, headers);
-  const videoStream = fs.createReadStream(videoPath);
-  videoStream.pipe(res);
+  // 添加range后前端播放器才能指定任意秒数开始播放
+  const videoRange = req.headers.range;
+  if (videoRange) {
+    const parts = videoRange.replace(/bytes=/, "").split("-");
+    const start = parseInt(parts[0], 10);
+    const end = parts[1] ? parseInt(parts[1], 10) : videoSize - 1;
+    const chunksize = end - start + 1;
+
+    const headers = {
+      "Content-Range": `bytes ${start}-${end}/${videoSize}`,
+      "Accept-Ranges": "bytes",
+      "Content-Length": chunksize,
+      "Content-Type": "video/mp4",
+    };
+    res.writeHead(206, headers);
+
+    const videoStream = fs.createReadStream(videoPath, { start, end });
+    videoStream.pipe(res);
+  } else {
+    const headers = {
+      "Content-Length": videoSize,
+      "Content-Type": "video/mp4",
+    };
+    res.writeHead(200, headers);
+    const videoStream = fs.createReadStream(videoPath);
+    videoStream.pipe(res);
+  }
 });
 
 app.get("/video/info/:id", async (req, res) => {

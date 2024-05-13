@@ -95,19 +95,31 @@
             class="dialog-video"
             crossorigin="anonymous"
             width="640"
-            controls>
+            controls
+            preload="auto">
             <source :src="previewVideoUrl" type="video/mp4" />
           </video>
           <div class="dialog-video-control">
-            <div
-              v-if="showPlayIcon"
-              class="circle-button"
-              @click="handlePlayVideo">
-              <VideoPlay />
+            <div class="circle-button" @click="handlePlayVideo">
+              <VideoPlay v-if="showPlayIcon" />
+              <VideoPause v-else />
             </div>
-            <div v-else class="circle-button" @click="handlePauseVideo">
-              <VideoPause />
+            <el-button @click="handleReplayVideo"> 重播 </el-button>
+            <div class="volume-container">
+              <el-button @click="handleShowVideoVolume"> 音量 </el-button>
+              <div v-show="isShowVideoVolume" class="volume-slider">
+                <el-slider
+                  v-model="videoInfo.volume"
+                  :min="0"
+                  :max="100"
+                  :step="1"
+                  vertical
+                  height="100px"
+                  @change="handleVideoVolumeChange" />
+              </div>
             </div>
+            <el-button @click="handleMuteVideo"> 静音 </el-button>
+            <el-button @click="handleFullscreenVideo"> 全屏 </el-button>
             <div class="action-bar">
               <el-button type="primary" @click="handleStartDraw">
                 绘制
@@ -117,8 +129,21 @@
                 关闭绘制
               </el-button>
             </div>
+          </div>
+          <div class="progress-slider-container">
+            <div class="progress-slider">
+              <el-slider
+                v-model="videoInfo.currentTime"
+                :min="0"
+                :max="videoInfo.maxSecond"
+                :step="1"
+                :format-tooltip="formatVideoTooltip"
+                @change="handleVideoProgressChange" />
+            </div>
             <div class="timeline">
-              {{ videoInfo.currentTime }}/{{ videoInfo.duration }}
+              {{ formatVideoTooltip(videoInfo.currentTime) }}/{{
+                formatVideoTooltip(videoInfo.duration)
+              }}
             </div>
           </div>
           <canvas
@@ -265,20 +290,64 @@
     currentFrame: 0,
     currentTime: 0,
     duration: 0,
+    maxSecond: 0,
+    volume: 100,
+    progress: 0,
   });
 
   const showPlayIcon = ref(true);
 
   const handlePlayVideo = () => {
-    videoRef.value.play();
+    if (videoRef.value.paused || videoRef.value.ended) {
+      videoRef.value.play();
+    } else {
+      videoRef.value.pause();
+    }
+  };
+  const handleReplayVideo = () => {
+    videoRef.value.pause();
+    videoRef.value.currentTime = 0;
+    videoInfo.value.progress = 0;
   };
 
-  const handlePauseVideo = () => {
-    videoRef.value.pause();
+  const handleMuteVideo = () => {
+    videoRef.value.muted = !videoRef.value.muted;
+  };
+
+  const isShowVideoVolume = ref(false);
+  const handleShowVideoVolume = () => {
+    isShowVideoVolume.value = !isShowVideoVolume.value;
+  };
+  // volume范围0-1
+  const handleVideoVolumeChange = (val: number) => {
+    videoRef.value.volume = val / 100;
+  };
+
+  const handleVideoProgressChange = (val: number) => {
+    // const targetVal = (val / videoInfo.value.maxSecond) * videoInfo.value.duration;
+
+    videoRef.value.currentTime = val;
+  };
+  const formatVideoTooltip = (val: number) => {
+    return translateTime(Math.floor(val));
+  };
+
+  const handleFullscreenVideo = () => {
+    if (document.fullscreenElement !== null) {
+      // The document is in fullscreen mode
+      document.exitFullscreen();
+      videoRef.value.setAttribute("data-fullscreen", "true");
+    } else {
+      // The document is not in fullscreen mode
+      videoRef.value.requestFullscreen();
+      videoRef.value.setAttribute("data-fullscreen", "false");
+    }
   };
 
   const frameList = ref([]);
+
   const requestFrameList = ref([]);
+  const requestFrameObj: Record<string, ImageBitmap> = {};
 
   const handlePreviewData = (row: any) => {
     previewVideoUrl.value = `http://localhost:3005/video/${row.id}`;
@@ -304,16 +373,20 @@
     }
 
     requestFrameList.value = [];
-    const updateCanvas = async () => {
+    const updateCanvas = async (now: number, metadata: any) => {
+      // mediaTime与video.currentTime相同，presentedFrames 表示已播放帧数
+      // console.log(metadata.mediaTime, metadata.presentedFrames);
       const bitmap = await createImageBitmap(video);
 
-      requestFrameList.value.push({
-        timeSamp: video.currentTime,
-        data: bitmap,
-      });
+      requestFrameObj[video.currentTime] = bitmap;
+      if (!requestFrameList.value.includes(video.currentTime)) {
+        requestFrameList.value.push(video.currentTime);
+      }
+
       // Re-register the callback to run on the next frame
       video.requestVideoFrameCallback(updateCanvas);
     };
+
     video.requestVideoFrameCallback(updateCanvas);
 
     video.addEventListener("canplay", () => {
@@ -331,10 +404,12 @@
     });
     video.addEventListener("ended", () => {
       showPlayIcon.value = true;
+      requestFrameList.value.sort();
       console.log(requestFrameList.value.length, frameList.value.length);
     });
     video.addEventListener("durationchange", () => {
       videoInfo.value.duration = video.duration;
+      videoInfo.value.maxSecond = Math.round(video.duration);
     });
   };
 
@@ -363,7 +438,7 @@
     const ctx = canvas.getContext("2d");
     if (requestFrameList.value[videoInfo.value.currentFrame]) {
       ctx.drawImage(
-        requestFrameList.value[videoInfo.value.currentFrame].data,
+        requestFrameObj[requestFrameList.value[videoInfo.value.currentFrame]],
         0,
         0,
         canvas.width,
@@ -519,15 +594,12 @@
   }
   .dialog-video-container {
     position: relative;
-    padding-bottom: 40px;
     .dialog-video-control {
-      position: absolute;
-      bottom: 0;
-      left: 0;
       display: flex;
       justify-content: space-between;
+      align-items: center;
       width: 100%;
-      height: 40px;
+      height: 60px;
       background-color: #f2f2f2;
       z-index: 1;
       .circle-button {
@@ -540,10 +612,34 @@
         flex-direction: row;
         align-items: center;
       }
+      .volume-container {
+        position: relative;
+      }
+      .volume-slider {
+        position: absolute;
+        left: 0;
+        bottom: 60px;
+        padding: 10px;
+        height: 120px;
+        border-top-left-radius: 4px;
+        border-top-right-radius: 4px;
+        background-color: #ccc;
+      }
+    }
+    .progress-slider-container {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      padding: 0 20px;
+
+      .progress-slider {
+        flex-grow: 1;
+        flex-shrink: 0;
+        margin-right: 20px;
+      }
       .timeline {
-        margin: 0 10px;
-        width: 140px;
-        line-height: 40px;
+        flex-basis: 140px;
+        text-align: right;
       }
     }
     .dialog-video-canvas {
