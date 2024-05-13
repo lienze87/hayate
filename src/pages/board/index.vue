@@ -53,6 +53,8 @@
   import { initCanvasDraw } from "@/utils/canvasDraw";
 
   const FONT_SIZE = 24;
+  const BACKGROUND_COLOR = "#274c43";
+  const PEN_COLOR = "#ffffff";
 
   const formData = ref({
     min: 0,
@@ -87,7 +89,7 @@
     const paddingLeft = 50;
     const paddingTop = Math.floor(height * 0.9);
 
-    ctx.fillStyle = "#000";
+    ctx.fillStyle = PEN_COLOR;
     ctx.beginPath();
 
     // x轴
@@ -117,7 +119,7 @@
     const paddingLeft = Math.floor(width * 0.1);
     const paddingTop = 50;
 
-    ctx.fillStyle = "#000";
+    ctx.fillStyle = PEN_COLOR;
     ctx.beginPath();
 
     // x轴
@@ -141,7 +143,7 @@
   }
 
   const onReset = () => {
-    ctx.fillStyle = "#fff";
+    ctx.fillStyle = BACKGROUND_COLOR;
     ctx.fillRect(0, 0, myCanvas.width, myCanvas.height);
   };
 
@@ -171,6 +173,7 @@
       ctx = myCanvas.getContext("2d");
       ctx.font = `${FONT_SIZE}px serif`;
       ctx.lineWidth = 1;
+      ctx.strokeStyle = PEN_COLOR;
       if (ctx) {
         initCanvasDraw(myCanvas, ctx);
       }
