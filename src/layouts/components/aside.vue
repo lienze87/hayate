@@ -1,6 +1,6 @@
 <template>
   <div class="page-aside">
-    <el-menu :default-active="activeMenu" class="el-menu-vertical">
+    <el-menu :default-active="activeMenu" class="page-aside-menu">
       <el-menu-item
         v-for="item in menuList"
         :index="item.path"
@@ -49,10 +49,14 @@
   };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
   .page-aside {
     padding: 20px 0;
     height: calc(100vh - 100px);
+
+    .page-aside-menu {
+      height: 100%;
+    }
 
     :deep(.is-active) {
       background-color: rgba(64, 158, 255, 0.1);

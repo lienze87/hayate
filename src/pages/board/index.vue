@@ -181,7 +181,7 @@
     onSubmit();
   });
 </script>
-<style scoped>
+<style lang="scss" scoped>
   .main-content {
     display: flex;
     flex-direction: column;

@@ -25,7 +25,7 @@
   });
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
   .main-content {
     width: 100vw;
     height: 100vh;
