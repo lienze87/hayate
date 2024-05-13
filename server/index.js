@@ -2,8 +2,9 @@ import fs from "fs";
 import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
+import fileUpload from "express-fileupload";
 import { Sequelize, Model, DataTypes } from "sequelize";
-import { extractVideoByTime, extractImageByFrames } from "./video.js";
+import { extractImageByFrames, getVideoMetadata } from "./video.js";
 
 const app = express();
 const port = 3005;
@@ -76,7 +77,8 @@ Notes.init(
 );
 
 // Sync models with database
-sequelize.sync({ alter: true }); // 在原基础上更新
+sequelize.sync();
+// sequelize.sync({ alter: true }); // 在原基础上更新
 // sequelize.sync({ force: true }); // 删除再更新
 
 app.use(cors());
@@ -84,7 +86,31 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+// 配置defParamCharset解决文件名中的中文乱码
+app.use(fileUpload({ defParamCharset: "utf8" }));
+
 app.use(express.static("public"));
+
+app.post("/upload", function (req, res) {
+  let sampleFile;
+  let uploadPath;
+
+  if (!req.files || Object.keys(req.files).length === 0) {
+    return res.status(400).send("No files were uploaded.");
+  }
+
+  // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
+  sampleFile = req.files.file;
+
+  uploadPath = "./upload/" + sampleFile.name;
+
+  // Use the mv() method to place the file somewhere on your server
+  sampleFile.mv(uploadPath, function (err) {
+    if (err) return res.status(500).send(err);
+
+    res.json({ message: "success" });
+  });
+});
 
 app.get("/frames", async (req, res) => {
   const frames = await Frames.findAll({
@@ -190,6 +216,23 @@ app.get("/video/:id", async (req, res) => {
   res.writeHead(200, headers);
   const videoStream = fs.createReadStream(videoPath);
   videoStream.pipe(res);
+});
+
+app.get("/video/info/:id", async (req, res) => {
+  const frame = await Frames.findByPk(req.params.id);
+
+  const basePath = `C:/Users/Administrator/Videos/${frame.sourceName}`;
+
+  const metaDataPath = `./metadata/${frame.sourceName.split(".mp4")[0]}.json`;
+
+  if (fs.existsSync(metaDataPath)) {
+    const data = fs.readFileSync(metaDataPath, "utf8");
+    res.json(data);
+  } else {
+    getVideoMetadata(basePath, (data) => {
+      res.json(data);
+    });
+  }
 });
 
 app.get("/images/:id", async (req, res) => {

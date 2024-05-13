@@ -2,6 +2,7 @@ import { exec } from "child_process";
 import process from "process";
 import fs from "fs";
 import util from "util";
+import ffmpeg from "fluent-ffmpeg";
 
 const promiseExec = util.promisify(exec);
 
@@ -51,6 +52,7 @@ async function execCommand(command) {
   // console.log("stdout:", stdout);
   // console.log("stderr:", stderr);
   console.log("command finished");
+  return { stdout, stderr };
 }
 
 // 按时间截取视频
@@ -108,4 +110,32 @@ export async function extractImageByFrames(
   await execCommand(
     `ffmpeg -i ${inputFileName} -vf select="between(n\\,${begin}\\,${end})" -frame_pts 1 -vsync 0 ${outFolderName}/frames%2d.png`
   );
+}
+
+async function getVideoInfoByCmd(fileName) {
+  if (!fs.existsSync(fileName)) {
+    throw Error(`${fileName} not exit`);
+  }
+  return await execCommand(
+    `ffprobe -of json -show_streams -show_format ${fileName}`
+  );
+}
+
+export function getVideoMetadata(fileName, callback) {
+  if (!fs.existsSync(fileName)) {
+    throw Error(`${fileName} not exit`);
+  }
+  ffmpeg.ffprobe(fileName, function (err, data) {
+    callback(data);
+    const json = JSON.stringify(data);
+    fs.writeFile(
+      `./metadata/${fileName.split("/").slice(-1)[0].split(".mp4")[0]}.json`,
+      json,
+      "utf8",
+      () => {
+        if (err) throw err;
+        console.log("complete");
+      }
+    );
+  });
 }
