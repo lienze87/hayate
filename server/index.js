@@ -158,7 +158,7 @@ app.delete("/frames/:id", async (req, res) => {
 });
 
 app.get("/video", async (req, res) => {
-  const videoPath = `C:/Users/Administrator/Videos/${req.query.fileName}`;
+  const videoPath = `./upload/${req.query.fileName}`;
 
   if (!fs.existsSync(videoPath)) {
     res.status(404).json({ message: "video not found" });
@@ -198,7 +198,7 @@ app.get("/video", async (req, res) => {
 app.get("/video/:id", async (req, res) => {
   const frame = await Frames.findByPk(req.params.id);
 
-  const basePath = `C:/Users/Administrator/Videos/${frame.sourceName}`;
+  const basePath = `./upload/${frame.sourceName}`;
 
   const resultFileName = `${frame.sourceName.split(".mp4")[0]}-${frame.startIndex}-${frame.endIndex}.mp4`;
   const videoPath = `./public/${resultFileName}`;
@@ -221,7 +221,7 @@ app.get("/video/:id", async (req, res) => {
 app.get("/video/info/:id", async (req, res) => {
   const frame = await Frames.findByPk(req.params.id);
 
-  const basePath = `C:/Users/Administrator/Videos/${frame.sourceName}`;
+  const basePath = `./upload/${frame.sourceName}`;
 
   const metaDataPath = `./metadata/${frame.sourceName.split(".mp4")[0]}.json`;
 
