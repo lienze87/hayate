@@ -1,7 +1,15 @@
 <template>
   <div class="main-content">
-    <div class="action_bar">
+    <div class="content-header">
       <el-button type="primary" plain @click="handleAddData">新增</el-button>
+      <el-upload
+        v-model:file-list="uploadFileList"
+        class="upload-demo"
+        action="http://localhost:3005/upload"
+        :show-file-list="false"
+        :on-success="handleUploadSuccess">
+        <el-button type="primary">上传文件</el-button>
+      </el-upload>
     </div>
     <el-table :data="dataList">
       <el-table-column type="index" width="50" />
@@ -78,33 +86,57 @@
     <el-dialog
       v-model="videoDialogVisible"
       title="视频预览"
-      width="600"
+      width="672"
       destroy-on-close>
       <div class="dialog-container">
-        <el-collapse v-model="videoDialogActiveNames">
-          <el-collapse-item title="视频" name="video">
-            <div class="dialog-video">
-              <video ref="videoRef" controls width="568">
-                <source :src="previewVideoUrl" type="video/mp4" />
-              </video>
+        <div class="dialog-video-container">
+          <video
+            ref="videoRef"
+            class="dialog-video"
+            crossorigin="anonymous"
+            width="640"
+            controls>
+            <source :src="previewVideoUrl" type="video/mp4" />
+          </video>
+          <div class="dialog-video-control">
+            <div
+              v-if="showPlayIcon"
+              class="circle-button"
+              @click="handlePlayVideo">
+              <VideoPlay />
             </div>
-          </el-collapse-item>
-          <el-collapse-item title="分帧查看" name="canvas">
-            <div class="dialog-canvas">
-              <span>当前帧数:</span>
-              <el-input-number
-                v-model="videoInfo.currentFrame"
-                :min="0"
-                :max="videoInfo.framesCount"
-                :step="1"
-                @change="handleFrameChange"></el-input-number>
-              <span>/{{ videoInfo.framesCount }}</span>
+            <div v-else class="circle-button" @click="handlePauseVideo">
+              <VideoPause />
             </div>
-            <el-divider />
-            <canvas ref="canvasRef" width="568" height="320"></canvas>
-          </el-collapse-item>
-        </el-collapse>
+
+            <div class="timeline">
+              {{ videoInfo.currentTime }}/{{ videoInfo.duration }}
+            </div>
+          </div>
+          <canvas
+            ref="videoCanvasRef"
+            class="dialog-video-canvas"
+            width="640"
+            height="360">
+          </canvas>
+        </div>
       </div>
+      <el-collapse>
+        <el-collapse-item title="视频帧" name="video">
+          <div class="dialog-canvas">
+            <span>当前帧数:</span>
+            <el-input-number
+              v-model="videoInfo.currentFrame"
+              :min="0"
+              :max="frameList.length"
+              :step="1"
+              @change="handleFrameChange"></el-input-number>
+            <span>/{{ frameList.length }}</span>
+          </div>
+          <el-divider />
+          <canvas ref="canvasRef" width="640" height="360"></canvas>
+        </el-collapse-item>
+      </el-collapse>
     </el-dialog>
     <el-dialog
       v-model="imageDialogVisible"
@@ -148,8 +180,9 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref, onMounted, nextTick } from "vue";
+  import { computed, ref, onMounted, nextTick } from "vue";
   import { ElMessage } from "element-plus";
+  import { VideoPlay, VideoPause } from "@element-plus/icons-vue";
   import {
     getDataList,
     getDataDetail,
@@ -159,7 +192,17 @@
     updateDataImage,
     getDataImageDetail,
   } from "@/api/video";
-  import { randomHex } from "@/utils";
+  import { v4 as uuidV4 } from "uuid";
+  import { initCanvasDraw } from "@/utils/canvasDraw";
+
+  const FONT_SIZE = 24;
+  const BACKGROUND_COLOR = "#274c43";
+  const PEN_COLOR = "#ffffff";
+
+  const uploadFileList = ref([]);
+  const handleUploadSuccess = () => {
+    ElMessage.success("上传成功");
+  };
 
   const dataList = ref([]);
   const editId = ref("");
@@ -207,59 +250,89 @@
   };
 
   const videoDialogVisible = ref(false);
-  const videoDialogActiveNames = ref("video");
   const previewVideoUrl = ref("");
   const videoRef = ref<HTMLVideoElement>();
-  const canvasRef = ref<HTMLCanvasElement>();
-  const videoInfo = ref({ framesCount: 0, currentFrame: 0 });
+  const videoCanvasRef = ref<HTMLCanvasElement>();
+  const videoInfo = ref({
+    currentFrame: 0,
+    currentTime: 0,
+    duration: 0,
+  });
+
+  const showPlayIcon = ref(true);
+
+  const handlePlayVideo = () => {
+    videoRef.value.play();
+  };
+
+  const handlePauseVideo = () => {
+    videoRef.value.pause();
+  };
 
   const frameList = ref([]);
+  const requestFrameList = ref([]);
 
   const handlePreviewData = (row: any) => {
     previewVideoUrl.value = `http://localhost:3005/video/${row.id}`;
     videoDialogVisible.value = true;
     nextTick(() => {
-      handleVideoToCanvas();
       // getFrameList();
+      initVideoCanvas();
     });
   };
 
-  async function handleVideoToCanvas() {
-    const canvas = canvasRef.value;
+  const initVideoCanvas = () => {
+    const videoCanvas = videoCanvasRef.value;
     const video = videoRef.value;
-    const ctx = canvas.getContext("2d");
 
-    // 每帧执行
-    if ("requestVideoFrameCallback" in HTMLVideoElement.prototype) {
-      let paintCount = 0;
-
-      const updateCanvas = async () => {
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        const bitmap = await createImageBitmap(video);
-
-        frameList.value.push(bitmap);
-
-        videoInfo.value.framesCount = ++paintCount;
-        // Re-register the callback to run on the next frame
-        video.requestVideoFrameCallback(updateCanvas);
-      };
-      video.requestVideoFrameCallback(updateCanvas);
-    } else {
-      video.addEventListener("timeupdate", () => {
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      });
+    const ctx = videoCanvas.getContext("2d");
+    ctx.font = `${FONT_SIZE}px serif`;
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = PEN_COLOR;
+    if (ctx) {
+      initCanvasDraw(videoCanvas, ctx, "transparent");
     }
 
-    video.play();
-    video.addEventListener("ended", () => {
-      console.log("累计帧数：" + frameList.value.length);
-    });
-  }
+    requestFrameList.value = [];
+    const updateCanvas = async () => {
+      const bitmap = await createImageBitmap(video);
 
+      requestFrameList.value.push({
+        timeSamp: video.currentTime,
+        data: bitmap,
+      });
+      // Re-register the callback to run on the next frame
+      video.requestVideoFrameCallback(updateCanvas);
+    };
+    video.requestVideoFrameCallback(updateCanvas);
+
+    video.addEventListener("canplay", () => {
+      getFrameList();
+    });
+    video.addEventListener("play", () => {
+      showPlayIcon.value = false;
+    });
+    video.addEventListener("pause", () => {
+      showPlayIcon.value = true;
+    });
+    video.addEventListener("timeupdate", () => {
+      videoInfo.value.currentTime = video.currentTime;
+    });
+    video.addEventListener("ended", () => {
+      showPlayIcon.value = true;
+      console.log(requestFrameList.value.length, frameList.value.length);
+    });
+    video.addEventListener("durationchange", () => {
+      videoInfo.value.duration = video.duration;
+    });
+  };
+
+  const canvasRef = ref();
   const handleFrameChange = () => {
     const canvas = canvasRef.value;
     const ctx = canvas.getContext("2d");
-    if (videoInfo.value.framesCount === 0) {
+    if (frameList.value.length === 0) {
+      return;
     }
     if (frameList.value[videoInfo.value.currentFrame]) {
       ctx.drawImage(
@@ -271,10 +344,10 @@
       );
     }
   };
-
-  // 存在跨域问题
   async function getFrameList() {
     const video = videoRef.value;
+    frameList.value = [];
+
     // @ts-ignore
     if (window.MediaStreamTrackProcessor) {
       await video.play();
@@ -398,6 +471,11 @@
     width: 100%;
     height: calc(100vh - 100px);
   }
+  .content-header {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
   .dialog-container {
     display: flex;
     flex-direction: column;
@@ -410,5 +488,36 @@
   .dialog-images {
     max-height: 250px;
     overflow-y: auto;
+  }
+  .dialog-video-container {
+    position: relative;
+    padding-bottom: 40px;
+    .dialog-video-control {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      height: 40px;
+      background-color: #f2f2f2;
+      z-index: 1;
+      .circle-button {
+        padding: 4px 0;
+        width: 32px;
+        border-radius: 50%;
+      }
+      .timeline {
+        margin: 0 10px;
+        line-height: 40px;
+      }
+    }
+    .dialog-video-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 3;
+      pointer-events: none;
+    }
   }
 </style>
