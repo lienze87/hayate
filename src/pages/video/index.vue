@@ -157,14 +157,31 @@
       <el-collapse>
         <el-collapse-item title="视频帧" name="video">
           <div class="dialog-canvas">
+            <span>帧率:</span>
+            <el-input-number
+              v-model="videoInfo.frameRate"
+              :min="1"
+              :max="240"
+              :step="1"></el-input-number>
+            <el-divider direction="vertical" />
+            <span>步长:</span>
+            <el-input-number
+              v-model="videoInfo.frameStep"
+              :min="1"
+              :max="24"
+              :step="1"></el-input-number>
+            <el-divider direction="vertical" />
             <span>当前帧数:</span>
             <el-input-number
               v-model="videoInfo.currentFrame"
               :min="0"
               :max="requestFrameList.length"
-              :step="1"
+              :step="videoInfo.frameStep"
               @change="handleFrameChange"></el-input-number>
             <span>/{{ requestFrameList.length }}</span>
+            <el-button type="primary" @click="handlePlayFrame">
+              {{ autoPlayFrame ? "暂停" : "播放" }}
+            </el-button>
           </div>
           <el-divider />
           <canvas ref="canvasRef" width="640" height="360"></canvas>
@@ -182,11 +199,15 @@
             <el-form-item label="起始帧">
               <el-input-number
                 v-model="imageData.begin"
+                :min="0"
+                :max="imageData.end"
                 :step="1"></el-input-number>
             </el-form-item>
             <el-form-item label="结束帧">
               <el-input-number
                 v-model="imageData.end"
+                :min="imageData.begin"
+                :max="9999"
                 :step="1"></el-input-number>
             </el-form-item>
             <el-form-item label="描述">
@@ -202,8 +223,11 @@
         <el-divider />
         <div class="dialog-images">
           <el-image
-            :src="imageList[0]"
+            v-for="(image, index) in imageList"
+            :key="image"
+            :src="image"
             :preview-src-list="imageList"
+            :initial-index="index"
             style="margin-right: 10px; width: 100px"
             fit="contain" />
         </div>
@@ -288,6 +312,8 @@
   const videoCanvasRef = ref<HTMLCanvasElement>();
   const videoInfo = ref({
     currentFrame: 0,
+    frameStep: 3,
+    frameRate: 24,
     currentTime: 0,
     duration: 0,
     maxSecond: 0,
@@ -345,9 +371,31 @@
   };
 
   const frameList = ref([]);
+  const recordFrame = ref(false);
 
   const requestFrameList = ref([]);
   const requestFrameObj: Record<string, ImageBitmap> = {};
+
+  const autoPlayFrame = ref(false);
+  let playFrameTimer = 0;
+  const handlePlayFrame = () => {
+    autoPlayFrame.value = !autoPlayFrame.value;
+    if (playFrameTimer) {
+      clearInterval(playFrameTimer);
+      playFrameTimer = 0;
+    }
+    if (autoPlayFrame.value) {
+      playFrameTimer = setInterval(() => {
+        if (videoInfo.value.currentFrame < requestFrameList.value.length) {
+          videoInfo.value.currentFrame += videoInfo.value.frameStep;
+          handleFrameChange();
+        } else {
+          autoPlayFrame.value = false;
+          clearInterval(playFrameTimer);
+        }
+      }, 1000 / videoInfo.value.frameRate);
+    }
+  };
 
   const handlePreviewData = (row: any) => {
     previewVideoUrl.value = `http://localhost:3005/video/${row.id}`;
@@ -381,6 +429,11 @@
       requestFrameObj[video.currentTime] = bitmap;
       if (!requestFrameList.value.includes(video.currentTime)) {
         requestFrameList.value.push(video.currentTime);
+      }
+      if (recordFrame.value) {
+        if (!frameList.value.includes(video.currentTime)) {
+          frameList.value.push(video.currentTime);
+        }
       }
 
       // Re-register the callback to run on the next frame
@@ -563,6 +616,9 @@
 
   onMounted(() => {
     queryData();
+    window.addEventListener("keydown", (event) => {
+      console.log(event.code);
+    });
   });
 </script>
 <style lang="scss" scoped>
@@ -618,7 +674,7 @@
       .volume-slider {
         position: absolute;
         left: 0;
-        bottom: 60px;
+        bottom: 40px;
         padding: 10px;
         height: 120px;
         border-top-left-radius: 4px;
