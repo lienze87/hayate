@@ -90,6 +90,7 @@ app.use(bodyParser.json());
 app.use(fileUpload({ defParamCharset: "utf8" }));
 
 app.use(express.static("public"));
+app.use(express.static("upload"));
 
 app.post("/upload", function (req, res) {
   let sampleFile;
@@ -108,7 +109,10 @@ app.post("/upload", function (req, res) {
   sampleFile.mv(uploadPath, function (err) {
     if (err) return res.status(500).send(err);
 
-    res.json({ message: "success" });
+    res.json({
+      data: `http://localhost:${port}/${sampleFile.name}`,
+      message: "success",
+    });
   });
 });
 
