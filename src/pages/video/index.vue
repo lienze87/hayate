@@ -236,6 +236,12 @@
   </div>
 </template>
 
+<script lang="ts">
+  export default {
+    name: "Video",
+  };
+</script>
+
 <script lang="ts" setup>
   import { computed, ref, onMounted, nextTick } from "vue";
   import { ElMessage } from "element-plus";
@@ -385,6 +391,7 @@
       playFrameTimer = 0;
     }
     if (autoPlayFrame.value) {
+      // @ts-ignore
       playFrameTimer = setInterval(() => {
         if (videoInfo.value.currentFrame < requestFrameList.value.length) {
           videoInfo.value.currentFrame += videoInfo.value.frameStep;

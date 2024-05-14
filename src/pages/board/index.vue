@@ -48,6 +48,12 @@
   </div>
 </template>
 
+<script lang="ts">
+  export default {
+    name: "Board",
+  };
+</script>
+
 <script setup lang="ts">
   import { ref, onMounted, computed } from "vue";
   import { initCanvasDraw } from "@/utils/canvasDraw";

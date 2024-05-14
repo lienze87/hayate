@@ -93,8 +93,14 @@
   </div>
 </template>
 
+<script lang="ts">
+  export default {
+    name: "Notes",
+  };
+</script>
+
 <script setup lang="ts">
-  import { ref, onMounted, nextTick } from "vue";
+  import { ref, onMounted } from "vue";
   import { ElMessage } from "element-plus";
   import { getDataList, addData, updateData, deleteData } from "@/api/notes";
 

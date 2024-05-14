@@ -156,6 +156,12 @@
   </div>
 </template>
 
+<script lang="ts">
+  export default {
+    name: "Charts",
+  };
+</script>
+
 <script lang="ts" setup>
   import ECharts from "@/components/ECharts.vue";
   import Editor from "@/components/Editor.vue";

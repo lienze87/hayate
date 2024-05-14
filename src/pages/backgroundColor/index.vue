@@ -7,6 +7,12 @@
   </div>
 </template>
 
+<script lang="ts">
+  export default {
+    name: "BackgroundColor",
+  };
+</script>
+
 <script lang="ts" setup>
   import { ref, onMounted, computed } from "vue";
   const color = ref("#ffffff");
