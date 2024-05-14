@@ -4,19 +4,20 @@
     "module": "esnext",
     "moduleResolution": "node",
     "jsx": "preserve",
+    "jsxImportSource": "vue",
     "sourceMap": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,
     "lib": ["esnext", "dom"],
-    "types": ["vite/client","element-plus/global"],
+    "types": ["vite/client", "element-plus/global"],
     "noEmit": true,
     "baseUrl": "./",
     "paths": {
       "@/*": ["src/*"]
     },
-    "noImplicitAny": true,
+    "noImplicitAny": true
   },
   "include": [
     "**/*.ts",
@@ -24,7 +25,7 @@
     "src/types/**/*.d.ts",
     "src/**/*.ts",
     "src/**/*.tsx",
-    "src/**/*.vue",
+    "src/**/*.vue"
   ],
   "compileOnSave": false
 }
