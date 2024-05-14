@@ -11,7 +11,7 @@
           <el-dropdown-menu>
             <el-dropdown-item v-for="item in menuList" :key="item.path">
               <el-link :href="item.path" type="primary" target="_blank">
-                {{ item.name }} {{ item.path }}
+                {{ item.name }}
               </el-link>
             </el-dropdown-item>
           </el-dropdown-menu>

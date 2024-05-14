@@ -24,14 +24,10 @@
             </el-form-item>
             <el-form-item>
               <div class="form-inline-block">
-                <el-select
+                <el-input
                   v-model="addFormData.subtitle"
-                  placeholder="请选择类型"
-                  style="width: 150px">
-                  <el-option label="vue" value="vue"></el-option>
-                  <el-option label="js" value="js"></el-option>
-                  <el-option label="css" value="css"></el-option>
-                </el-select>
+                  placeholder="请输入次级标题">
+                </el-input>
                 <el-button type="primary" @click="handleConfirmData('add')">
                   确定
                 </el-button>

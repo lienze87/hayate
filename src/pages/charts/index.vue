@@ -67,6 +67,17 @@
             <el-switch v-model="config.legend.show"></el-switch>
           </el-form-item>
           <div class="config-group">
+            <p>Series</p>
+            <div v-for="group in dataset" :key="group.id">
+              <el-form-item label="集合名称">
+                <el-input
+                  v-model="group.name"
+                  placeholder="请输入集合名称"></el-input>
+              </el-form-item>
+              <el-divider />
+            </div>
+          </div>
+          <div class="config-group">
             <p>提示框</p>
             <el-form-item label="启用">
               <el-switch v-model="config.tooltip.show"></el-switch>
@@ -137,17 +148,6 @@
             <el-form-item label="启用">
               <el-switch v-model="lineConfig.areaStyle.enable"></el-switch>
             </el-form-item>
-          </div>
-          <div class="config-group">
-            <p>series</p>
-            <div v-for="group in dataset" :key="group.id">
-              <el-form-item label="集合名称">
-                <el-input
-                  v-model="group.name"
-                  placeholder="请输入集合名称"></el-input>
-              </el-form-item>
-              <el-divider />
-            </div>
           </div>
         </el-form>
       </div>
