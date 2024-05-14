@@ -32,6 +32,10 @@
       name: "笔记",
       path: "/note",
     },
+    {
+      name: "脚本",
+      path: "/script",
+    },
   ];
 
   const router = useRouter();

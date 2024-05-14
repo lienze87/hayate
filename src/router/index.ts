@@ -42,6 +42,14 @@ const routeList: RouteRecordRaw[] = [
           title: "笔记",
         },
       },
+      {
+        path: "/script",
+        name: "Script",
+        component: () => import("@/pages/script/index.vue"),
+        meta: {
+          title: "脚本",
+        },
+      },
     ],
   },
   {
