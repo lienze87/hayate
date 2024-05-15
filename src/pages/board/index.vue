@@ -199,7 +199,6 @@
   .my-board {
     width: 100%;
     height: 594px;
-    border: 1px solid green;
     cursor: crosshair;
   }
 </style>

@@ -55,6 +55,11 @@
         </template>
       </el-table-column>
     </el-table>
+    <SimpleTable :initData="tableData" :columns="columns">
+      <template #reference="scope">
+        <ImgUploader v-model:url="scope.row.reference" />
+      </template>
+    </SimpleTable>
   </div>
 </template>
 
@@ -67,7 +72,7 @@
 <script setup lang="ts">
   import { ref } from "vue";
   import ImgUploader from "@/components/ImgUploader.vue";
-
+  import SimpleTable from "@/components/simple-table";
   const tableData = ref([
     {
       uuid: "0",
@@ -80,6 +85,44 @@
       video: "",
       copywriting: "",
       describe: "",
+    },
+  ]);
+  const columns = ref([
+    {
+      label: "大纲",
+      prop: "outline",
+    },
+    {
+      label: "景别",
+      prop: "scene",
+    },
+    {
+      label: "运镜",
+      prop: "cameraOperation",
+    },
+    {
+      label: "参考图",
+      prop: "reference",
+    },
+    {
+      label: "时长",
+      prop: "duration",
+    },
+    {
+      label: "分镜描述",
+      prop: "cameraDescription",
+    },
+    {
+      label: "已拍摄片段",
+      prop: "video",
+    },
+    {
+      label: "台词文案",
+      prop: "copywriting",
+    },
+    {
+      label: "备注",
+      prop: "describe",
     },
   ]);
 </script>
