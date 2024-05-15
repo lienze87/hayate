@@ -10,14 +10,9 @@
     </div>
     <div class="content-container">
       <div class="video-container">
-        <video
-          class="source-video"
-          crossorigin="anonymous"
-          width="960"
-          controls
-          preload="metadata">
+        <VideoPlayer width="960" preload="metadata">
           <source :src="sourceVideoPath" type="video/mp4" />
-        </video>
+        </VideoPlayer>
       </div>
       <div class="video-aside">
         <div class="video-part-header">

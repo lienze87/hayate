@@ -1,11 +1,8 @@
 export function initCanvasDraw(
   myCanvas: HTMLCanvasElement,
-  ctx: CanvasRenderingContext2D,
-  backgroundColor: string = "#274c43",
-  penColor: string = "#ffffff"
+  ctx: CanvasRenderingContext2D
 ) {
   // Set Background Color
-  ctx.fillStyle = backgroundColor;
   ctx.fillRect(0, 0, myCanvas.width, myCanvas.height);
 
   // Mouse Event Handlers
@@ -28,7 +25,6 @@ export function initCanvasDraw(
         canvasX = evt.pageX - myCanvas.getBoundingClientRect().left;
         canvasY = evt.pageY - myCanvas.getBoundingClientRect().top - scrollTop;
         ctx.lineTo(canvasX, canvasY);
-        ctx.strokeStyle = penColor;
         ctx.stroke();
       }
     },
@@ -73,7 +69,6 @@ export function initCanvasDraw(
           scrollTop;
 
         ctx.lineTo(canvasX, canvasY);
-        ctx.strokeStyle = penColor;
         ctx.stroke();
       }
     },

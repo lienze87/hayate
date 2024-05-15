@@ -6,7 +6,8 @@
       crossorigin="anonymous"
       width="640"
       controls
-      preload="auto">
+      preload="auto"
+      v-bind="$attrs">
       <slot />
     </video>
     <div class="video-control">
@@ -31,6 +32,7 @@
       <el-button @click="handleMuteVideo"> 静音 </el-button>
       <el-button @click="handleFullscreenVideo"> 全屏 </el-button>
       <div class="action-bar">
+        <el-color-picker v-model="penColor" @change="handlePenColorChange" />
         <el-button type="primary" @click="handleStartDraw"> 绘制 </el-button>
         <el-button @click="handleResetDraw"> 重置 </el-button>
         <el-button type="danger" @click="handleQuitDraw"> 关闭绘制 </el-button>
@@ -97,8 +99,7 @@
   import { translateTime } from "@/utils";
 
   const FONT_SIZE = 24;
-  const BACKGROUND_COLOR = "#274c43";
-  const PEN_COLOR = "#ffffff";
+  const penColor = ref("#000000");
 
   const showPlayIcon = ref(true);
   const videoRef = ref<HTMLVideoElement>();
@@ -170,9 +171,10 @@
     const video = videoRef.value;
 
     const ctx = videoCanvas.getContext("2d");
+
     ctx.font = `${FONT_SIZE}px serif`;
     ctx.lineWidth = 1;
-    ctx.strokeStyle = PEN_COLOR;
+
     if (ctx) {
       initCanvasDraw(videoCanvas, ctx);
       // 将canvas背景置为透明
@@ -196,12 +198,15 @@
 
     video.requestVideoFrameCallback(updateCanvas);
 
-    // video.addEventListener("canplay", () => {
-    //   video.play();
-    //   // getFrameList();
-    // });
+    video.addEventListener("canplay", () => {
+      // video.play();
+      // getFrameList();
+      videoCanvas.width = video.clientWidth;
+      videoCanvas.height = video.clientHeight;
+    });
     video.addEventListener("play", () => {
       showPlayIcon.value = false;
+      handleQuitDraw();
     });
     video.addEventListener("pause", () => {
       showPlayIcon.value = true;
@@ -252,6 +257,12 @@
       console.error("your browser doesn't support this API yet");
     }
   }
+
+  const handlePenColorChange = () => {
+    const videoCanvas = videoCanvasRef.value;
+    const ctx = videoCanvas.getContext("2d");
+    ctx.strokeStyle = penColor.value;
+  };
 
   const handleStartDraw = () => {
     videoRef.value.pause();
