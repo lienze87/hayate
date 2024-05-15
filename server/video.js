@@ -13,10 +13,10 @@ function printProgress(string) {
   process.stdout.write(string);
 }
 
-function emptyDir(filePath) {
-  const files = fs.readdirSync(filePath); //读取该文件夹
+function emptyDir(folderPath) {
+  const files = fs.readdirSync(folderPath); //读取该文件夹
   files.forEach((file) => {
-    const nextFilePath = `${filePath}/${file}`;
+    const nextFilePath = `${folderPath}/${file}`;
     const states = fs.statSync(nextFilePath);
     if (states.isDirectory()) {
       emptyDir(nextFilePath);
@@ -62,7 +62,9 @@ export async function extractVideoByTime(
   inputFileName,
   outFileName
 ) {
-  // 如果结果文件存在，就删除文件
+  if (!fs.existsSync(inputFileName)) {
+    throw Error(`${inputFileName} not exit`);
+  }
   if (fs.existsSync(outFileName)) {
     fs.unlinkSync(outFileName);
   }
@@ -80,6 +82,9 @@ export async function extractVideoByTime(
 //    2          6          6 x 1/75 = 0.08
 //    3          9          9 x 1/75 = 0.12
 function extractVideoByFrames(begin, end, inputFileName, outFileName) {
+  if (!fs.existsSync(inputFileName)) {
+    throw Error(`${inputFileName} not exit`);
+  }
   // 如果结果文件存在，就删除文件
   if (fs.existsSync(outFileName)) {
     fs.unlinkSync(outFileName);
@@ -138,4 +143,17 @@ export function getVideoMetadata(fileName, callback) {
       }
     );
   });
+}
+
+export async function getVideoPoster(inputFileName, outFileName) {
+  if (!fs.existsSync(inputFileName)) {
+    throw Error(`${inputFileName} not exit`);
+  }
+  if (fs.existsSync(outFileName)) {
+    fs.unlinkSync(outFileName);
+  }
+
+  await execCommand(
+    `ffmpeg -i ${fileName} -ss 00:00:01.000 -vframes 1 ${outFileName}`
+  );
 }
