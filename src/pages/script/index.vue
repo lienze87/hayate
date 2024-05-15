@@ -27,7 +27,8 @@
           <el-input
             v-model="scope.row.cameraDescription"
             :rows="3"
-            type="textarea"></el-input>
+            type="textarea"
+            placeholder="详细描述分镜"></el-input>
         </template>
       </el-table-column>
       <el-table-column prop="video" label="已拍摄片段">
@@ -40,7 +41,8 @@
           <el-input
             v-model="scope.row.copywriting"
             :rows="3"
-            type="textarea"></el-input>
+            type="textarea"
+            placeholder="请输入文案"></el-input>
         </template>
       </el-table-column>
       <el-table-column prop="describe" label="备注">
@@ -48,7 +50,8 @@
           <el-input
             v-model="scope.row.describe"
             :rows="3"
-            type="textarea"></el-input>
+            type="textarea"
+            placeholder="请输入备注"></el-input>
         </template>
       </el-table-column>
     </el-table>

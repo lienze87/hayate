@@ -1,8 +1,21 @@
 import { request } from "@/utils/request";
 
-export function getDataList() {
+export function getVideoList() {
+  return request.get<any>({
+    url: "/upload/mp4",
+  });
+}
+
+export function getVideoInfo(id: string) {
+  return request.get<any>({
+    url: `//video/info/${id}`,
+  });
+}
+
+export function getDataList(params: any) {
   return request.get<any>({
     url: "/frames",
+    params,
   });
 }
 
