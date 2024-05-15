@@ -4,7 +4,13 @@ import cors from "cors";
 import bodyParser from "body-parser";
 import fileUpload from "express-fileupload";
 import { Sequelize, Model, DataTypes } from "sequelize";
-import { extractImageByFrames, getVideoMetadata } from "./video.js";
+import {
+  extractImageByFrames,
+  getVideoMetadata,
+  getVideoPoster,
+  extractVideoByTime,
+} from "./video.js";
+import { getFileExtension } from "./utils.js";
 
 const app = express();
 const port = 3005;
@@ -90,11 +96,10 @@ app.use(bodyParser.json());
 app.use(fileUpload({ defParamCharset: "utf8" }));
 
 app.use(express.static("public"));
-app.use(express.static("upload"));
 
 app.post("/upload", function (req, res) {
   let sampleFile;
-  let uploadPath;
+  let uploadPath = "./upload/";
 
   if (!req.files || Object.keys(req.files).length === 0) {
     return res.status(400).send("No files were uploaded.");
@@ -103,12 +108,17 @@ app.post("/upload", function (req, res) {
   // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
   sampleFile = req.files.file;
 
-  uploadPath = "./upload/" + sampleFile.name;
+  const filePath = uploadPath + sampleFile.name;
 
   // Use the mv() method to place the file somewhere on your server
-  sampleFile.mv(uploadPath, function (err) {
+  sampleFile.mv(filePath, function (err) {
     if (err) return res.status(500).send(err);
-
+    if (sampleFile.name.split(".").pop() === "mp4") {
+      getVideoPoster(
+        filePath,
+        `./public/${sampleFile.name.split(".mp4")[0]}.jpg`
+      );
+    }
     res.json({
       data: `http://localhost:${port}/${sampleFile.name}`,
       message: "success",
@@ -116,8 +126,19 @@ app.post("/upload", function (req, res) {
   });
 });
 
+app.get("/upload/:extension", function (req, res) {
+  const folderPath = "./upload/";
+  const files = fs.readdirSync(folderPath);
+  const result = files.filter((file) => {
+    return getFileExtension(file) === req.params.extension;
+  });
+
+  res.json(result);
+});
+
 app.get("/frames", async (req, res) => {
   const frames = await Frames.findAll({
+    where: { sourceName: req.query.sourceName },
     include: { model: Images },
   });
   res.json(frames);
@@ -161,13 +182,14 @@ app.delete("/frames/:id", async (req, res) => {
   }
 });
 
-app.get("/video", async (req, res) => {
-  const videoPath = `./upload/${req.query.fileName}`;
+app.get("/video/:filename", async (req, res) => {
+  const videoPath = `./upload/${req.params.filename}`;
 
   if (!fs.existsSync(videoPath)) {
     res.status(404).json({ message: "video not found" });
     return;
   }
+
   const videoStat = fs.statSync(videoPath);
   const videoSize = videoStat.size;
 
@@ -199,7 +221,7 @@ app.get("/video", async (req, res) => {
   }
 });
 
-app.get("/video/:id", async (req, res) => {
+app.get("/videoPart/:id", async (req, res) => {
   const frame = await Frames.findByPk(req.params.id);
 
   const basePath = `./upload/${frame.sourceName}`;
