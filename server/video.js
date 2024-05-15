@@ -100,7 +100,8 @@ export async function extractImageByFrames(
   begin,
   end,
   inputFileName,
-  outFolderName
+  outFolderName,
+  step = 1
 ) {
   // select="between(t\\,2\\,5)" 选择第2-5秒
   // select="between(n\\,2\\,5)" 选择第2-5帧
@@ -112,9 +113,16 @@ export async function extractImageByFrames(
     fs.mkdirSync(outFolderName);
   }
 
-  await execCommand(
-    `ffmpeg -i ${inputFileName} -vf select="between(n\\,${begin}\\,${end})" -frame_pts 1 -vsync 0 ${outFolderName}/frames%2d.png`
-  );
+  if (step === 1) {
+    await execCommand(
+      `ffmpeg -i ${inputFileName} -vf select="between(n\\,${begin}\\,${end})" -frame_pts 1 -vsync 0 ${outFolderName}/frames%2d.png`
+    );
+  } else {
+    // 每step帧取一次;
+    await execCommand(
+      `ffmpeg -i ${inputFileName} -vf select="between(n\\,${begin}\\,${end})*not(mod(n\\,${step}))" -frame_pts 1 -vsync 0 ${outFolderName}/frames%2d.png`
+    );
+  }
 }
 
 async function getVideoInfoByCmd(fileName) {

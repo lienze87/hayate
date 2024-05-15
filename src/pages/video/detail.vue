@@ -117,6 +117,13 @@
                 :max="9999"
                 :step="1"></el-input-number>
             </el-form-item>
+            <el-form-item label="帧间隔">
+              <el-input-number
+                v-model="imageData.step"
+                :min="1"
+                :max="60"
+                :step="1"></el-input-number>
+            </el-form-item>
             <el-form-item label="描述">
               <el-input v-model="imageData.describe"></el-input>
             </el-form-item>
@@ -272,6 +279,7 @@
     frameId: 0,
     begin: 0,
     end: 1,
+    step: 1,
     describe: "",
   });
 

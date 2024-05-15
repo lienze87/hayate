@@ -56,6 +56,10 @@ Images.init(
     videoPath: DataTypes.STRING,
     begin: DataTypes.INTEGER,
     end: DataTypes.INTEGER,
+    step: {
+      type: DataTypes.INTEGER,
+      defaultValue: 1,
+    },
     describe: DataTypes.STRING,
   },
   { sequelize, modelName: "images" }
@@ -314,7 +318,8 @@ app.post("/images", async (req, res) => {
     req.body.begin,
     req.body.end,
     videoPath,
-    folderPath
+    folderPath,
+    req.body.step
   );
   await Images.create({
     frameId: req.body.frameId,
@@ -335,7 +340,8 @@ app.put("/images/:id", async (req, res) => {
         req.body.begin,
         req.body.end,
         images.videoPath,
-        images.folderPath
+        images.folderPath,
+        req.body.step
       );
     }
     await images.update(req.body);
