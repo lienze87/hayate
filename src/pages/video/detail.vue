@@ -15,7 +15,7 @@
           crossorigin="anonymous"
           width="960"
           controls
-          preload="none">
+          preload="metadata">
           <source :src="sourceVideoPath" type="video/mp4" />
         </video>
       </div>
@@ -34,13 +34,13 @@
             <div>{{ item.describe }}</div>
             <div>
               <el-button type="primary" @click="handlePreviewData(item)">
-                详情
+                预览
               </el-button>
               <el-button type="primary" plain @click="handleEditData(item)">
                 修改
               </el-button>
               <el-button type="primary" plain @click="handleExtractData(item)">
-                裁剪
+                帧生成
               </el-button>
             </div>
           </div>
@@ -49,7 +49,7 @@
     </div>
     <el-dialog
       v-model="partDialogVisible"
-      title="视频剪切"
+      title="数据更新"
       width="672"
       destroy-on-close>
       <div class="dialog-container">
@@ -99,39 +99,6 @@
           <source :src="previewVideoUrl" type="video/mp4" />
         </VideoPlayer>
       </div>
-      <el-collapse>
-        <el-collapse-item title="视频帧" name="video">
-          <div class="dialog-canvas">
-            <span>帧率:</span>
-            <el-input-number
-              v-model="videoInfo.frameRate"
-              :min="1"
-              :max="240"
-              :step="1"></el-input-number>
-            <el-divider direction="vertical" />
-            <span>步长:</span>
-            <el-input-number
-              v-model="videoInfo.frameStep"
-              :min="1"
-              :max="24"
-              :step="1"></el-input-number>
-            <el-divider direction="vertical" />
-            <span>当前帧数:</span>
-            <el-input-number
-              v-model="videoInfo.currentFrame"
-              :min="0"
-              :max="requestFrameList.length"
-              :step="videoInfo.frameStep"
-              @change="handleFrameChange"></el-input-number>
-            <span>/{{ requestFrameList.length }}</span>
-            <el-button type="primary" @click="handlePlayFrame">
-              {{ autoPlayFrame ? "暂停" : "播放" }}
-            </el-button>
-          </div>
-          <el-divider />
-          <canvas ref="canvasRef" width="640" height="360"></canvas>
-        </el-collapse-item>
-      </el-collapse>
     </el-dialog>
     <el-dialog
       v-model="imageDialogVisible"
@@ -188,7 +155,7 @@
 </script>
 
 <script lang="ts" setup>
-  import { computed, ref, onMounted, nextTick } from "vue";
+  import { computed, ref, onMounted } from "vue";
   import { ElMessage } from "element-plus";
   import {
     getDataList,
@@ -284,60 +251,10 @@
   const videoDialogVisible = ref(false);
   const previewVideoUrl = ref("");
   const videoPlayerRef = ref();
-  const videoInfo = ref({
-    currentFrame: 0,
-    frameStep: 3,
-    frameRate: 24,
-    currentTime: 0,
-    duration: 0,
-    maxSecond: 0,
-    volume: 100,
-    progress: 0,
-  });
 
   const handlePreviewData = (row: any) => {
     previewVideoUrl.value = `http://localhost:3005/videoPart/${row.id}`;
     videoDialogVisible.value = true;
-  };
-
-  const requestFrameList = ref([]);
-  const requestFrameObj: Record<string, ImageBitmap> = {};
-  const autoPlayFrame = ref(false);
-  let playFrameTimer = 0;
-
-  const handlePlayFrame = () => {
-    autoPlayFrame.value = !autoPlayFrame.value;
-    if (playFrameTimer) {
-      clearInterval(playFrameTimer);
-      playFrameTimer = 0;
-    }
-    if (autoPlayFrame.value) {
-      // @ts-ignore
-      playFrameTimer = setInterval(() => {
-        if (videoInfo.value.currentFrame < requestFrameList.value.length) {
-          videoInfo.value.currentFrame += videoInfo.value.frameStep;
-          handleFrameChange();
-        } else {
-          autoPlayFrame.value = false;
-          clearInterval(playFrameTimer);
-        }
-      }, 1000 / videoInfo.value.frameRate);
-    }
-  };
-
-  const canvasRef = ref();
-  const handleFrameChange = () => {
-    const canvas = canvasRef.value;
-    const ctx = canvas.getContext("2d");
-    if (requestFrameList.value[videoInfo.value.currentFrame]) {
-      ctx.drawImage(
-        requestFrameObj[requestFrameList.value[videoInfo.value.currentFrame]],
-        0,
-        0,
-        canvas.width,
-        canvas.height
-      );
-    }
   };
 
   const imageDialogVisible = ref(false);

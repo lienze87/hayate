@@ -1,6 +1,6 @@
 <template>
   <div class="page-header">
-    <div class="header-title">Vue</div>
+    <div class="header-title">Hayate</div>
     <div class="header-nav">
       <el-dropdown trigger="click">
         <span class="el-dropdown-link">

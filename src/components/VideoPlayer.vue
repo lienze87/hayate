@@ -52,6 +52,33 @@
         }}
       </div>
     </div>
+    <div class="frame-player-container">
+      <span>帧率:</span>
+      <el-input-number
+        v-model="videoInfo.frameRate"
+        :min="1"
+        :max="240"
+        :step="1"></el-input-number>
+      <el-divider direction="vertical" />
+      <span>步长:</span>
+      <el-input-number
+        v-model="videoInfo.frameStep"
+        :min="1"
+        :max="24"
+        :step="1"></el-input-number>
+      <el-divider direction="vertical" />
+      <span>当前帧数:</span>
+      <el-input-number
+        v-model="videoInfo.currentFrame"
+        :min="0"
+        :max="requestFrameList.length"
+        :step="videoInfo.frameStep"
+        @change="handleFrameChange"></el-input-number>
+      <span>/{{ requestFrameList.length }}</span>
+      <el-button type="primary" @click="handlePlayFrame">
+        {{ autoPlayFrame ? "暂停" : "播放" }}
+      </el-button>
+    </div>
     <canvas ref="videoCanvasRef" class="video-canvas" width="640" height="360">
     </canvas>
   </div>
@@ -151,6 +178,7 @@
       // 将canvas背景置为透明
       ctx.clearRect(0, 0, videoCanvas.width, videoCanvas.height);
     }
+    videoInfo.value.currentFrame = 0;
     requestFrameList.value = [];
     const updateCanvas = async (now: number, metadata: any) => {
       // mediaTime与video.currentTime相同，presentedFrames 表示已播放帧数
@@ -168,10 +196,10 @@
 
     video.requestVideoFrameCallback(updateCanvas);
 
-    video.addEventListener("canplay", () => {
-      video.play();
-      // getFrameList();
-    });
+    // video.addEventListener("canplay", () => {
+    //   video.play();
+    //   // getFrameList();
+    // });
     video.addEventListener("play", () => {
       showPlayIcon.value = false;
     });
@@ -242,6 +270,52 @@
   const handleQuitDraw = () => {
     handleResetDraw();
     videoCanvasRef.value.setAttribute("style", "pointer-events: none;");
+  };
+
+  const autoPlayFrame = ref(false);
+  let playFrameTimer = 0;
+
+  const handlePlayFrame = () => {
+    autoPlayFrame.value = !autoPlayFrame.value;
+    if (playFrameTimer) {
+      clearInterval(playFrameTimer);
+      playFrameTimer = 0;
+    }
+    if (autoPlayFrame.value) {
+      handleResetDraw();
+      handleStartDraw();
+      // @ts-ignore
+      playFrameTimer = setInterval(() => {
+        if (videoInfo.value.currentFrame < requestFrameList.value.length) {
+          videoInfo.value.currentFrame += videoInfo.value.frameStep;
+
+          handleFrameChange();
+        } else {
+          autoPlayFrame.value = false;
+          clearInterval(playFrameTimer);
+        }
+      }, 1000 / videoInfo.value.frameRate);
+    } else {
+      handleQuitDraw();
+      videoRef.value.currentTime = videoInfo.value.currentTime;
+    }
+  };
+
+  const handleFrameChange = () => {
+    const videoCanvas = videoCanvasRef.value;
+
+    const ctx = videoCanvas.getContext("2d");
+    if (requestFrameList.value[videoInfo.value.currentFrame]) {
+      ctx.drawImage(
+        requestFrameObj[requestFrameList.value[videoInfo.value.currentFrame]],
+        0,
+        0,
+        videoCanvas.width,
+        videoCanvas.height
+      );
+      videoInfo.value.currentTime =
+        requestFrameList.value[videoInfo.value.currentFrame];
+    }
   };
 
   onMounted(() => {
