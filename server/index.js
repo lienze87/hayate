@@ -118,6 +118,11 @@ app.post("/upload", function (req, res) {
         filePath,
         `./public/${sampleFile.name.split(".mp4")[0]}.jpg`
       );
+      const metaDataPath = `./metadata/${sampleFile.name.split(".mp4")[0]}.json`;
+
+      if (!fs.existsSync(metaDataPath)) {
+        getVideoMetadata(basePath, () => {});
+      }
     }
     res.json({
       data: `http://localhost:${port}/${sampleFile.name}`,
@@ -273,7 +278,7 @@ app.get("/video/info/:id", async (req, res) => {
 
   if (fs.existsSync(metaDataPath)) {
     const data = fs.readFileSync(metaDataPath, "utf8");
-    res.json(data);
+    res.json(JSON.parse(data).streams);
   } else {
     getVideoMetadata(basePath, (data) => {
       res.json(data);

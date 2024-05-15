@@ -8,7 +8,7 @@ export function getVideoList() {
 
 export function getVideoInfo(id: string) {
   return request.get<any>({
-    url: `//video/info/${id}`,
+    url: `/video/info/${id}`,
   });
 }
 

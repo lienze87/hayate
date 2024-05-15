@@ -165,6 +165,7 @@
     addDataImage,
     updateDataImage,
     getDataImageDetail,
+    getVideoInfo,
   } from "@/api/video";
   import VideoPlayer from "@/components/VideoPlayer.vue";
   import { translateTime } from "@/utils";
@@ -184,6 +185,15 @@
   const sourceVideoPath = computed(() => {
     return `http://localhost:3005/video/${props.filename}`;
   });
+  const sourceVideoStreams = ref([]);
+  async function getVideoMetaData(id: string) {
+    try {
+      const res = await getVideoInfo(id);
+      sourceVideoStreams.value = res;
+    } catch (e) {
+      ElMessage.error(e.message);
+    }
+  }
 
   const dataList = ref([]);
   async function queryData() {
@@ -254,6 +264,9 @@
 
   const handlePreviewData = (row: any) => {
     previewVideoUrl.value = `http://localhost:3005/videoPart/${row.id}`;
+    if (sourceVideoStreams.value.length === 0) {
+      getVideoMetaData(row.id);
+    }
     videoDialogVisible.value = true;
   };
 
