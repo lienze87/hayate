@@ -12,10 +12,30 @@
 # Server
 
 使用Express+[Sequelize](https://sequelize.org/docs/v6/)(a promise-based Node.js ORM tool)+sqlite3构建
+
 ```bash
  cd .\server\
  yarn dev
 ```
+
+## upload
+
+#### 路由表
+
+| Path               | Method | Describe                                         |
+| ------------------ | ------ | ------------------------------------------------ |
+| /upload            | post   | 上传文件接口，文件存储在/server/upload文件夹内   |
+| /upload/:extension | get    | 查询/server/upload文件夹中指定文件后缀的文件列表 |
+
+## video
+
+#### 路由表
+
+| Path             | Method | Describe                      |
+| ---------------- | ------ | ----------------------------- |
+| /video/:filename | get    | 查询完整视频                  |
+| /video/info/:id  | get    | 查询由ffprobe获取的视频元信息 |
+| /videoPart/:id   | get    | 查询id对应的frames的截取视频  |
 
 ## frames
 
@@ -52,15 +72,6 @@ Frames.init(
 | /frames     | post   | 新增数据 |
 | /frames/:id | put    | 更新数据 |
 | /frames/:id | delete | 删除数据 |
-
-## video
-
-#### 路由表
-
-| Path              | Method | Describe                     |
-| ----------------- | ------ | ---------------------------- |
-| /video?episode=01 | get    | 查询完整视频                 |
-| /video/:id        | get    | 查询id对应的frames的截取视频 |
 
 ## images
 
