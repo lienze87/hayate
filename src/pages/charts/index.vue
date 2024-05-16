@@ -27,7 +27,7 @@
               <span v-else>{{ scope.row[category] }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="操作">
+          <el-table-column label="操作" width="180">
             <template #default="scope">
               <el-button
                 v-if="editId === scope.row.id"
@@ -35,12 +35,14 @@
                 @click="handleConfirmData(scope.row)">
                 确定
               </el-button>
-              <el-button
-                v-else
-                type="success"
-                @click="handleEditData(scope.row)">
-                修改
-              </el-button>
+              <template v-else>
+                <el-button type="success" @click="handleEditData(scope.row)">
+                  修改
+                </el-button>
+                <el-button type="danger" @click="handleDeleteData(scope.row)">
+                  删除
+                </el-button>
+              </template>
             </template>
           </el-table-column>
         </el-table>
@@ -340,6 +342,13 @@
       }),
     });
     editId.value = 0;
+  };
+
+  const handleDeleteData = (row: any) => {
+    const targetIndex = dataset.value.findIndex(
+      (ele: any) => ele.id === editId.value
+    );
+    dataset.value.splice(targetIndex, 1);
   };
 
   const options = computed(() => {

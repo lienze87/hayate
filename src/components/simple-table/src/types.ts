@@ -1,18 +1,18 @@
 import type { Component } from "vue";
 
-export declare type TableProps = {
+export declare interface TableProps {
   initData: Array<any>;
   columns: Array<ColumnProps>;
   height?: number;
   showLoading?: boolean;
-};
+}
 
-export declare type ColumnProps = {
+export declare interface ColumnProps {
   label: string;
   prop: string;
   width?: number;
   type?: "selection" | "index" | "expand";
-  extType?: "link" | "btn" | "switch";
+  extType?: "link" | "btn" | "switch" | "custom";
   formatter?: (
     row: any,
     column: any,
@@ -30,7 +30,7 @@ export declare type ColumnProps = {
   btnList?: Array<BtnProps>;
   opts?: any;
   customOpts?: any;
-};
+}
 
 export declare type ScopeProps = {
   row?: any;
@@ -39,7 +39,7 @@ export declare type ScopeProps = {
   $index?: number;
 };
 
-export declare type LinkProps = {
+export declare interface LinkProps {
   handler: (row: any) => void;
   customDisabled?: (
     row: any,
@@ -50,14 +50,14 @@ export declare type LinkProps = {
   opts?: {
     type: string;
   };
-};
+}
 
-export declare type SwitchProps = {
+export declare interface SwitchProps {
   handler: (row: any, val: any) => void;
   opts?: any;
-};
+}
 
-export declare type BtnProps = {
+export declare interface BtnProps {
   text: string;
   handler: (row: any, e?: Event) => void;
   formatter?: (row: any) => string;
@@ -69,4 +69,4 @@ export declare type BtnProps = {
     type: string;
     icon: string | Component;
   };
-};
+}

@@ -33,7 +33,7 @@
 </script>
 
 <script lang="ts" setup>
-  import { ref, computed } from "vue";
+  import { ref, onMounted } from "vue";
   import { ElMessage } from "element-plus";
   import type { UploadFile, UploadUserFile } from "element-plus";
   import { Plus, ZoomIn, Delete } from "@element-plus/icons-vue";
@@ -49,14 +49,22 @@
   const POST_URL = "http://localhost:3005/upload";
   const fileList = ref<UploadUserFile[]>([]);
 
-  const handlePreview = (file: UploadFile) => {};
-  const handleDelete = (file: UploadFile) => {};
-
   const handleUploadSuccess = (response: any, file: UploadFile) => {
     ElMessage.success("上传成功");
     fileList.value = [{ ...file, url: response.data }];
     emit("update:url", response.data);
   };
+
+  onMounted(() => {
+    if (props.url) {
+      fileList.value = [
+        {
+          name: props.url.split("/").slice(-1)[0],
+          url: props.url,
+        },
+      ];
+    }
+  });
 </script>
 
 <style lang="scss" scoped>

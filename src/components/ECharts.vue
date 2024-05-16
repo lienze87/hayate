@@ -13,7 +13,7 @@
 
   function initChart(options: any) {
     if (myChart !== null) {
-      myChart.setOption(options);
+      myChart.setOption(options, true);
       return;
     }
 

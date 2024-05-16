@@ -31,114 +31,117 @@ const SimpleTableColumn = defineComponent({
     checkAttr(config, "width", column.width, 80);
     checkAttr(config, "extType", column.extType, "");
 
-    return { config };
-  },
-  render() {
-    try {
-      const {
-        label,
-        prop,
-        width,
-        type,
-        extType,
-        formatter,
-        render,
-        opts,
-        customOpts,
-      } = this.config;
+    return () => {
+      try {
+        const {
+          label,
+          prop,
+          width,
+          type,
+          extType,
+          formatter,
+          render,
+          opts,
+          customOpts,
+        } = config;
 
-      if (type) {
-        return (
-          <el-table-column type={type} label={label} width={55} {...opts} />
-        );
-      }
+        if (type) {
+          return (
+            <el-table-column type={type} label={label} width={55} {...opts} />
+          );
+        }
 
-      switch (extType) {
-        case "link":
-          return (
-            <el-table-column
-              label={label}
-              prop={prop}
-              min-width={width}
-              formatter={formatter}
-              {...opts}>
-              {{
-                default: (scope: ScopeProps) =>
-                  typeRenders.link(scope, this.config),
-              }}
-            </el-table-column>
-          );
-        case "btn":
-          return (
-            <el-table-column
-              label={label}
-              prop={prop}
-              min-width={width}
-              {...opts}>
-              {{
-                default: (scope: ScopeProps) =>
-                  typeRenders.btn(scope, this.config),
-              }}
-            </el-table-column>
-          );
-        case "switch":
-          return (
-            <el-table-column
-              label={label}
-              prop={prop}
-              min-width={width}
-              {...opts}>
-              {{
-                default: (scope: ScopeProps) =>
-                  typeRenders.switch(scope, this.config),
-              }}
-            </el-table-column>
-          );
-        case "custom":
-          return (
-            <el-table-column
-              label={label}
-              prop={prop}
-              min-width={width}
-              formatter={formatter}
-              show-overflow-tooltip={true}
-              {...opts}>
-              {{
-                default: (scope: ScopeProps) => {
-                  const value = prop && scope.row[prop];
-                  const context = render
-                    ? render(scope.row, scope.column, scope.value, scope.$index)
-                    : value?.toString?.() || "";
-                  // 当context类型为字符串时，使用v-html模式，否则视context为v-node
-                  if (typeof context === "string") {
-                    return (
-                      <span
-                        class="custom-cell"
-                        v-html={context}
-                        {...customOpts}></span>
-                    );
-                  } else {
-                    return context;
-                  }
-                },
-              }}
-            </el-table-column>
-          );
-        default:
-          return (
-            <el-table-column
-              label={label}
-              prop={prop}
-              min-width={width}
-              formatter={formatter}
-              show-overflow-tooltip={true}
-              {...opts}
-            />
-          );
+        switch (extType) {
+          case "link":
+            return (
+              <el-table-column
+                label={label}
+                prop={prop}
+                min-width={width}
+                formatter={formatter}
+                {...opts}>
+                {{
+                  default: (scope: ScopeProps) =>
+                    typeRenders.link(scope, config),
+                }}
+              </el-table-column>
+            );
+          case "btn":
+            return (
+              <el-table-column
+                label={label}
+                prop={prop}
+                min-width={width}
+                {...opts}>
+                {{
+                  default: (scope: ScopeProps) =>
+                    typeRenders.btn(scope, config),
+                }}
+              </el-table-column>
+            );
+          case "switch":
+            return (
+              <el-table-column
+                label={label}
+                prop={prop}
+                min-width={width}
+                {...opts}>
+                {{
+                  default: (scope: ScopeProps) =>
+                    typeRenders.switch(scope, config),
+                }}
+              </el-table-column>
+            );
+          case "custom":
+            return (
+              <el-table-column
+                label={label}
+                prop={prop}
+                min-width={width}
+                formatter={formatter}
+                show-overflow-tooltip={true}
+                {...opts}>
+                {{
+                  default: (scope: ScopeProps) => {
+                    const value = prop && scope.row[prop];
+                    const context = render
+                      ? render(
+                          scope.row,
+                          scope.column,
+                          scope.value,
+                          scope.$index
+                        )
+                      : value?.toString?.() || "";
+                    // 当context类型为字符串时，使用v-html模式，否则视context为v-node
+                    if (typeof context === "string") {
+                      return (
+                        <span
+                          class="custom-cell"
+                          v-html={context}
+                          {...customOpts}></span>
+                      );
+                    } else {
+                      return context;
+                    }
+                  },
+                }}
+              </el-table-column>
+            );
+          default:
+            return (
+              <el-table-column
+                label={label}
+                prop={prop}
+                min-width={width}
+                formatter={formatter}
+                show-overflow-tooltip={true}
+                {...opts}></el-table-column>
+            );
+        }
+      } catch (e) {
+        console.error("表格错误", e);
       }
-    } catch (e) {
-      console.error("表格错误", e);
-    }
+    };
   },
 });
 
