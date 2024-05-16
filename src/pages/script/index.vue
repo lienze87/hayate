@@ -10,7 +10,15 @@
             placeholder="概括拍摄内容"></el-input>
         </template>
       </el-table-column>
-      <el-table-column prop="scene" label="景别" width="180" />
+      <el-table-column prop="scene" label="景别" width="180">
+        <template #default="scope">
+          <el-select v-model="scope.row.scene">
+            <el-option label="远景" value="far"></el-option>
+            <el-option label="中景" value="middle"></el-option>
+            <el-option label="近景" value="near"></el-option>
+          </el-select>
+        </template>
+      </el-table-column>
       <el-table-column prop="cameraOperation" label="运镜" width="180" />
       <el-table-column prop="reference" label="参考图">
         <template #default="scope">
@@ -29,11 +37,6 @@
             :rows="3"
             type="textarea"
             placeholder="详细描述分镜"></el-input>
-        </template>
-      </el-table-column>
-      <el-table-column prop="video" label="已拍摄片段">
-        <template #default="scope">
-          <el-input v-model="scope.row.video"></el-input>
         </template>
       </el-table-column>
       <el-table-column prop="copywriting" label="台词文案">
@@ -55,7 +58,7 @@
         </template>
       </el-table-column>
     </el-table>
-    <SimpleTable :initData="tableData" :columns="columns">
+    <SimpleTable :initData="tableData" :columns="dataColumns">
       <template #reference="scope">
         <ImgUploader v-model:url="scope.row.reference" />
       </template>
@@ -76,18 +79,22 @@
   const tableData = ref([
     {
       uuid: "0",
-      outline: "",
-      scene: "中景",
+      outline: "一段故事",
+      scene: "middle",
       cameraOperation: "固定",
       reference: "",
-      duration: "",
-      cameraDescription: "",
-      video: "",
-      copywriting: "",
-      describe: "",
+      duration: "5",
+      cameraDescription: "拍摄主角",
+      copywriting: "啊",
+      describe: "一段备注",
     },
   ]);
-  const columns = ref([
+  const sceneObj: Record<string, string> = {
+    far: "远景",
+    middle: "中景",
+    near: "近景",
+  };
+  const dataColumns = ref<any[]>([
     {
       label: "大纲",
       prop: "outline",
@@ -95,6 +102,9 @@
     {
       label: "景别",
       prop: "scene",
+      formatter: (row: any) => {
+        return sceneObj[row.scene];
+      },
     },
     {
       label: "运镜",
@@ -113,16 +123,25 @@
       prop: "cameraDescription",
     },
     {
-      label: "已拍摄片段",
-      prop: "video",
-    },
-    {
       label: "台词文案",
       prop: "copywriting",
     },
     {
       label: "备注",
       prop: "describe",
+    },
+    {
+      label: "操作",
+      prop: "",
+      extType: "btn",
+      btnList: [
+        {
+          text: "编辑",
+          handler: (row: any) => {
+            console.log(row);
+          },
+        },
+      ],
     },
   ]);
 </script>

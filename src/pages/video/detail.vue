@@ -25,9 +25,11 @@
             class="video-part-item"
             v-for="item in dataList"
             :key="item.uuid">
-            <div>{{ item.name }} {{ `${item.start}-${item.end}` }}</div>
-            <div>{{ item.describe }}</div>
-            <div>
+            <div class="part-item-title">
+              {{ item.name }} {{ `${item.start}-${item.end}` }}
+            </div>
+            <div class="part-item-describe">{{ item.describe }}</div>
+            <div class="part-item-action">
               <el-button type="primary" @click="handlePreviewData(item)">
                 预览
               </el-button>
@@ -142,7 +144,7 @@
             :src="image"
             :preview-src-list="imageList"
             :initial-index="index"
-            style="margin-right: 10px; width: 100px"
+            class="frame-image"
             fit="contain" />
         </div>
       </div>
@@ -391,5 +393,9 @@
   .dialog-images {
     max-height: 250px;
     overflow-y: auto;
+    .frame-image {
+      margin-right: 10px;
+      width: 100px;
+    }
   }
 </style>
