@@ -29,6 +29,7 @@ export declare type ColumnProps = {
   switchAttr?: SwitchProps;
   btnList?: Array<BtnProps>;
   opts?: any;
+  customOpts?: any;
 };
 
 export declare type ScopeProps = {

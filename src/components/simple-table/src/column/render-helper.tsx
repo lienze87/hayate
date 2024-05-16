@@ -84,7 +84,7 @@ export const typeRenders = {
             text = btn.formatter(scope.row);
           }
           let opts = Object.assign(
-            { size: "mini", type: "primary", plain: true },
+            { size: "small", type: "primary", plain: true },
             btn.opts
           );
           let disabled = btn.customDisabled && btn.customDisabled(scope.row);
@@ -107,7 +107,7 @@ export const typeRenders = {
             {{
               default: (dropdownScope: any) => {
                 return (
-                  <el-button type="primary" plain size="mini">
+                  <el-button type="primary" plain size="small">
                     更多
                     <el-icon class="el-icon--right">
                       <ArrowDown />

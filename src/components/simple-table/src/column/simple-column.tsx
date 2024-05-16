@@ -3,7 +3,7 @@ import type { ColumnProps, ScopeProps } from "../types";
 import { typeRenders } from "./render-helper";
 
 function checkAttr(
-  obj: object,
+  obj: Record<string, any>,
   key: string,
   value: string | number | undefined,
   defaultVal?: string | number
@@ -35,8 +35,17 @@ const SimpleTableColumn = defineComponent({
   },
   render() {
     try {
-      const { label, prop, width, type, extType, formatter, opts } =
-        this.config;
+      const {
+        label,
+        prop,
+        width,
+        type,
+        extType,
+        formatter,
+        render,
+        opts,
+        customOpts,
+      } = this.config;
 
       if (type) {
         return (
@@ -67,8 +76,6 @@ const SimpleTableColumn = defineComponent({
               min-width={width}
               {...opts}>
               {{
-                header: (scope: ScopeProps) =>
-                  typeRenders.header(scope, this.config),
                 default: (scope: ScopeProps) =>
                   typeRenders.btn(scope, this.config),
               }}
@@ -87,7 +94,36 @@ const SimpleTableColumn = defineComponent({
               }}
             </el-table-column>
           );
-
+        case "custom":
+          return (
+            <el-table-column
+              label={label}
+              prop={prop}
+              min-width={width}
+              formatter={formatter}
+              show-overflow-tooltip={true}
+              {...opts}>
+              {{
+                default: (scope: ScopeProps) => {
+                  const value = prop && scope.row[prop];
+                  const context = render
+                    ? render(scope.row, scope.column, scope.value, scope.$index)
+                    : value?.toString?.() || "";
+                  // 当context类型为字符串时，使用v-html模式，否则视context为v-node
+                  if (typeof context === "string") {
+                    return (
+                      <span
+                        class="custom-cell"
+                        v-html={context}
+                        {...customOpts}></span>
+                    );
+                  } else {
+                    return context;
+                  }
+                },
+              }}
+            </el-table-column>
+          );
         default:
           return (
             <el-table-column
