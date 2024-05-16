@@ -16,18 +16,11 @@
                 clearable />
             </el-form-item>
             <el-form-item label="内容">
-              <el-input
-                v-model="addFormData.context"
-                :autosize="{ minRows: 5, maxRows: 20 }"
-                type="textarea"
-                placeholder="请输入内容" />
+              <MarkdownEditor v-model="addFormData.context"></MarkdownEditor>
             </el-form-item>
             <el-form-item>
               <div class="form-inline-block">
-                <el-input
-                  v-model="addFormData.subtitle"
-                  placeholder="请输入次级标题">
-                </el-input>
+                <div></div>
                 <el-button type="primary" @click="handleConfirmData('add')">
                   确定
                 </el-button>
@@ -61,21 +54,10 @@
           </template>
           <div class="card-item-content" v-if="editId === row.uuid">
             <div class="form-item">
-              <el-input
-                v-model="editFormData.context"
-                :autosize="{ minRows: 5, maxRows: 20 }"
-                type="textarea"
-                placeholder="请输入内容" />
+              <MarkdownEditor v-model="editFormData.context"></MarkdownEditor>
             </div>
             <div class="form-inline-block">
-              <el-select
-                v-model="editFormData.subtitle"
-                placeholder="请选择类型"
-                style="width: 150px">
-                <el-option label="vue" value="vue"></el-option>
-                <el-option label="js" value="js"></el-option>
-                <el-option label="css" value="css"></el-option>
-              </el-select>
+              <div></div>
               <div>
                 <el-button type="primary" @click="handleConfirmData('edit')">
                   确定
@@ -85,7 +67,7 @@
             </div>
           </div>
           <div class="card-item-content" v-else>
-            <p>{{ row.context }}</p>
+            <div class="card-item-context" v-html="getHtml(row.context)"></div>
           </div>
         </el-card>
       </div>
@@ -102,7 +84,9 @@
 <script setup lang="ts">
   import { ref, onMounted } from "vue";
   import { ElMessage } from "element-plus";
+  import { marked } from "marked";
   import { getDataList, addData, updateData, deleteData } from "@/api/notes";
+  import MarkdownEditor from "@/components/MarkdownEditor.vue";
 
   const dataList = ref([]);
   const editId = ref("");
@@ -170,6 +154,10 @@
     activeNames.value = "";
   };
 
+  const getHtml = (text: string) => {
+    return marked.parse(text);
+  };
+
   async function queryData() {
     try {
       const res = await getDataList();
@@ -192,6 +180,8 @@
     height: calc(100vh - 100px);
   }
   .content-header {
+    position: sticky;
+    top: -20px;
     width: 100%;
     min-height: 60px;
   }
