@@ -38,12 +38,38 @@
           </el-select>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="onSubmit">确定</el-button>
-          <el-button type="danger" @click="onReset">重置</el-button>
+          <el-button type="primary" @click="onDrawAxis">确定</el-button>
+          <el-button type="danger" @click="onResetCanvas">重置</el-button>
         </el-form-item>
       </el-form>
-      <p>请在画板内用鼠标进行绘制</p>
-      <div class="my-board" ref="myBoard"></div>
+      <div class="canvas-action">
+        <el-radio-group
+          v-model="currentTool"
+          size="large"
+          @change="handleToolChange">
+          <el-radio-button label="选择" value="mouse" />
+          <el-dropdown @command="handleShapeChange">
+            <el-radio-button :label="currentShapeName" value="shape" />
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item command="line">直线</el-dropdown-item>
+                <el-dropdown-item command="circle">圆</el-dropdown-item>
+                <el-dropdown-item command="rect">矩形</el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+          <el-radio-button label="画笔" value="draw" />
+          <el-radio-button label="橡皮" value="eraser" />
+        </el-radio-group>
+        <div class="action-item">
+          <span>画笔大小</span>
+          <el-input-number v-model="currentLineWidth"></el-input-number>
+        </div>
+      </div>
+      <div
+        class="my-board"
+        ref="myBoard"
+        :style="`cursor: ${cursorType}`"></div>
     </div>
   </div>
 </template>
@@ -55,12 +81,16 @@
 </script>
 
 <script setup lang="ts">
-  import { ref, onMounted, computed } from "vue";
-  import { initCanvasDraw } from "@/utils/canvasDraw";
+  import { computed, ref, onMounted, onUnmounted } from "vue";
 
   const FONT_SIZE = 24;
   const BACKGROUND_COLOR = "#274c43";
   const PEN_COLOR = "#ffffff";
+
+  const myBoard = ref();
+  const myCanvas: HTMLCanvasElement = document.createElement("canvas");
+  myCanvas.id = "my-canvas";
+  let ctx: CanvasRenderingContext2D | null = null;
 
   const formData = ref({
     min: 0,
@@ -148,14 +178,11 @@
     });
   }
 
-  const onReset = () => {
-    ctx.fillStyle = BACKGROUND_COLOR;
-    ctx.fillRect(0, 0, myCanvas.width, myCanvas.height);
-  };
-
-  function onSubmit() {
+  function onDrawAxis() {
     dataList.value = getDataList();
-    onReset();
+    currentTool.value = "mouse";
+    handleToolChange("mouse");
+
     if (formData.value.direction === "vertical") {
       drawYAxis();
     } else {
@@ -163,10 +190,393 @@
     }
   }
 
-  const myBoard = ref();
-  const myCanvas: HTMLCanvasElement = document.createElement("canvas");
-  myCanvas.id = "my-canvas";
-  let ctx: CanvasRenderingContext2D | null = null;
+  const onResetCanvas = () => {
+    shapeLines.value = [];
+    shapeCircles.value = [];
+    shapeRects.value = [];
+    ctx.fillStyle = BACKGROUND_COLOR;
+    ctx.fillRect(0, 0, myCanvas.width, myCanvas.height);
+  };
+
+  const currentTool = ref("mouse");
+  const cursorType = ref("default");
+  const currentShape = ref("line");
+  const shapeObj: Record<string, string> = {
+    line: "直线",
+    circle: "圆",
+    rect: "方形",
+  };
+  const shapeLines = ref<
+    { begin: { x: number; y: number }; end: { x: number; y: number } }[]
+  >([]);
+  const shapeCircles = ref<
+    { begin: { x: number; y: number }; radius: number }[]
+  >([]);
+  const shapeRects = ref<
+    { x: number; y: number; width: number; height: number }[]
+  >([]);
+
+  const currentShapeName = computed(() => {
+    return currentShape.value ? `形状-${shapeObj[currentShape.value]}` : "形状";
+  });
+  const handleShapeChange = (shape: string) => {
+    currentShape.value = shape;
+  };
+
+  const lineWidth = ref(1);
+  const currentLineWidth = computed({
+    get() {
+      return lineWidth.value;
+    },
+    set(val) {
+      lineWidth.value = val;
+      ctx.lineWidth = val;
+    },
+  });
+
+  const handleToolChange = (tool: string) => {
+    switch (tool) {
+      case "mouse":
+        cursorType.value = "default";
+        currentLineWidth.value = 1;
+        ctx.strokeStyle = PEN_COLOR;
+        break;
+      case "shape":
+        currentShape.value = "line";
+        currentLineWidth.value = 1;
+        ctx.strokeStyle = PEN_COLOR;
+        onResetCanvas();
+        break;
+      case "draw":
+        cursorType.value = "crosshair";
+        currentLineWidth.value = 1;
+        ctx.strokeStyle = PEN_COLOR;
+        break;
+      case "eraser":
+        currentLineWidth.value = 20;
+        ctx.strokeStyle = BACKGROUND_COLOR;
+        cursorType.value = "cell";
+        break;
+      default:
+        cursorType.value = "auto";
+        break;
+    }
+  };
+
+  function drawLine(
+    ctx: CanvasRenderingContext2D,
+    line: {
+      begin: { x: number; y: number };
+      end: { x: number; y: number };
+      strokeStyle?: string;
+    }
+  ) {
+    const { begin, end, strokeStyle = "PEN_COLOR" } = line;
+    ctx.beginPath();
+    ctx.moveTo(begin.x, begin.y);
+    ctx.lineTo(end.x, end.y);
+    ctx.strokeStyle = strokeStyle;
+    ctx.stroke();
+  }
+
+  function drawCircle(
+    ctx: CanvasRenderingContext2D,
+    line: {
+      begin: { x: number; y: number };
+      radius: number;
+      strokeStyle?: string;
+    }
+  ) {
+    const { begin, radius, strokeStyle = "PEN_COLOR" } = line;
+    ctx.beginPath();
+    ctx.arc(begin.x, begin.y, radius, 0, Math.PI * 2, true);
+    ctx.strokeStyle = strokeStyle;
+    ctx.stroke();
+  }
+
+  const getMousePosition = (evt: MouseEvent): { x: number; y: number } => {
+    const scrollTop = window.scrollY;
+    let position = {
+      x: evt.pageX - myCanvas.getBoundingClientRect().left,
+      y: evt.pageY - myCanvas.getBoundingClientRect().top - scrollTop,
+    };
+    return position;
+  };
+
+  // Mouse Event Handlers
+
+  const mouseDraw = {
+    isDown: false,
+    down: { x: 0, y: 0 },
+    current: { x: 0, y: 0 },
+    up: { x: 0, y: 0 },
+    mousedown: function (evt: MouseEvent) {
+      this.isDown = true;
+      this.down = getMousePosition(evt);
+
+      if (["draw", "eraser"].includes(currentTool.value)) {
+        ctx.beginPath();
+        ctx.moveTo(this.down.x, this.down.y);
+      }
+    },
+    mousemove: function (evt: MouseEvent) {
+      if (this.isDown) {
+        this.current = getMousePosition(evt);
+
+        if (["draw", "eraser"].includes(currentTool.value)) {
+          ctx.lineTo(this.current.x, this.current.y);
+          ctx.stroke();
+        }
+        if (currentTool.value === "shape") {
+          ctx.fillRect(0, 0, myCanvas.width, myCanvas.height);
+
+          if (currentShape.value === "line") {
+            let line = {
+              begin: this.down,
+              end: this.current,
+            };
+            shapeLines.value.pop();
+            shapeLines.value.push(line);
+          } else if (currentShape.value === "circle") {
+            const radius = Math.sqrt(
+              (this.current.x - this.down.x) ** 2 +
+                (this.current.y - this.down.y) ** 2
+            );
+            let circle = {
+              begin: this.down,
+              radius,
+            };
+            shapeCircles.value.pop();
+            shapeCircles.value.push(circle);
+          } else if (currentShape.value === "rect") {
+            let rect = {
+              x: this.down.x,
+              y: this.down.y,
+              width: this.current.x - this.down.x,
+              height: this.current.y - this.down.y,
+            };
+            shapeRects.value.pop();
+            shapeRects.value.push(rect);
+          }
+        }
+      }
+    },
+    mouseup: function (evt: MouseEvent) {
+      this.isDown = false;
+      this.up = getMousePosition(evt);
+      if (currentTool.value === "shape") {
+        if (currentShape.value === "line") {
+          const line = {
+            begin: this.down,
+            end: this.up,
+          };
+          shapeLines.value.push(line);
+        } else if (currentShape.value === "circle") {
+          const radius = Math.sqrt(
+            (this.current.x - this.down.x) ** 2 +
+              (this.current.y - this.down.y) ** 2
+          );
+          let circle = {
+            begin: this.down,
+            radius,
+          };
+          shapeCircles.value.push(circle);
+        } else if (currentShape.value === "rect") {
+          let rect = {
+            x: this.down.x,
+            y: this.down.y,
+            width: this.current.x - this.down.x,
+            height: this.current.y - this.down.y,
+          };
+
+          shapeRects.value.push(rect);
+        }
+      }
+
+      ctx.closePath();
+    },
+    mouseleave: function (evt: MouseEvent) {
+      this.isDown = false;
+      ctx.closePath();
+    },
+  };
+
+  const getTouchPosition = (evt: TouchEvent): { x: number; y: number } => {
+    const scrollTop = window.scrollY;
+    let position = {
+      x: evt.touches[0].pageX - myCanvas.getBoundingClientRect().left,
+      y:
+        evt.touches[0].pageY - myCanvas.getBoundingClientRect().top - scrollTop,
+    };
+    return position;
+  };
+
+  // Touch Events Handlers
+  const touchDraw = {
+    started: false,
+    down: { x: 0, y: 0 },
+    current: { x: 0, y: 0 },
+    up: { x: 0, y: 0 },
+    start: function (evt: TouchEvent) {
+      this.started = true;
+      this.down = getTouchPosition(evt);
+      if (["draw", "eraser"].includes(currentTool.value)) {
+        ctx.beginPath();
+        ctx.moveTo(this.down.x, this.down.y);
+      }
+    },
+    move: function (evt: TouchEvent) {
+      evt.preventDefault();
+
+      if (this.started) {
+        this.current = getTouchPosition(evt);
+        if (["draw", "eraser"].includes(currentTool.value)) {
+          ctx.lineTo(this.current.x, this.current.y);
+          ctx.stroke();
+        }
+        if (currentTool.value === "shape") {
+          ctx.fillRect(0, 0, myCanvas.width, myCanvas.height);
+
+          if (currentShape.value === "line") {
+            let line = {
+              begin: this.down,
+              end: this.current,
+            };
+            shapeLines.value.pop();
+            shapeLines.value.push(line);
+          } else if (currentShape.value === "circle") {
+            const radius = Math.sqrt(
+              (this.current.x - this.down.x) ** 2 +
+                (this.current.y - this.down.y) ** 2
+            );
+            let circle = {
+              begin: this.down,
+              radius,
+            };
+            shapeCircles.value.pop();
+            shapeCircles.value.push(circle);
+          } else if (currentShape.value === "rect") {
+            let rect = {
+              x: this.down.x,
+              y: this.down.y,
+              width: this.current.x - this.down.x,
+              height: this.current.y - this.down.y,
+            };
+            shapeRects.value.pop();
+            shapeRects.value.push(rect);
+          }
+        }
+      }
+    },
+    end: function (evt: TouchEvent) {
+      this.started = false;
+      this.up = getTouchPosition(evt);
+      if (currentTool.value === "shape") {
+        if (currentShape.value === "line") {
+          const line = {
+            begin: this.down,
+            end: this.up,
+          };
+          shapeLines.value.push(line);
+        } else if (currentShape.value === "circle") {
+          const radius = Math.sqrt(
+            (this.current.x - this.down.x) ** 2 +
+              (this.current.y - this.down.y) ** 2
+          );
+          let circle = {
+            begin: this.down,
+            radius,
+          };
+          shapeCircles.value.push(circle);
+        } else if (currentShape.value === "rect") {
+          let rect = {
+            x: this.down.x,
+            y: this.down.y,
+            width: this.current.x - this.down.x,
+            height: this.current.y - this.down.y,
+          };
+
+          shapeRects.value.push(rect);
+        }
+      }
+
+      ctx.closePath();
+    },
+  };
+
+  const drawController = new AbortController();
+
+  function initCanvasDraw(
+    myCanvas: HTMLCanvasElement,
+    ctx: CanvasRenderingContext2D
+  ) {
+    // Set Background Color
+    ctx.fillRect(0, 0, myCanvas.width, myCanvas.height);
+
+    // Mouse Events
+    myCanvas.addEventListener("mousedown", mouseDraw.mousedown, {
+      capture: false,
+      signal: drawController.signal,
+    });
+    myCanvas.addEventListener("mouseup", mouseDraw.mouseup, {
+      capture: false,
+      signal: drawController.signal,
+    });
+    myCanvas.addEventListener("mousemove", mouseDraw.mousemove, {
+      capture: false,
+      signal: drawController.signal,
+    });
+    myCanvas.addEventListener("mouseleave", mouseDraw.mouseleave, {
+      capture: false,
+      signal: drawController.signal,
+    });
+
+    // Touch Events
+    myCanvas.addEventListener("touchstart", touchDraw.start, {
+      capture: false,
+      signal: drawController.signal,
+    });
+    myCanvas.addEventListener("touchend", touchDraw.end, {
+      capture: false,
+      signal: drawController.signal,
+    });
+    myCanvas.addEventListener("touchmove", touchDraw.move, {
+      capture: false,
+      signal: drawController.signal,
+    });
+
+    // Disable Page Move
+    document.body.addEventListener(
+      "touchmove",
+      function (evt) {
+        evt.stopPropagation();
+      },
+      {
+        capture: false,
+        signal: drawController.signal,
+      }
+    );
+  }
+
+  window.requestAnimationFrame(function loop() {
+    if (currentTool.value === "shape") {
+      ctx.fillRect(0, 0, myCanvas.width, myCanvas.height);
+
+      shapeLines.value.forEach(function (line) {
+        drawLine(ctx, line);
+      });
+
+      shapeCircles.value.forEach(function (circle) {
+        drawCircle(ctx, circle);
+      });
+
+      shapeRects.value.forEach(function (rect) {
+        ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
+      });
+    }
+
+    window.requestAnimationFrame(loop);
+  });
 
   onMounted(() => {
     if (myBoard.value) {
@@ -178,13 +588,17 @@
       myBoard.value.appendChild(myCanvas);
       ctx = myCanvas.getContext("2d");
       ctx.font = `${FONT_SIZE}px serif`;
-      ctx.lineWidth = 1;
+      ctx.lineWidth = lineWidth.value;
       ctx.strokeStyle = PEN_COLOR;
       if (ctx) {
         initCanvasDraw(myCanvas, ctx);
       }
     }
-    onSubmit();
+    onResetCanvas();
+  });
+
+  onUnmounted(() => {
+    drawController.abort();
   });
 </script>
 <style lang="scss" scoped>
@@ -196,9 +610,17 @@
     width: 100%;
     height: calc(100vh - 100px);
   }
+  .canvas-action {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin: 10px 0;
+    .action-item {
+      margin: 0 10px;
+    }
+  }
   .my-board {
     width: 100%;
     height: 594px;
-    cursor: crosshair;
   }
 </style>
