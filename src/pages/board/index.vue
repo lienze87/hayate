@@ -65,6 +65,12 @@
           <span>画笔大小</span>
           <el-input-number v-model="currentLineWidth"></el-input-number>
         </div>
+        <el-button
+          v-if="currentTool === 'shape'"
+          type="danger"
+          @click="handleShapeUndo">
+          撤销上一步
+        </el-button>
       </div>
       <div
         class="my-board"
@@ -191,36 +197,40 @@
   }
 
   const onResetCanvas = () => {
-    shapeLines.value = [];
-    shapeCircles.value = [];
-    shapeRects.value = [];
+    shapeDataList.value = [];
     ctx.fillStyle = BACKGROUND_COLOR;
     ctx.fillRect(0, 0, myCanvas.width, myCanvas.height);
   };
 
   const currentTool = ref("mouse");
   const cursorType = ref("default");
+
   const currentShape = ref("line");
   const shapeObj: Record<string, string> = {
     line: "直线",
     circle: "圆",
     rect: "方形",
   };
-  const shapeLines = ref<
-    { begin: { x: number; y: number }; end: { x: number; y: number } }[]
-  >([]);
-  const shapeCircles = ref<
-    { begin: { x: number; y: number }; radius: number }[]
-  >([]);
-  const shapeRects = ref<
-    { x: number; y: number; width: number; height: number }[]
-  >([]);
-
+  const shapeDataList = ref([]);
   const currentShapeName = computed(() => {
     return currentShape.value ? `形状-${shapeObj[currentShape.value]}` : "形状";
   });
   const handleShapeChange = (shape: string) => {
     currentShape.value = shape;
+  };
+  const handleShapeUndo = () => {
+    // 形状数据数组的最后一个元素永远是key为end的元素,此元素用于绘制时使用
+    if (shapeDataList.value.length > 0) {
+      shapeDataList.value.splice(shapeDataList.value.length - 2, 2);
+      const lastShape = shapeDataList.value.slice(-1)[0];
+      if (lastShape) {
+        shapeDataList.value.push({
+          ...lastShape,
+          key: "end",
+        });
+        currentShape.value = lastShape.type;
+      }
+    }
   };
 
   const lineWidth = ref(1);
@@ -265,13 +275,14 @@
 
   function drawLine(
     ctx: CanvasRenderingContext2D,
-    line: {
+    data: {
+      type: string;
       begin: { x: number; y: number };
       end: { x: number; y: number };
       strokeStyle?: string;
     }
   ) {
-    const { begin, end, strokeStyle = "PEN_COLOR" } = line;
+    const { begin, end, strokeStyle = "PEN_COLOR" } = data;
     ctx.beginPath();
     ctx.moveTo(begin.x, begin.y);
     ctx.lineTo(end.x, end.y);
@@ -281,13 +292,14 @@
 
   function drawCircle(
     ctx: CanvasRenderingContext2D,
-    line: {
+    data: {
+      type: string;
       begin: { x: number; y: number };
       radius: number;
       strokeStyle?: string;
     }
   ) {
-    const { begin, radius, strokeStyle = "PEN_COLOR" } = line;
+    const { begin, radius, strokeStyle = "PEN_COLOR" } = data;
     ctx.beginPath();
     ctx.arc(begin.x, begin.y, radius, 0, Math.PI * 2, true);
     ctx.strokeStyle = strokeStyle;
@@ -332,31 +344,37 @@
 
           if (currentShape.value === "line") {
             let line = {
+              key: "move",
+              type: "line",
               begin: this.down,
               end: this.current,
             };
-            shapeLines.value.pop();
-            shapeLines.value.push(line);
+            shapeDataList.value.pop();
+            shapeDataList.value.push(line);
           } else if (currentShape.value === "circle") {
             const radius = Math.sqrt(
               (this.current.x - this.down.x) ** 2 +
                 (this.current.y - this.down.y) ** 2
             );
             let circle = {
+              key: "move",
+              type: "circle",
               begin: this.down,
               radius,
             };
-            shapeCircles.value.pop();
-            shapeCircles.value.push(circle);
+            shapeDataList.value.pop();
+            shapeDataList.value.push(circle);
           } else if (currentShape.value === "rect") {
             let rect = {
+              key: "move",
+              type: "rect",
               x: this.down.x,
               y: this.down.y,
               width: this.current.x - this.down.x,
               height: this.current.y - this.down.y,
             };
-            shapeRects.value.pop();
-            shapeRects.value.push(rect);
+            shapeDataList.value.pop();
+            shapeDataList.value.push(rect);
           }
         }
       }
@@ -367,29 +385,37 @@
       if (currentTool.value === "shape") {
         if (currentShape.value === "line") {
           const line = {
+            key: "end",
+            type: "line",
             begin: this.down,
             end: this.up,
           };
-          shapeLines.value.push(line);
+
+          shapeDataList.value.push(line);
         } else if (currentShape.value === "circle") {
           const radius = Math.sqrt(
             (this.current.x - this.down.x) ** 2 +
               (this.current.y - this.down.y) ** 2
           );
           let circle = {
+            key: "end",
+            type: "circle",
             begin: this.down,
             radius,
           };
-          shapeCircles.value.push(circle);
+
+          shapeDataList.value.push(circle);
         } else if (currentShape.value === "rect") {
           let rect = {
+            key: "end",
+            type: "rect",
             x: this.down.x,
             y: this.down.y,
             width: this.current.x - this.down.x,
             height: this.current.y - this.down.y,
           };
 
-          shapeRects.value.push(rect);
+          shapeDataList.value.push(rect);
         }
       }
 
@@ -439,31 +465,37 @@
 
           if (currentShape.value === "line") {
             let line = {
+              key: "move",
+              type: "line",
               begin: this.down,
               end: this.current,
             };
-            shapeLines.value.pop();
-            shapeLines.value.push(line);
+
+            shapeDataList.value.push(line);
           } else if (currentShape.value === "circle") {
             const radius = Math.sqrt(
               (this.current.x - this.down.x) ** 2 +
                 (this.current.y - this.down.y) ** 2
             );
             let circle = {
+              key: "move",
+              type: "circle",
               begin: this.down,
               radius,
             };
-            shapeCircles.value.pop();
-            shapeCircles.value.push(circle);
+
+            shapeDataList.value.push(circle);
           } else if (currentShape.value === "rect") {
             let rect = {
+              key: "move",
+              type: "rect",
               x: this.down.x,
               y: this.down.y,
               width: this.current.x - this.down.x,
               height: this.current.y - this.down.y,
             };
-            shapeRects.value.pop();
-            shapeRects.value.push(rect);
+
+            shapeDataList.value.push(rect);
           }
         }
       }
@@ -474,29 +506,37 @@
       if (currentTool.value === "shape") {
         if (currentShape.value === "line") {
           const line = {
+            key: "end",
+            type: "line",
             begin: this.down,
             end: this.up,
           };
-          shapeLines.value.push(line);
+
+          shapeDataList.value.push(line);
         } else if (currentShape.value === "circle") {
           const radius = Math.sqrt(
             (this.current.x - this.down.x) ** 2 +
               (this.current.y - this.down.y) ** 2
           );
           let circle = {
+            key: "end",
+            type: "circle",
             begin: this.down,
             radius,
           };
-          shapeCircles.value.push(circle);
+
+          shapeDataList.value.push(circle);
         } else if (currentShape.value === "rect") {
           let rect = {
+            key: "end",
+            type: "rect",
             x: this.down.x,
             y: this.down.y,
             width: this.current.x - this.down.x,
             height: this.current.y - this.down.y,
           };
 
-          shapeRects.value.push(rect);
+          shapeDataList.value.push(rect);
         }
       }
 
@@ -562,16 +602,14 @@
     if (currentTool.value === "shape") {
       ctx.fillRect(0, 0, myCanvas.width, myCanvas.height);
 
-      shapeLines.value.forEach(function (line) {
-        drawLine(ctx, line);
-      });
-
-      shapeCircles.value.forEach(function (circle) {
-        drawCircle(ctx, circle);
-      });
-
-      shapeRects.value.forEach(function (rect) {
-        ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
+      shapeDataList.value.forEach((data) => {
+        if (data.type === "line") {
+          drawLine(ctx, data);
+        } else if (data.type === "circle") {
+          drawCircle(ctx, data);
+        } else if (data.type === "rect") {
+          ctx.strokeRect(data.x, data.y, data.width, data.height);
+        }
       });
     }
 
