@@ -12,79 +12,31 @@ function syntaxHighlight(json: string) {
   if (typeof json != "string") {
     json = JSON.stringify(json, undefined, 2);
   }
+
   json = json
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
 
-  json = json
-    .replace(
-      /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,
-      function (match) {
-        var cls = "number";
-        if (/^"/.test(match)) {
-          if (/:$/.test(match)) {
-            cls = "key";
-          } else {
-            cls = "string";
-          }
-        } else if (/true|false/.test(match)) {
-          cls = "boolean";
-        } else if (/null/.test(match)) {
-          cls = "null";
-        }
-        return `<span class="${cls}">${match}</span>`;
-      },
-    )
-    .replace(/\{|\}|\[|\]/g, function (match) {
-      return `<span class="pattern">${match}</span>`;
-    })
-    .replace(/\,/g, function (match) {
-      return `<span class="comma">${match}</span>`;
-    });
-
-  const spanList = json.match(/<span(([\s\S])*?)<\/span>/g);
-  function getClass(tag: string) {
-    return tag.match(/=\"\w+\"/)[0].replace(/\"|=/g, "");
-  }
-  function getTagValue(tag: string) {
-    return tag.match(/>.+</)[0].replace(/\"|<|>/g, "");
-  }
-  const breakLineList = spanList.map((str: string, index: number) => {
-    const type = getClass(str);
-
-    if (type === "pattern" && spanList[index + 1]) {
-      if (spanList[index + 1] && getClass(spanList[index + 1]) === "comma") {
-        if (
-          spanList[index - 1] &&
-          getClass(spanList[index - 1]) !== "pattern"
-        ) {
-          return "\n" + str;
-        } else {
-          return str;
-        }
+  const lineList = json.match(/.+\n/g).map((line: string) => {
+    const keys = line.split(" ").map((key: string) => {
+      if (key !== " " && key.slice(-1)[0] === ":") {
+        return `<span class="key">${key}</span>`;
       }
-    }
-
-    if (["pattern", "comma"].includes(type)) {
-      return str + "\n";
-    }
-
-    return str;
+      return key.replace(/\{|\}|\[|\]/g, (match: string) => {
+        return `<span class="pattern">${match}</span>`;
+      });
+    });
+    return keys.join(" ");
   });
 
-  // return json;
-  return breakLineList.join("");
+  return lineList.join("");
 }
 
-const config = computed({
-  get() {
-    const text = JSON.stringify(props.options);
-    return syntaxHighlight(text);
-  },
-  set(val) {
-    console.log(val);
-  },
+const config = computed(() => {
+  // 第三个参数自动插入空格进行缩进
+  let json = JSON.stringify(props.options, undefined, 2);
+  return syntaxHighlight(json);
 });
 
 function handleCopy(str: string) {
@@ -123,27 +75,17 @@ const onCopy = () => {
 
   .editor-content {
     padding: 20px 10px;
-    color: #f2f2f2;
+    color: #ce9178;
     border-radius: 4px;
     background-color: #263238;
-    word-break: break-all;
     white-space: pre;
   }
   :deep(.editor-content) {
     .key {
-      color: #2c99ce;
+      color: #569ccb;
     }
-    .number {
-      color: #f07178;
-    }
-    .string {
-      color: #f07178;
-    }
-    .boolean {
-      color: #d8cb33;
-    }
-    .null {
-      color: #f72c5b;
+    .pattern {
+      color: #d46ed6;
     }
   }
 }
