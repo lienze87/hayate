@@ -19,7 +19,8 @@
             v-for="category in categoryList"
             :key="category"
             :prop="category"
-            :label="category">
+            :label="category"
+          >
             <template #default="scope">
               <div v-if="editId === scope.row.id">
                 <el-input v-model="scope.row[category]"></el-input>
@@ -32,7 +33,8 @@
               <el-button
                 v-if="editId === scope.row.id"
                 type="primary"
-                @click="handleConfirmData(scope.row)">
+                @click="handleConfirmData(scope.row)"
+              >
                 确定
               </el-button>
               <template v-else>
@@ -55,7 +57,8 @@
                 v-for="item in seriesTypeList"
                 :key="item.value"
                 :label="item.name"
-                :value="item.value" />
+                :value="item.value"
+              />
             </el-select>
           </el-form-item>
           <el-form-item label="标题">
@@ -63,7 +66,8 @@
             <el-input
               v-if="config.title.show"
               v-model="config.title.text"
-              placeholder="请输入标题"></el-input>
+              placeholder="请输入标题"
+            ></el-input>
           </el-form-item>
           <el-form-item label="图例">
             <el-switch v-model="config.legend.show"></el-switch>
@@ -74,7 +78,8 @@
               <el-form-item label="集合名称">
                 <el-input
                   v-model="group.name"
-                  placeholder="请输入集合名称"></el-input>
+                  placeholder="请输入集合名称"
+                ></el-input>
               </el-form-item>
               <el-divider />
             </div>
@@ -90,7 +95,8 @@
                   v-for="item in tooltipTriggerList"
                   :key="item.value"
                   :label="item.name"
-                  :value="item.value" />
+                  :value="item.value"
+                />
               </el-select>
             </el-form-item>
           </div>
@@ -122,7 +128,8 @@
                   v-for="item in axisTypeList"
                   :key="item.value"
                   :label="item.name"
-                  :value="item.value" />
+                  :value="item.value"
+                />
               </el-select>
             </el-form-item>
             <el-form-item label="刻度居中 ">
@@ -137,7 +144,8 @@
                   v-for="item in axisTypeList"
                   :key="item.value"
                   :label="item.name"
-                  :value="item.value" />
+                  :value="item.value"
+                />
               </el-select>
             </el-form-item>
           </div>
@@ -153,271 +161,271 @@
           </div>
         </el-form>
       </div>
-      <Editor v-show="activeTab === 'editor'" :options="options" />
+      <JsonEditor v-show="activeTab === 'editor'" :options="options" />
     </div>
   </div>
 </template>
 
 <script lang="ts">
-  export default {
-    name: "Charts",
-  };
+export default {
+  name: "Charts",
+};
 </script>
 
 <script lang="ts" setup>
-  import ECharts from "@/components/ECharts.vue";
-  import Editor from "@/components/Editor.vue";
-  import { ref, computed, nextTick } from "vue";
+import ECharts from "@/components/ECharts.vue";
+import JsonEditor from "@/components/JsonEditor.vue";
+import { ref, computed, nextTick } from "vue";
 
-  const eChartsRef = ref();
+const eChartsRef = ref();
 
-  const seriesTypeList = [
-    {
-      name: "折线图",
-      value: "line",
-    },
-    {
-      name: "柱状图",
-      value: "bar",
-    },
-    {
-      name: "散点图",
-      value: "scatter",
-    },
-    {
-      name: "饼图",
-      value: "pie",
-    },
-  ];
+const seriesTypeList = [
+  {
+    name: "折线图",
+    value: "line",
+  },
+  {
+    name: "柱状图",
+    value: "bar",
+  },
+  {
+    name: "散点图",
+    value: "scatter",
+  },
+  {
+    name: "饼图",
+    value: "pie",
+  },
+];
 
-  const axisTypeList = [
-    {
-      name: "数值轴",
-      value: "value",
-    },
-    {
-      name: "类目轴",
-      value: "category",
-    },
-    {
-      name: "时间轴",
-      value: "time",
-    },
-    {
-      name: "对数轴",
-      value: "log",
-    },
-  ];
+const axisTypeList = [
+  {
+    name: "数值轴",
+    value: "value",
+  },
+  {
+    name: "类目轴",
+    value: "category",
+  },
+  {
+    name: "时间轴",
+    value: "time",
+  },
+  {
+    name: "对数轴",
+    value: "log",
+  },
+];
 
-  const tooltipTriggerList = [
-    {
-      name: "数据项图形",
-      value: "item",
-    },
-    {
-      name: "坐标轴",
-      value: "axis",
-    },
-    {
-      name: "不触发",
-      value: "none",
-    },
-  ];
+const tooltipTriggerList = [
+  {
+    name: "数据项图形",
+    value: "item",
+  },
+  {
+    name: "坐标轴",
+    value: "axis",
+  },
+  {
+    name: "不触发",
+    value: "none",
+  },
+];
 
-  const dataset = ref([
-    {
-      id: 1,
-      name: "Email",
-      values: [
-        { name: "Mon", value: 120 },
-        { name: "Tue", value: 132 },
-        { name: "Wed", value: 101 },
-        { name: "Thu", value: 134 },
-        { name: "Fri", value: 90 },
-        { name: "Sat", value: 130 },
-        { name: "Sun", value: 110 },
-      ],
-    },
-    {
-      id: 2,
-      name: "Phone",
-      values: [
-        { name: "Mon", value: 220 },
-        { name: "Tue", value: 232 },
-        { name: "Wed", value: 201 },
-        { name: "Thu", value: 234 },
-        { name: "Fri", value: 290 },
-        { name: "Sat", value: 230 },
-        { name: "Sun", value: 210 },
-      ],
-    },
-  ]);
-  const editId = ref(0);
+const dataset = ref([
+  {
+    id: 1,
+    name: "Email",
+    values: [
+      { name: "Mon", value: 120 },
+      { name: "Tue", value: 132 },
+      { name: "Wed", value: 101 },
+      { name: "Thu", value: 134 },
+      { name: "Fri", value: 90 },
+      { name: "Sat", value: 130 },
+      { name: "Sun", value: 110 },
+    ],
+  },
+  {
+    id: 2,
+    name: "Phone",
+    values: [
+      { name: "Mon", value: 220 },
+      { name: "Tue", value: 232 },
+      { name: "Wed", value: 201 },
+      { name: "Thu", value: 234 },
+      { name: "Fri", value: 290 },
+      { name: "Sat", value: 230 },
+      { name: "Sun", value: 210 },
+    ],
+  },
+]);
+const editId = ref(0);
 
-  const config = ref({
-    title: {
-      show: false,
-      text: "图表标题",
-      left: "auto",
-      top: "auto",
-      right: "auto",
-      bottom: "auto",
-    },
-    tooltip: {
-      show: true,
-      trigger: "item",
-    },
-    grid: {
-      show: true,
-      left: "10%",
-      top: 60,
-      right: "10%",
-      bottom: 60,
-      containLabel: false,
-    },
-    legend: {
-      show: true,
-      left: "auto",
-      top: "auto",
-      right: "auto",
-      bottom: "auto",
-    },
-    xAxis: {
-      show: true,
-      type: "category",
-      boundaryGap: false,
-      data: [],
-    },
-    yAxis: { show: true, type: "value" },
-  });
+const config = ref({
+  title: {
+    show: false,
+    text: "图表标题",
+    left: "auto",
+    top: "auto",
+    right: "auto",
+    bottom: "auto",
+  },
+  tooltip: {
+    show: true,
+    trigger: "item",
+  },
+  grid: {
+    show: true,
+    left: "10%",
+    top: 60,
+    right: "10%",
+    bottom: 60,
+    containLabel: false,
+  },
+  legend: {
+    show: true,
+    left: "auto",
+    top: "auto",
+    right: "auto",
+    bottom: "auto",
+  },
+  xAxis: {
+    show: true,
+    type: "category",
+    boundaryGap: false,
+    data: [],
+  },
+  yAxis: { show: true, type: "value" },
+});
 
-  const seriesType = ref("line");
-  const lineConfig = ref({
-    smooth: false,
-    areaStyle: { enable: false },
-  });
+const seriesType = ref("line");
+const lineConfig = ref({
+  smooth: false,
+  areaStyle: { enable: false },
+});
 
-  const categoryList = computed(() => {
-    return dataset.value[0].values.map((ele) => ele.name);
-  });
+const categoryList = computed(() => {
+  return dataset.value[0].values.map((ele) => ele.name);
+});
 
-  const dataList = computed(() => {
-    return dataset.value.map((group) => {
-      let data: any = { id: group.id };
+const dataList = computed(() => {
+  return dataset.value.map((group) => {
+    let data: any = { id: group.id };
 
-      group.values.forEach((item) => {
-        data[item.name] = item.value;
-      });
-
-      return data;
+    group.values.forEach((item) => {
+      data[item.name] = item.value;
     });
+
+    return data;
   });
+});
 
-  const handleAddData = () => {
-    const id = Date.now();
-    dataset.value.push({
-      id,
-      name: "Name",
-      values: categoryList.value.map((category: string) => {
-        return { name: category, value: 0 };
-      }),
-    });
-    nextTick(() => {
-      editId.value = id;
-    });
-  };
+const handleAddData = () => {
+  const id = Date.now();
+  dataset.value.push({
+    id,
+    name: "Name",
+    values: categoryList.value.map((category: string) => {
+      return { name: category, value: 0 };
+    }),
+  });
+  nextTick(() => {
+    editId.value = id;
+  });
+};
 
-  const handleEditData = (row: any) => {
-    editId.value = row.id;
-  };
+const handleEditData = (row: any) => {
+  editId.value = row.id;
+};
 
-  const handleConfirmData = (row: any) => {
-    const targetIndex = dataset.value.findIndex(
-      (ele: any) => ele.id === editId.value
-    );
-    dataset.value.splice(targetIndex, 1, {
-      ...dataset.value[targetIndex],
-      values: categoryList.value.map((category: string) => {
-        return { name: category, value: Number(row[category]) };
-      }),
-    });
-    editId.value = 0;
-  };
+const handleConfirmData = (row: any) => {
+  const targetIndex = dataset.value.findIndex(
+    (ele: any) => ele.id === editId.value,
+  );
+  dataset.value.splice(targetIndex, 1, {
+    ...dataset.value[targetIndex],
+    values: categoryList.value.map((category: string) => {
+      return { name: category, value: Number(row[category]) };
+    }),
+  });
+  editId.value = 0;
+};
 
-  const handleDeleteData = (row: any) => {
-    const targetIndex = dataset.value.findIndex(
-      (ele: any) => ele.id === editId.value
-    );
-    dataset.value.splice(targetIndex, 1);
-  };
+const handleDeleteData = (row: any) => {
+  const targetIndex = dataset.value.findIndex(
+    (ele: any) => ele.id === editId.value,
+  );
+  dataset.value.splice(targetIndex, 1);
+};
 
-  const options = computed(() => {
-    if (seriesType.value === "pie") {
-      config.value.xAxis.show = false;
-      config.value.yAxis.show = false;
-      config.value.grid.show = false;
-    } else {
-      config.value.xAxis.show = true;
-      config.value.yAxis.show = true;
-      config.value.grid.show = true;
-    }
-    config.value.xAxis.data = categoryList.value;
-    return {
-      ...config.value,
-      series: dataset.value.map((item) => {
-        const valueList = item.values.map((ele) => ele.value);
-        if (seriesType.value === "pie") {
-          return {
-            name: item.name,
-            type: seriesType.value,
-            data: item.values,
-          };
-        } else if (seriesType.value === "line") {
-          let tempConf = { ...lineConfig.value };
-          if (!tempConf.areaStyle.enable) {
-            tempConf.areaStyle = undefined;
-          }
-
-          return {
-            name: item.name,
-            type: seriesType.value,
-            data: valueList,
-            ...tempConf,
-          };
-        } else {
-          return { name: item.name, type: seriesType.value, data: valueList };
+const options = computed(() => {
+  if (seriesType.value === "pie") {
+    config.value.xAxis.show = false;
+    config.value.yAxis.show = false;
+    config.value.grid.show = false;
+  } else {
+    config.value.xAxis.show = true;
+    config.value.yAxis.show = true;
+    config.value.grid.show = true;
+  }
+  config.value.xAxis.data = categoryList.value;
+  return {
+    ...config.value,
+    series: dataset.value.map((item) => {
+      const valueList = item.values.map((ele) => ele.value);
+      if (seriesType.value === "pie") {
+        return {
+          name: item.name,
+          type: seriesType.value,
+          data: item.values,
+        };
+      } else if (seriesType.value === "line") {
+        let tempConf = { ...lineConfig.value };
+        if (!tempConf.areaStyle.enable) {
+          tempConf.areaStyle = undefined;
         }
-      }),
-    };
-  });
 
-  const activeTab = ref("form");
+        return {
+          name: item.name,
+          type: seriesType.value,
+          data: valueList,
+          ...tempConf,
+        };
+      } else {
+        return { name: item.name, type: seriesType.value, data: valueList };
+      }
+    }),
+  };
+});
+
+const activeTab = ref("form");
 </script>
 
 <style lang="scss" scoped>
-  .main-content {
-    display: flex;
-    justify-content: space-around;
-    align-items: flex-start;
-    width: 100%;
-    height: calc(100vh - 100px);
-  }
-  .charts-container {
-    flex-basis: 640px;
-    padding: 20px;
-  }
-  .options-container {
-    flex-grow: 1;
-    flex-shrink: 0;
-    max-height: 100%;
-    overflow: auto;
-  }
+.main-content {
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-start;
+  width: 100%;
+  height: calc(100vh - 100px);
+}
+.charts-container {
+  flex-basis: 640px;
+  padding: 20px;
+}
+.options-container {
+  flex-grow: 1;
+  flex-shrink: 0;
+  max-height: 100%;
+  overflow: auto;
+}
 
-  .form-item-inline {
-    display: flex;
-    justify-content: space-around;
-  }
-  .options-form {
-    width: 80%;
-  }
+.form-item-inline {
+  display: flex;
+  justify-content: space-around;
+}
+.options-form {
+  width: 80%;
+}
 </style>
