@@ -7,7 +7,8 @@
             v-model="scope.row.outline"
             :rows="3"
             type="textarea"
-            placeholder="概括拍摄内容"></el-input>
+            placeholder="概括拍摄内容"
+          ></el-input>
         </template>
       </el-table-column>
       <el-table-column prop="scene" label="景别" width="180">
@@ -36,7 +37,8 @@
             v-model="scope.row.cameraDescription"
             :rows="3"
             type="textarea"
-            placeholder="详细描述分镜"></el-input>
+            placeholder="详细描述分镜"
+          ></el-input>
         </template>
       </el-table-column>
       <el-table-column prop="copywriting" label="台词文案">
@@ -45,7 +47,8 @@
             v-model="scope.row.copywriting"
             :rows="3"
             type="textarea"
-            placeholder="请输入文案"></el-input>
+            placeholder="请输入文案"
+          ></el-input>
         </template>
       </el-table-column>
       <el-table-column prop="describe" label="备注">
@@ -54,11 +57,12 @@
             v-model="scope.row.describe"
             :rows="3"
             type="textarea"
-            placeholder="请输入备注"></el-input>
+            placeholder="请输入备注"
+          ></el-input>
         </template>
       </el-table-column>
     </el-table>
-    <SimpleTable :initData="tableData" :columns="dataColumns">
+    <SimpleTable :init-data="tableData" :columns="dataColumns">
       <template #reference="scope">
         <ImgUploader v-model:url="scope.row.reference" />
       </template>
@@ -67,94 +71,94 @@
 </template>
 
 <script lang="ts">
-  export default {
-    name: "Script",
-  };
+export default {
+  name: "Script",
+};
 </script>
 
 <script setup lang="ts">
-  import { ref } from "vue";
-  import ImgUploader from "@/components/ImgUploader.vue";
-  import SimpleTable from "@/components/simple-table";
-  const tableData = ref([
-    {
-      uuid: "0",
-      outline: "一段故事",
-      scene: "middle",
-      cameraOperation: "固定",
-      reference: "",
-      duration: "5",
-      cameraDescription: "拍摄主角",
-      copywriting: "啊",
-      describe: "一段备注",
+import { ref } from "vue";
+import ImgUploader from "@/components/ImgUploader.vue";
+import SimpleTable from "@/components/simple-table";
+const tableData = ref([
+  {
+    uuid: "0",
+    outline: "一段故事",
+    scene: "middle",
+    cameraOperation: "固定",
+    reference: "",
+    duration: "5",
+    cameraDescription: "拍摄主角",
+    copywriting: "啊",
+    describe: "一段备注",
+  },
+]);
+const sceneObj: Record<string, string> = {
+  far: "远景",
+  middle: "中景",
+  near: "近景",
+};
+const dataColumns = ref<any[]>([
+  {
+    label: "大纲",
+    prop: "outline",
+  },
+  {
+    label: "景别",
+    prop: "scene",
+    formatter: (row: any) => {
+      return sceneObj[row.scene];
     },
-  ]);
-  const sceneObj: Record<string, string> = {
-    far: "远景",
-    middle: "中景",
-    near: "近景",
-  };
-  const dataColumns = ref<any[]>([
-    {
-      label: "大纲",
-      prop: "outline",
-    },
-    {
-      label: "景别",
-      prop: "scene",
-      formatter: (row: any) => {
-        return sceneObj[row.scene];
-      },
-    },
-    {
-      label: "运镜",
-      prop: "cameraOperation",
-    },
-    {
-      label: "参考图",
-      prop: "reference",
-    },
-    {
-      label: "时长",
-      prop: "duration",
-    },
-    {
-      label: "分镜描述",
-      prop: "cameraDescription",
-    },
-    {
-      label: "台词文案",
-      prop: "copywriting",
-    },
-    {
-      label: "备注",
-      prop: "describe",
-    },
-    {
-      label: "操作",
-      prop: "",
-      extType: "btn",
-      btnList: [
-        {
-          text: "编辑",
-          handler: (row: any) => {
-            console.log(row);
-          },
+  },
+  {
+    label: "运镜",
+    prop: "cameraOperation",
+  },
+  {
+    label: "参考图",
+    prop: "reference",
+  },
+  {
+    label: "时长",
+    prop: "duration",
+  },
+  {
+    label: "分镜描述",
+    prop: "cameraDescription",
+  },
+  {
+    label: "台词文案",
+    prop: "copywriting",
+  },
+  {
+    label: "备注",
+    prop: "describe",
+  },
+  {
+    label: "操作",
+    prop: "",
+    extType: "btn",
+    btnList: [
+      {
+        text: "编辑",
+        handler: (row: any) => {
+          console.log(row);
         },
-      ],
-    },
-  ]);
+      },
+    ],
+  },
+]);
 </script>
 <style lang="scss" scoped>
-  .main-content {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: flex-start;
-    width: 100%;
-    height: calc(100vh - 100px);
-  }
-  .data-table {
-    width: 100%;
-  }
+.main-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  width: 100%;
+  height: calc(100vh - 100px);
+}
+.data-table {
+  width: 100%;
+}
 </style>
