@@ -22,35 +22,39 @@
 </template>
 
 <script setup lang="ts">
-  import { ref } from "vue";
-  import { ArrowDown } from "@element-plus/icons-vue";
+import { ref } from "vue";
+import { ArrowDown } from "@element-plus/icons-vue";
 
-  const menuList = ref([
-    {
-      name: "纯色背景",
-      path: "/background",
-    },
-  ]);
+const menuList = ref([
+  {
+    name: "纯色背景",
+    path: "/background",
+  },
+  {
+    name: "动画",
+    path: "/animation/timeline",
+  },
+]);
 </script>
 <style lang="scss" scoped>
-  .page-header {
-    display: flex;
-    justify-content: space-between;
-    padding: 0 20px;
-    height: 100%;
-    border-bottom: 1px solid #d6d6d6;
-  }
-  .header-title {
-    line-height: 60px;
-    font-size: 32px;
-  }
-  .header-nav {
-    display: flex;
-  }
-  .el-dropdown-link {
-    cursor: pointer;
-    color: var(--el-color-primary);
-    display: flex;
-    align-items: center;
-  }
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 20px;
+  height: 100%;
+  border-bottom: 1px solid #d6d6d6;
+}
+.header-title {
+  line-height: 60px;
+  font-size: 32px;
+}
+.header-nav {
+  display: flex;
+}
+.el-dropdown-link {
+  cursor: pointer;
+  color: var(--el-color-primary);
+  display: flex;
+  align-items: center;
+}
 </style>

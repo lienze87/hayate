@@ -58,6 +58,20 @@ const routeList: RouteRecordRaw[] = [
     component: () => import("@/pages/backgroundColor/index.vue"),
     meta: { title: "背景板" },
   },
+  {
+    path: "/animation",
+    name: "Animation",
+    redirect: "/animation/timeline",
+    meta: { title: "动画" },
+    children: [
+      {
+        path: "timeline",
+        name: "AnimationTimeline",
+        component: () => import("@/pages/animation/timeline.vue"),
+        meta: { title: "时间线" },
+      },
+    ],
+  },
 ];
 
 const router = createRouter({
