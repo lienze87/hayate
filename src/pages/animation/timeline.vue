@@ -11,6 +11,43 @@
         <p>
           动画包括两个部分：描述动画的样式规则和用于指定动画开始、结束以及中间点样式的关键帧。
         </p>
+        <div class="accordion-list" @click="handleAccordionChange">
+          <div
+            :class="`accordion-item${active === 1 ? ' active' : ''}`"
+            data-index="1"
+          >
+            <div class="accordion-item-week">Mon</div>
+            <div class="accordion-item-temp">22&deg;C-33&deg;C</div>
+          </div>
+          <div
+            :class="`accordion-item${active === 2 ? ' active' : ''}`"
+            data-index="2"
+          >
+            <div class="accordion-item-week">Tue</div>
+            <div class="accordion-item-temp">21&deg;C-25&deg;C</div>
+          </div>
+          <div
+            :class="`accordion-item${active === 3 ? ' active' : ''}`"
+            data-index="3"
+          >
+            <div class="accordion-item-week">Wed</div>
+            <div class="accordion-item-temp">19&deg;C-25&deg;C</div>
+          </div>
+          <div
+            :class="`accordion-item${active === 4 ? ' active' : ''}`"
+            data-index="4"
+          >
+            <div class="accordion-item-week">Thu</div>
+            <div class="accordion-item-temp">23&deg;C-34&deg;C</div>
+          </div>
+          <div
+            :class="`accordion-item${active === 5 ? ' active' : ''}`"
+            data-index="5"
+          >
+            <div class="accordion-item-week">Fri</div>
+            <div class="accordion-item-temp">23&deg;C-34&deg;C</div>
+          </div>
+        </div>
       </div>
     </div>
     <div class="article-content">
@@ -40,7 +77,7 @@
         X-Y
         Problem最大的严重的问题就是：<strong>在一个根本错误的方向上浪费他人大量的时间和精力</strong>！
       </p>
-      <img src="../../assets/733318.jpg" />
+      <img class="article-image" src="../../assets/blue-mountains.jpg" />
       <h2>示例</h2>
       <blockquote>
         <p>
@@ -97,7 +134,7 @@
           </i>
         </p>
       </blockquote>
-      <img src="../../assets/733323.jpg" />
+      <img class="article-image" src="../../assets/purple-mountains.jpg" />
       <div class="scroller">
         <ul class="scroller-inline">
           <li>HTML</li>
@@ -140,6 +177,38 @@
           <li>NPM</li>
         </ul>
       </div>
+      <div class="image-list">
+        <div class="image-item">
+          <div class="image-info">
+            <div class="image-info-header">蓝色水彩山水</div>
+            <div class="image-info-footer">
+              <div class="image-info-footer-link">pngtree.com</div>
+              <div class="image-info-footer-icon">></div>
+            </div>
+          </div>
+          <img src="../../assets/blue-mountains.jpg" />
+        </div>
+        <div class="image-item">
+          <div class="image-info">
+            <div class="image-info-header">紫色水彩山水</div>
+            <div class="image-info-footer">
+              <div class="image-info-footer-link">pngtree.com</div>
+              <div class="image-info-footer-icon">></div>
+            </div>
+          </div>
+          <img src="../../assets/purple-mountains.jpg" />
+        </div>
+        <div class="image-item">
+          <div class="image-info">
+            <div class="image-info-header">绿色水彩山水</div>
+            <div class="image-info-footer">
+              <div class="image-info-footer-link">pngtree.com</div>
+              <div class="image-info-footer-icon">></div>
+            </div>
+          </div>
+          <img src="../../assets/green-mountains.jpg" />
+        </div>
+      </div>
       <h2>一些变种</h2>
       <p>
         我们不要以为X-Y
@@ -175,12 +244,20 @@
 
 <script lang="ts">
 export default {
-  name: "HomePage",
+  name: "Timeline",
 };
 </script>
 
 <script lang="ts" setup>
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted } from "vue";
+
+const active = ref(1);
+const handleAccordionChange = (e: MouseEvent) => {
+  const index = Number(e.target?.dataset.index);
+  if (!isNaN(index)) {
+    active.value = index;
+  }
+};
 
 onMounted(() => {
   window.addEventListener("keydown", (event) => {
@@ -216,11 +293,11 @@ onMounted(() => {
 .article-header {
   position: relative;
   display: grid;
-  place-items: center;
+  place-items: center center;
   width: 100%;
   height: 100vh;
   background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
-    url(../../assets/733313.jpg);
+    url(../../assets/header-bg.jpg);
   background-position: center center;
   background-size: cover;
   // filter: brightness(0.5);
@@ -233,12 +310,12 @@ onMounted(() => {
 @keyframes fade-out {
   to {
     background-image: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)),
-      url(../../assets/733313.jpg);
+      url(../../assets/header-bg.jpg);
   }
 }
 
 .header-content {
-  width: 600px;
+  width: 720px;
   color: #fff;
   font-size: 16px;
   line-height: 1.4;
@@ -249,13 +326,52 @@ onMounted(() => {
   }
 }
 
+.accordion-list {
+  display: flex;
+  justify-content: space-around;
+  color: #f2f2f2;
+  .accordion-item {
+    flex-basis: 125px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin-right: 20px;
+    padding: 10px;
+    height: 300px;
+    border-radius: 8px;
+    box-sizing: border-box;
+
+    background: center/28rem no-repeat url(../../assets/weather-1.jpg);
+
+    transition-property: flex-basis, padding, background-size;
+    overflow: hidden;
+  }
+  .accordion-item,
+  .accordion-item-week {
+    transition-duration: 0.5s;
+    transition-timing-function: ease-in-out;
+  }
+  .accordion-item:nth-child(2n) {
+    background-image: url(../../assets/weather-2.jpg);
+  }
+
+  .accordion-item.active {
+    flex-basis: 300px;
+    cursor: auto;
+  }
+  .accordion-item:not(.active):hover {
+    padding: 20px 10px;
+    background-size: 36rem;
+  }
+}
+
 .article-content {
-  padding: 20px 25%;
+  padding: 20px 20%;
   text-align: left;
   color: #fff;
   background-color: #0e0e0e;
 
-  img {
+  .article-image {
     width: 100%;
     object-fit: contain;
     animation: fade-in linear;
@@ -274,7 +390,7 @@ onMounted(() => {
   }
 
   blockquote {
-    margin-left: 0.5em;
+    margin: 0.5em;
     padding: 0.5em 1em;
     border-left: 5px solid #455a64;
     background: #212121;
@@ -318,6 +434,91 @@ onMounted(() => {
     }
     .scroller-inline-reverse {
       animation-direction: reverse;
+    }
+  }
+
+  .image-list {
+    display: flex;
+    justify-content: space-around;
+    .image-item {
+      position: relative;
+      flex: 1;
+      overflow: hidden;
+      .image-info {
+        position: absolute;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        z-index: 2;
+
+        .image-info-header {
+          font-size: 24px;
+          font-weight: 600;
+          transform: translate3d(0, -3rem, 0);
+          transition-property: opacity, transform;
+        }
+        .image-info-footer {
+          width: 100%;
+          display: inline-flex;
+          justify-content: center;
+
+          font-size: 14px;
+          transform: translate3d(0, 3rem, 0);
+          transition-property: opacity, transform;
+
+          .image-info-footer-icon {
+            margin-left: 40px;
+            opacity: 0;
+            transform: translate3d(-2rem, 0, 0);
+            transition-property: opacity, transform;
+            transition-delay: 0.5s;
+          }
+        }
+      }
+
+      img {
+        width: 100%;
+        object-fit: contain;
+        transform: scale(1.2);
+        transition-property: transform;
+      }
+      .image-info-header,
+      .image-info-footer,
+      .image-info-footer-icon,
+      img {
+        transition-duration: 0.5s;
+        transition-timing-function: ease-in-out;
+      }
+    }
+    .image-item:hover {
+      .image-info {
+        background: linear-gradient(
+          180deg,
+          rgba(21, 22, 24, 0.24) 0%,
+          rgba(21, 22, 24, 1) 100%
+        );
+        opacity: 1;
+        .image-info-header {
+          transform: translate3d(0, 0, 0);
+        }
+        .image-info-footer {
+          transform: translate3d(0, 0, 0);
+        }
+        .image-info-footer-icon {
+          opacity: 1;
+          transform: translate3d(0, 0, 0);
+        }
+      }
+      img {
+        transform: scale(1);
+      }
+    }
+    .image-item + .image-item {
+      margin-left: 10px;
     }
   }
 }

@@ -86,4 +86,8 @@ const router = createRouter({
   },
 });
 
+router.afterEach((to) => {
+  document.title = (to.meta.title as string) || "Hayate";
+});
+
 export default router;
