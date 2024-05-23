@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed } from "vue";
+import { computed } from 'vue';
 
 const props = defineProps({
   options: {
@@ -9,28 +9,25 @@ const props = defineProps({
 });
 
 function syntaxHighlight(json: string) {
-  if (typeof json != "string") {
+  if (typeof json != 'string') {
     json = JSON.stringify(json, undefined, 2);
   }
 
-  json = json
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
+  json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
   const lineList = json.match(/.+\n/g).map((line: string) => {
-    const keys = line.split(" ").map((key: string) => {
-      if (key !== " " && key.slice(-1)[0] === ":") {
+    const keys = line.split(' ').map((key: string) => {
+      if (key !== ' ' && key.slice(-1)[0] === ':') {
         return `<span class="key">${key}</span>`;
       }
       return key.replace(/\{|\}|\[|\]/g, (match: string) => {
         return `<span class="pattern">${match}</span>`;
       });
     });
-    return keys.join(" ");
+    return keys.join(' ');
   });
 
-  return lineList.join("");
+  return lineList.join('');
 }
 
 const config = computed(() => {
@@ -40,16 +37,16 @@ const config = computed(() => {
 });
 
 function handleCopy(str: string) {
-  const type = "text/plain";
+  const type = 'text/plain';
   const blob = new Blob([str], { type });
   const data = [new ClipboardItem({ [type]: blob })];
 
   navigator.clipboard.write(data).then(
     () => {
-      console.log("已复制到剪贴板");
+      console.log('已复制到剪贴板');
     },
     () => {
-      console.log("复制失败，请稍后重试");
+      console.log('复制失败，请稍后重试');
     },
   );
 }

@@ -1,7 +1,4 @@
-export function initCanvasDraw(
-  myCanvas: HTMLCanvasElement,
-  ctx: CanvasRenderingContext2D
-) {
+export function initCanvasDraw(myCanvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
   // Set Background Color
   ctx.fillRect(0, 0, myCanvas.width, myCanvas.height);
 
@@ -39,10 +36,10 @@ export function initCanvasDraw(
   };
 
   // Mouse Events
-  myCanvas.addEventListener("mousedown", mouseDraw.mousedown, false);
-  myCanvas.addEventListener("mouseup", mouseDraw.mouseup, false);
-  myCanvas.addEventListener("mousemove", mouseDraw.mousemove, false);
-  myCanvas.addEventListener("mouseleave", mouseDraw.mouseleave, false);
+  myCanvas.addEventListener('mousedown', mouseDraw.mousedown, false);
+  myCanvas.addEventListener('mouseup', mouseDraw.mouseup, false);
+  myCanvas.addEventListener('mousemove', mouseDraw.mousemove, false);
+  myCanvas.addEventListener('mouseleave', mouseDraw.mouseleave, false);
 
   // Touch Events Handlers
   const touchDraw = {
@@ -51,8 +48,7 @@ export function initCanvasDraw(
       ctx.beginPath();
       const scrollTop = window.scrollY;
       canvasX = evt.touches[0].pageX - myCanvas.getBoundingClientRect().left;
-      canvasY =
-        evt.touches[0].pageY - myCanvas.getBoundingClientRect().top - scrollTop;
+      canvasY = evt.touches[0].pageY - myCanvas.getBoundingClientRect().top - scrollTop;
 
       ctx.moveTo(canvasX, canvasY);
       this.started = true;
@@ -63,10 +59,7 @@ export function initCanvasDraw(
       if (this.started) {
         const scrollTop = window.scrollY;
         canvasX = evt.touches[0].pageX - myCanvas.getBoundingClientRect().left;
-        canvasY =
-          evt.touches[0].pageY -
-          myCanvas.getBoundingClientRect().top -
-          scrollTop;
+        canvasY = evt.touches[0].pageY - myCanvas.getBoundingClientRect().top - scrollTop;
 
         ctx.lineTo(canvasX, canvasY);
         ctx.stroke();
@@ -78,16 +71,16 @@ export function initCanvasDraw(
   };
 
   // Touch Events
-  myCanvas.addEventListener("touchstart", touchDraw.start, false);
-  myCanvas.addEventListener("touchend", touchDraw.end, false);
-  myCanvas.addEventListener("touchmove", touchDraw.move, false);
+  myCanvas.addEventListener('touchstart', touchDraw.start, false);
+  myCanvas.addEventListener('touchend', touchDraw.end, false);
+  myCanvas.addEventListener('touchmove', touchDraw.move, false);
 
   // Disable Page Move
   document.body.addEventListener(
-    "touchmove",
+    'touchmove',
     function (evt) {
       evt.stopPropagation();
     },
-    false
+    false,
   );
 }

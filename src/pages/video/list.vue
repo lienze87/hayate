@@ -12,12 +12,7 @@
       </el-upload>
     </div>
     <div class="video-list">
-      <el-card
-        v-for="item in videoList"
-        :key="item.filename"
-        class="video-item"
-        @click="handleCheckDetail(item)"
-      >
+      <el-card v-for="item in videoList" :key="item.filename" class="video-item" @click="handleCheckDetail(item)">
         <template #header>{{ item.filename }}</template>
         <img :src="item.poster" />
       </el-card>
@@ -27,20 +22,20 @@
 
 <script lang="ts">
 export default {
-  name: "VideoList",
+  name: 'VideoList',
 };
 </script>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
-import { ElMessage } from "element-plus";
-import { getVideoList } from "@/api/video";
+import { ref, onMounted } from 'vue';
+import { ElMessage } from 'element-plus';
+import { getVideoList } from '@/api/video';
 
-const emit = defineEmits(["changePageType"]);
+const emit = defineEmits(['changePageType']);
 
 const uploadFileList = ref([]);
 const handleUploadSuccess = () => {
-  ElMessage.success("上传成功");
+  ElMessage.success('上传成功');
   getDataList();
 };
 
@@ -52,7 +47,7 @@ async function getDataList() {
     videoList.value = res.map((ele: string) => {
       return {
         filename: ele,
-        poster: `http://localhost:3005/${ele.split(".mp4")[0]}.jpg`,
+        poster: `http://localhost:3005/${ele.split('.mp4')[0]}.jpg`,
       };
     });
   } catch (e) {
@@ -61,7 +56,7 @@ async function getDataList() {
 }
 
 const handleCheckDetail = (row: any) => {
-  emit("changePageType", "DETAIL", row.filename);
+  emit('changePageType', 'DETAIL', row.filename);
 };
 onMounted(() => {
   getDataList();

@@ -76,16 +76,16 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent } from 'vue';
 
 export default defineComponent({
-  name: "TocNavbar",
+  name: 'TocNavbar',
 });
 </script>
 
 <script lang="ts" setup>
-import Anchor from "@/components/toc-navbar/anchor.vue";
-import SideBar from "@/components/toc-navbar/index.vue";
+import Anchor from '@/components/toc-navbar/anchor.vue';
+import SideBar from '@/components/toc-navbar/index.vue';
 </script>
 
 <style lang="scss" scoped>

@@ -1,13 +1,10 @@
-import { onMounted, onUnmounted, onUpdated } from "vue";
-import { isClient } from "@vueuse/core";
-import { throttleAndDebounce } from "./utils";
+import { onMounted, onUnmounted, onUpdated } from 'vue';
+import { isClient } from '@vueuse/core';
+import { throttleAndDebounce } from './utils';
 
-import type { Ref } from "vue";
+import type { Ref } from 'vue';
 
-export function useActiveSidebarLinks(
-  container: Ref<HTMLElement>,
-  marker: Ref<HTMLElement>,
-) {
+export function useActiveSidebarLinks(container: Ref<HTMLElement>, marker: Ref<HTMLElement>) {
   if (!isClient) return;
 
   const onScroll = throttleAndDebounce(setActiveLink, 150);
@@ -45,27 +42,25 @@ export function useActiveSidebarLinks(
     const activeLink = (prevActiveLink =
       hash == null
         ? null
-        : (container.value.querySelector(
-            `.toc-item a[href="${decodeURIComponent(hash)}"]`,
-          ) as HTMLAnchorElement));
+        : (container.value.querySelector(`.toc-item a[href="${decodeURIComponent(hash)}"]`) as HTMLAnchorElement));
 
     if (activeLink) {
-      activeLink.classList.add("active");
-      marker.value.style.opacity = "1";
+      activeLink.classList.add('active');
+      marker.value.style.opacity = '1';
       marker.value.style.top = `${activeLink.offsetTop}px`;
     } else {
-      marker.value.style.opacity = "0";
-      marker.value.style.top = "33px";
+      marker.value.style.opacity = '0';
+      marker.value.style.top = '33px';
     }
   }
 
   function deactiveLink(link: HTMLElement | null) {
-    link && link.classList.remove("active");
+    link && link.classList.remove('active');
   }
 
   onMounted(() => {
     window.requestAnimationFrame(setActiveLink);
-    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener('scroll', onScroll, { passive: true });
   });
 
   onUpdated(() => {
@@ -73,23 +68,17 @@ export function useActiveSidebarLinks(
   });
 
   onUnmounted(() => {
-    window.removeEventListener("scroll", onScroll);
+    window.removeEventListener('scroll', onScroll);
   });
 }
 
 function getSidebarLinks() {
-  return Array.from(
-    document.querySelectorAll(".toc-content .toc-link"),
-  ) as HTMLAnchorElement[];
+  return Array.from(document.querySelectorAll('.toc-content .toc-link')) as HTMLAnchorElement[];
 }
 
 function getAnchors(sidebarLinks: HTMLAnchorElement[]) {
-  return (
-    Array.from(
-      document.querySelectorAll(".doc-content .header-anchor"),
-    ) as HTMLAnchorElement[]
-  ).filter((anchor) =>
-    sidebarLinks.some((sidebarLink) => sidebarLink.hash === anchor.hash),
+  return (Array.from(document.querySelectorAll('.doc-content .header-anchor')) as HTMLAnchorElement[]).filter(
+    (anchor) => sidebarLinks.some((sidebarLink) => sidebarLink.hash === anchor.hash),
   );
 }
 function getPageOffset() {
@@ -104,11 +93,7 @@ function getAnchorTop(anchor: HTMLAnchorElement) {
     return 0;
   }
 }
-function isAnchorActive(
-  index: number,
-  anchor: HTMLAnchorElement,
-  nextAnchor: HTMLAnchorElement,
-) {
+function isAnchorActive(index: number, anchor: HTMLAnchorElement, nextAnchor: HTMLAnchorElement) {
   const scrollTop = window.scrollY;
 
   if (index === 0 && scrollTop === 0) {

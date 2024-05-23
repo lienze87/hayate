@@ -1,3 +1,3 @@
-import SimpleTableColumn from "./simple-column";
+import SimpleTableColumn from './simple-column';
 
 export default SimpleTableColumn;

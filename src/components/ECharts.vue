@@ -1,40 +1,40 @@
 <script lang="ts" setup>
-  import * as echarts from "echarts";
-  import { onMounted, watch } from "vue";
+import * as echarts from 'echarts';
+import { onMounted, watch } from 'vue';
 
-  const props = defineProps({
-    options: {
-      type: Object,
-      default: {},
-    },
-  });
+const props = defineProps({
+  options: {
+    type: Object,
+    default: {},
+  },
+});
 
-  let myChart: any = null;
+let myChart: any = null;
 
-  function initChart(options: any) {
-    if (myChart !== null) {
-      myChart.setOption(options, true);
-      return;
-    }
-
-    let container = document.getElementById("main-chart");
-    myChart = echarts.init(container);
+function initChart(options: any) {
+  if (myChart !== null) {
     myChart.setOption(options, true);
+    return;
   }
 
-  watch(
-    () => props.options,
-    () => {
-      initChart(props.options);
-    },
-    {
-      deep: true,
-    }
-  );
+  let container = document.getElementById('main-chart');
+  myChart = echarts.init(container);
+  myChart.setOption(options, true);
+}
 
-  onMounted(() => {
+watch(
+  () => props.options,
+  () => {
     initChart(props.options);
-  });
+  },
+  {
+    deep: true,
+  },
+);
+
+onMounted(() => {
+  initChart(props.options);
+});
 </script>
 
 <template>
@@ -42,8 +42,8 @@
 </template>
 
 <style lang="scss" scoped>
-  #main-chart {
-    width: 640px;
-    height: 480px;
-  }
+#main-chart {
+  width: 640px;
+  height: 480px;
+}
 </style>

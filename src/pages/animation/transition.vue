@@ -4,46 +4,26 @@
     <div class="article-header">
       <div class="header-content">
         <p class="article-title">CSS-only scroll-driven animation</p>
-        <p>
-          CSS animations 使得可以将从一个 CSS 样式配置转换到另一个 CSS
-          样式配置。
-        </p>
-        <p>
-          动画包括两个部分：描述动画的样式规则和用于指定动画开始、结束以及中间点样式的关键帧。
-        </p>
+        <p>CSS animations 使得可以将从一个 CSS 样式配置转换到另一个 CSS 样式配置。</p>
+        <p>动画包括两个部分：描述动画的样式规则和用于指定动画开始、结束以及中间点样式的关键帧。</p>
         <div class="accordion-list" @click="handleAccordionChange">
-          <div
-            :class="`accordion-item${active === 1 ? ' active' : ''}`"
-            data-index="1"
-          >
+          <div :class="`accordion-item${active === 1 ? ' active' : ''}`" data-index="1">
             <div class="accordion-item-week">Mon</div>
             <div class="accordion-item-temp">22&deg;C-33&deg;C</div>
           </div>
-          <div
-            :class="`accordion-item${active === 2 ? ' active' : ''}`"
-            data-index="2"
-          >
+          <div :class="`accordion-item${active === 2 ? ' active' : ''}`" data-index="2">
             <div class="accordion-item-week">Tue</div>
             <div class="accordion-item-temp">21&deg;C-25&deg;C</div>
           </div>
-          <div
-            :class="`accordion-item${active === 3 ? ' active' : ''}`"
-            data-index="3"
-          >
+          <div :class="`accordion-item${active === 3 ? ' active' : ''}`" data-index="3">
             <div class="accordion-item-week">Wed</div>
             <div class="accordion-item-temp">19&deg;C-25&deg;C</div>
           </div>
-          <div
-            :class="`accordion-item${active === 4 ? ' active' : ''}`"
-            data-index="4"
-          >
+          <div :class="`accordion-item${active === 4 ? ' active' : ''}`" data-index="4">
             <div class="accordion-item-week">Thu</div>
             <div class="accordion-item-temp">23&deg;C-34&deg;C</div>
           </div>
-          <div
-            :class="`accordion-item${active === 5 ? ' active' : ''}`"
-            data-index="5"
-          >
+          <div :class="`accordion-item${active === 5 ? ' active' : ''}`" data-index="5">
             <div class="accordion-item-week">Fri</div>
             <div class="accordion-item-temp">23&deg;C-34&deg;C</div>
           </div>
@@ -63,9 +43,7 @@
       </p>
       <p>
         简而言之，
-        <strong>
-          没有去问怎么解决问题X，而是去问解决方案Y应该怎么去实现和操作。
-        </strong>
+        <strong> 没有去问怎么解决问题X，而是去问解决方案Y应该怎么去实现和操作。 </strong>
       </p>
       <p>于是乎：</p>
       <p>
@@ -73,10 +51,7 @@
         2）在经过大量地讨论和浪费了大量的时间后，热心的人终于明白了原始的问题X是怎么一回事。<br />
         3）于是大家都发现，Y根本就不是用来解决X的合适的方案。
       </p>
-      <p>
-        X-Y
-        Problem最大的严重的问题就是：<strong>在一个根本错误的方向上浪费他人大量的时间和精力</strong>！
-      </p>
+      <p>X-Y Problem最大的严重的问题就是：<strong>在一个根本错误的方向上浪费他人大量的时间和精力</strong>！</p>
       <img class="article-image" src="../../assets/blue-mountains.jpg" />
       <h2>示例</h2>
       <blockquote>
@@ -90,9 +65,7 @@
             <a href="http://www.perlmonks.org/index.pl?node_id=430320">
               Re: How do I keep the command line from eating the backslashes? </a
             >&nbsp;by&nbsp;
-            <a href="http://www.perlmonks.org/index.pl?node_id=163683">
-              revdiablo
-            </a>
+            <a href="http://www.perlmonks.org/index.pl?node_id=163683"> revdiablo </a>
           </i>
         </p>
       </blockquote>
@@ -106,20 +79,16 @@
           <i>
             from&nbsp;
             <a href="http://www.perlmonks.org/index.pl?node_id=327963">
-              Re: Re: Re: Re: regex to validate e-mail addresses and phone
-              numbers
+              Re: Re: Re: Re: regex to validate e-mail addresses and phone numbers
             </a>
             &nbsp;by&nbsp;
-            <a href="http://www.perlmonks.org/index.pl?node_id=180961">
-              Limbic~Region
-            </a>
+            <a href="http://www.perlmonks.org/index.pl?node_id=180961"> Limbic~Region </a>
           </i>
         </p>
       </blockquote>
       <blockquote>
         <p>
-          X-Y
-          Problem又叫“过早下结论”：提问者其实并不非常清楚想要解决的X问题，他猜测用Y可以搞定，于是他问大家如何实现Y。
+          X-Y Problem又叫“过早下结论”：提问者其实并不非常清楚想要解决的X问题，他猜测用Y可以搞定，于是他问大家如何实现Y。
         </p>
         <p>
           —&nbsp;
@@ -211,14 +180,12 @@
       </div>
       <h2>一些变种</h2>
       <p>
-        我们不要以为X-Y
-        Problem就像上面那样的简单，我们不会出现，其实我们生活的这个世界有有各种X-Y
+        我们不要以为X-Y Problem就像上面那样的简单，我们不会出现，其实我们生活的这个世界有有各种X-Y
         Problem的变种。下面我个人觉得非常像XY Problem的总是：
       </p>
       <p style="padding-left: 30px">
         其一、大多数人有时候，非常容易把手段当目的，他们会用自己所喜欢的技术和方法来反推用户的需求，于是很有可能就会出现X-Y
-        Problem &#8211;
-        也许解决用户需求最适合的技术方案是PC，但是我们要让他们用手机。
+        Problem &#8211; 也许解决用户需求最适合的技术方案是PC，但是我们要让他们用手机。
       </p>
       <p style="padding-left: 30px">
         其二、产品经理有时候并不清楚他想解决的用户需求是什么，于是他觉得可能开发Y的功能能够满足用户，于是他提出了Y的需求让技术人员去做，但那根本不是解决X问题的最佳方案。
@@ -235,21 +202,19 @@
       <p style="padding-left: 30px">
         其六、很多团队Leader都喜欢制造信息不平等，并不告诉团队某个事情的来由，掩盖X，而直接把要做的Y告诉团队，导致团队并不真正地理解，而产生了很多时间和经历的浪费。
       </p>
-      <p>
-        所有的这些，在我心中都是X-Y Problem的变种，这是不是一种刻舟求剑的表现？
-      </p>
+      <p>所有的这些，在我心中都是X-Y Problem的变种，这是不是一种刻舟求剑的表现？</p>
     </div>
   </div>
 </template>
 
 <script lang="ts">
 export default {
-  name: "Transition",
+  name: 'Transition',
 };
 </script>
 
 <script lang="ts" setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted } from 'vue';
 
 const active = ref(1);
 const handleAccordionChange = (e: MouseEvent) => {
@@ -261,7 +226,7 @@ const handleAccordionChange = (e: MouseEvent) => {
 };
 
 onMounted(() => {
-  window.addEventListener("keydown", (event) => {
+  window.addEventListener('keydown', (event) => {
     console.log(event.code);
   });
 });
@@ -297,8 +262,7 @@ onMounted(() => {
   place-items: center center;
   width: 100%;
   height: 100vh;
-  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
-    url(../../assets/header-bg.jpg);
+  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(../../assets/header-bg.jpg);
   background-position: center center;
   background-size: cover;
   // filter: brightness(0.5);
@@ -310,8 +274,7 @@ onMounted(() => {
 
 @keyframes fade-out {
   to {
-    background-image: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)),
-      url(../../assets/header-bg.jpg);
+    background-image: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), url(../../assets/header-bg.jpg);
   }
 }
 
@@ -400,13 +363,7 @@ onMounted(() => {
   .scroller {
     width: 100%;
     overflow: hidden;
-    mask: linear-gradient(
-      90deg,
-      transparent,
-      white 20%,
-      white 80%,
-      transparent
-    );
+    mask: linear-gradient(90deg, transparent, white 20%, white 80%, transparent);
 
     .scroller-inline {
       display: flex;
@@ -497,11 +454,7 @@ onMounted(() => {
     }
     .image-item:hover {
       .image-info {
-        background: linear-gradient(
-          180deg,
-          rgba(21, 22, 24, 0.24) 0%,
-          rgba(21, 22, 24, 1) 100%
-        );
+        background: linear-gradient(180deg, rgba(21, 22, 24, 0.24) 0%, rgba(21, 22, 24, 1) 100%);
         opacity: 1;
         .image-info-header {
           transform: translate3d(0, 0, 0);

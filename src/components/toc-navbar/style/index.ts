@@ -1,1 +1,1 @@
-import "./side-bar.scss";
+import './side-bar.scss';

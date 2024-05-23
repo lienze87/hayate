@@ -8,10 +8,7 @@
     v-bind="$attrs"
     :key="uid"
   >
-    <template
-      v-for="(column, index) in columns"
-      :key="`${index}-${column.prop || 'default'}`"
-    >
+    <template v-for="(column, index) in columns" :key="`${index}-${column.prop || 'default'}`">
       <template v-if="column.prop && $slots[column.prop]">
         <el-table-column :label="column.label" v-bind="column.opts">
           <template #default="scope">
@@ -31,13 +28,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch, nextTick, PropType } from "vue";
-import { ElTable } from "element-plus";
-import SimpleColumn from "./column/index";
-import type { ColumnProps } from "./types";
+import { defineComponent, ref, watch, nextTick, PropType } from 'vue';
+import { ElTable } from 'element-plus';
+import SimpleColumn from './column/index';
+import type { ColumnProps } from './types';
 
 export default defineComponent({
-  name: "SimpleTable",
+  name: 'SimpleTable',
   components: {
     SimpleColumn,
   },
@@ -83,7 +80,7 @@ export default defineComponent({
         nextTick(() => {
           if (props.autoHeight) {
             tableAutoHeight.value = getAutoHeight();
-            console.log("tableHeight", tableAutoHeight.value);
+            console.log('tableHeight', tableAutoHeight.value);
           }
         });
       },
@@ -105,11 +102,7 @@ export default defineComponent({
     );
 
     function getAutoHeight() {
-      function getParentBottom(
-        el: HTMLElement,
-        rootClass: string,
-        result: number,
-      ): any {
+      function getParentBottom(el: HTMLElement, rootClass: string, result: number): any {
         if (!el.offsetParent) {
           return result;
         }
@@ -120,52 +113,30 @@ export default defineComponent({
 
         let computedStyle = window.getComputedStyle(el.offsetParent, null);
 
-        let paddingBottom = parseInt(
-          computedStyle.getPropertyValue("padding-bottom").replace("px", ""),
-        );
+        let paddingBottom = parseInt(computedStyle.getPropertyValue('padding-bottom').replace('px', ''));
 
-        let marginBottom = parseInt(
-          computedStyle.getPropertyValue("margin-bottom").replace("px", ""),
-        );
+        let marginBottom = parseInt(computedStyle.getPropertyValue('margin-bottom').replace('px', ''));
 
         let newResult = result + paddingBottom + marginBottom;
 
-        return getParentBottom(
-          el.offsetParent as HTMLElement,
-          rootClass,
-          newResult,
-        );
+        return getParentBottom(el.offsetParent as HTMLElement, rootClass, newResult);
       }
 
       let rootHeight = document.body.clientHeight;
-      let rootClass = "app-main";
-      let rootElement = document.querySelector("." + rootClass);
+      let rootClass = 'app-main';
+      let rootElement = document.querySelector('.' + rootClass);
       let rootOffsetTop = rootElement
-        ? parseInt(
-            window
-              .getComputedStyle(rootElement, null)
-              .getPropertyValue("padding-top")
-              .replace("px", ""),
-          )
+        ? parseInt(window.getComputedStyle(rootElement, null).getPropertyValue('padding-top').replace('px', ''))
         : 0;
       let tableParentOffsetTop = tableRef.value?.$el.offsetParent.offsetTop;
       let tableOffsetTop = tableRef.value?.$el.offsetTop;
 
       let pageBoxHeight = 64;
 
-      let tableParentOffsetBottom = getParentBottom(
-        tableRef.value?.$el,
-        rootClass,
-        0,
-      );
+      let tableParentOffsetBottom = getParentBottom(tableRef.value?.$el, rootClass, 0);
 
       let tableAutoHeight =
-        rootHeight -
-        rootOffsetTop -
-        tableParentOffsetTop -
-        tableOffsetTop -
-        pageBoxHeight -
-        tableParentOffsetBottom;
+        rootHeight - rootOffsetTop - tableParentOffsetTop - tableOffsetTop - pageBoxHeight - tableParentOffsetBottom;
 
       return tableAutoHeight;
     }

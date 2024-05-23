@@ -1,4 +1,4 @@
-import type { Component } from "vue";
+import type { Component } from 'vue';
 
 export declare interface TableProps {
   initData: Array<any>;
@@ -11,20 +11,10 @@ export declare interface ColumnProps {
   label: string;
   prop: string;
   width?: number;
-  type?: "selection" | "index" | "expand";
-  extType?: "link" | "btn" | "switch" | "custom";
-  formatter?: (
-    row: any,
-    column: any,
-    value: any,
-    $index: number | undefined
-  ) => string;
-  render?: (
-    row: any,
-    column: any,
-    value: any,
-    $index: number | undefined
-  ) => string;
+  type?: 'selection' | 'index' | 'expand';
+  extType?: 'link' | 'btn' | 'switch' | 'custom';
+  formatter?: (row: any, column: any, value: any, $index: number | undefined) => string;
+  render?: (row: any, column: any, value: any, $index: number | undefined) => string;
   linkAttr?: LinkProps;
   switchAttr?: SwitchProps;
   btnList?: Array<BtnProps>;
@@ -41,12 +31,7 @@ export declare type ScopeProps = {
 
 export declare interface LinkProps {
   handler: (row: any) => void;
-  customDisabled?: (
-    row: any,
-    column: any,
-    value: any,
-    $index: number | undefined
-  ) => boolean;
+  customDisabled?: (row: any, column: any, value: any, $index: number | undefined) => boolean;
   opts?: {
     type: string;
   };

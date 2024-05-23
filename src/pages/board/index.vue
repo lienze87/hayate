@@ -24,19 +24,10 @@
           />
         </el-form-item>
         <el-form-item label="间隔">
-          <el-input-number
-            v-model="formData.step"
-            :step="1"
-            placeholder="请输入"
-            clearable
-          />
+          <el-input-number v-model="formData.step" :step="1" placeholder="请输入" clearable />
         </el-form-item>
         <el-form-item label="方向">
-          <el-select
-            v-model="formData.direction"
-            placeholder="请选择"
-            style="width: 150px"
-          >
+          <el-select v-model="formData.direction" placeholder="请选择" style="width: 150px">
             <el-option label="水平线" :value="'horizon'"></el-option>
             <el-option label="垂直线" :value="'vertical'"></el-option>
           </el-select>
@@ -47,11 +38,7 @@
         </el-form-item>
       </el-form>
       <div class="canvas-action">
-        <el-radio-group
-          v-model="currentTool"
-          size="large"
-          @change="handleToolChange"
-        >
+        <el-radio-group v-model="currentTool" size="large" @change="handleToolChange">
           <el-radio-button label="选择" value="mouse" />
           <el-dropdown @command="handleShapeChange">
             <el-radio-button :label="currentShapeName" value="shape" />
@@ -73,46 +60,36 @@
             <el-input-number v-model="currentLineWidth"></el-input-number>
           </div>
         </div>
-        <el-button
-          v-if="currentTool === 'shape'"
-          type="danger"
-          @click="handleShapeUndo"
-        >
-          撤销
-        </el-button>
+        <el-button v-if="currentTool === 'shape'" type="danger" @click="handleShapeUndo"> 撤销 </el-button>
       </div>
-      <div
-        class="my-board"
-        ref="myBoard"
-        :style="`cursor: ${cursorType}`"
-      ></div>
+      <div class="my-board" ref="myBoard" :style="`cursor: ${cursorType}`"></div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
 export default {
-  name: "Board",
+  name: 'Board',
 };
 </script>
 
 <script setup lang="ts">
-import { computed, ref, onMounted, onUnmounted } from "vue";
+import { computed, ref, onMounted, onUnmounted } from 'vue';
 
 const FONT_SIZE = 24;
-const BACKGROUND_COLOR = "#274c43";
-const PEN_COLOR = "#ffffff";
+const BACKGROUND_COLOR = '#274c43';
+const PEN_COLOR = '#ffffff';
 
 const myBoard = ref();
-const myCanvas: HTMLCanvasElement = document.createElement("canvas");
-myCanvas.id = "my-canvas";
+const myCanvas: HTMLCanvasElement = document.createElement('canvas');
+myCanvas.id = 'my-canvas';
 let ctx: CanvasRenderingContext2D | null = null;
 
 const formData = ref({
   min: 0,
   max: 6,
   step: 1,
-  direction: "vertical",
+  direction: 'vertical',
 });
 const dataList = ref([]);
 const percentList = computed(() => {
@@ -125,11 +102,7 @@ const percentList = computed(() => {
 
 function getDataList() {
   let result = [];
-  for (
-    let i = formData.value.min;
-    i <= formData.value.max;
-    i += formData.value.step
-  ) {
+  for (let i = formData.value.min; i <= formData.value.max; i += formData.value.step) {
     result.push(i);
   }
   return result;
@@ -156,11 +129,7 @@ function drawXAxis() {
     ctx.moveTo(offsetLeft, paddingTop - 30);
     ctx.lineTo(offsetLeft, paddingTop);
     ctx.stroke();
-    ctx.fillText(
-      dataList.value[index].toString(),
-      offsetLeft - FONT_SIZE * 0.2,
-      paddingTop + FONT_SIZE,
-    );
+    ctx.fillText(dataList.value[index].toString(), offsetLeft - FONT_SIZE * 0.2, paddingTop + FONT_SIZE);
   });
 }
 
@@ -185,20 +154,16 @@ function drawYAxis() {
     ctx.moveTo(paddingLeft, offsetTop);
     ctx.lineTo(paddingLeft + 30, offsetTop);
     ctx.stroke();
-    ctx.fillText(
-      dataList.value[index].toString(),
-      paddingLeft - FONT_SIZE,
-      offsetTop + FONT_SIZE * 0.2,
-    );
+    ctx.fillText(dataList.value[index].toString(), paddingLeft - FONT_SIZE, offsetTop + FONT_SIZE * 0.2);
   });
 }
 
 function onDrawAxis() {
   dataList.value = getDataList();
-  currentTool.value = "mouse";
-  handleToolChange("mouse");
+  currentTool.value = 'mouse';
+  handleToolChange('mouse');
 
-  if (formData.value.direction === "vertical") {
+  if (formData.value.direction === 'vertical') {
     drawYAxis();
   } else {
     drawXAxis();
@@ -211,8 +176,8 @@ const onResetCanvas = () => {
   ctx.fillRect(0, 0, myCanvas.width, myCanvas.height);
 };
 
-const currentTool = ref("mouse");
-const cursorType = ref("default");
+const currentTool = ref('mouse');
+const cursorType = ref('default');
 
 const lineWidth = ref(1);
 const currentLineWidth = computed({
@@ -227,43 +192,43 @@ const currentLineWidth = computed({
 
 const handleToolChange = (tool: string) => {
   switch (tool) {
-    case "mouse":
-      cursorType.value = "default";
+    case 'mouse':
+      cursorType.value = 'default';
       currentLineWidth.value = 1;
       ctx.strokeStyle = PEN_COLOR;
       break;
-    case "shape":
-      currentShape.value = "line";
+    case 'shape':
+      currentShape.value = 'line';
       currentLineWidth.value = 1;
       ctx.strokeStyle = PEN_COLOR;
       onResetCanvas();
       break;
-    case "draw":
-      cursorType.value = "crosshair";
+    case 'draw':
+      cursorType.value = 'crosshair';
       currentLineWidth.value = 1;
       ctx.strokeStyle = PEN_COLOR;
       break;
-    case "eraser":
+    case 'eraser':
       // 通过绘制背景色线条实现橡皮功能
       currentLineWidth.value = 20;
       ctx.strokeStyle = BACKGROUND_COLOR;
-      cursorType.value = "cell";
+      cursorType.value = 'cell';
       break;
     default:
-      cursorType.value = "auto";
+      cursorType.value = 'auto';
       break;
   }
 };
 
-const currentShape = ref("line");
+const currentShape = ref('line');
 const shapeObj: Record<string, string> = {
-  line: "直线",
-  circle: "圆",
-  rect: "方形",
+  line: '直线',
+  circle: '圆',
+  rect: '方形',
 };
 const shapeDataList = ref([]);
 const currentShapeName = computed(() => {
-  return currentShape.value ? `形状-${shapeObj[currentShape.value]}` : "形状";
+  return currentShape.value ? `形状-${shapeObj[currentShape.value]}` : '形状';
 });
 const handleShapeChange = (shape: string) => {
   currentShape.value = shape;
@@ -276,7 +241,7 @@ const handleShapeUndo = () => {
     if (lastShape) {
       shapeDataList.value.push({
         ...lastShape,
-        key: "end",
+        key: 'end',
       });
       currentShape.value = lastShape.type;
     }
@@ -284,10 +249,10 @@ const handleShapeUndo = () => {
 };
 
 const handleDownload = () => {
-  let url = myCanvas.toDataURL("image/png");
+  let url = myCanvas.toDataURL('image/png');
   const filename = `canvas-${Date.now()}.png`;
-  const link = document.createElement("a");
-  url = url.replace(/^data:image\/[^;]/, "data:application/octet-stream");
+  const link = document.createElement('a');
+  url = url.replace(/^data:image\/[^;]/, 'data:application/octet-stream');
 
   link.download = filename;
   link.href = url;
@@ -303,7 +268,7 @@ function drawLine(
     strokeStyle?: string;
   },
 ) {
-  const { begin, end, strokeStyle = "PEN_COLOR" } = data;
+  const { begin, end, strokeStyle = 'PEN_COLOR' } = data;
   ctx.beginPath();
   ctx.moveTo(begin.x, begin.y);
   ctx.lineTo(end.x, end.y);
@@ -320,7 +285,7 @@ function drawCircle(
     strokeStyle?: string;
   },
 ) {
-  const { begin, radius, strokeStyle = "PEN_COLOR" } = data;
+  const { begin, radius, strokeStyle = 'PEN_COLOR' } = data;
   ctx.beginPath();
   ctx.arc(begin.x, begin.y, radius, 0, Math.PI * 2, true);
   ctx.strokeStyle = strokeStyle;
@@ -347,7 +312,7 @@ const mouseDraw = {
     this.isDown = true;
     this.down = getMousePosition(evt);
 
-    if (["draw", "eraser"].includes(currentTool.value)) {
+    if (['draw', 'eraser'].includes(currentTool.value)) {
       ctx.beginPath();
       ctx.moveTo(this.down.x, this.down.y);
     }
@@ -356,39 +321,36 @@ const mouseDraw = {
     if (this.isDown) {
       this.current = getMousePosition(evt);
 
-      if (["draw", "eraser"].includes(currentTool.value)) {
+      if (['draw', 'eraser'].includes(currentTool.value)) {
         ctx.lineTo(this.current.x, this.current.y);
         ctx.stroke();
       }
-      if (currentTool.value === "shape") {
+      if (currentTool.value === 'shape') {
         ctx.fillRect(0, 0, myCanvas.width, myCanvas.height);
 
-        if (currentShape.value === "line") {
+        if (currentShape.value === 'line') {
           let line = {
-            key: "move",
-            type: "line",
+            key: 'move',
+            type: 'line',
             begin: this.down,
             end: this.current,
           };
           shapeDataList.value.pop();
           shapeDataList.value.push(line);
-        } else if (currentShape.value === "circle") {
-          const radius = Math.sqrt(
-            (this.current.x - this.down.x) ** 2 +
-              (this.current.y - this.down.y) ** 2,
-          );
+        } else if (currentShape.value === 'circle') {
+          const radius = Math.sqrt((this.current.x - this.down.x) ** 2 + (this.current.y - this.down.y) ** 2);
           let circle = {
-            key: "move",
-            type: "circle",
+            key: 'move',
+            type: 'circle',
             begin: this.down,
             radius,
           };
           shapeDataList.value.pop();
           shapeDataList.value.push(circle);
-        } else if (currentShape.value === "rect") {
+        } else if (currentShape.value === 'rect') {
           let rect = {
-            key: "move",
-            type: "rect",
+            key: 'move',
+            type: 'rect',
             x: this.down.x,
             y: this.down.y,
             width: this.current.x - this.down.x,
@@ -403,33 +365,30 @@ const mouseDraw = {
   mouseup: function (evt: MouseEvent) {
     this.isDown = false;
     this.up = getMousePosition(evt);
-    if (currentTool.value === "shape") {
-      if (currentShape.value === "line") {
+    if (currentTool.value === 'shape') {
+      if (currentShape.value === 'line') {
         const line = {
-          key: "end",
-          type: "line",
+          key: 'end',
+          type: 'line',
           begin: this.down,
           end: this.up,
         };
 
         shapeDataList.value.push(line);
-      } else if (currentShape.value === "circle") {
-        const radius = Math.sqrt(
-          (this.current.x - this.down.x) ** 2 +
-            (this.current.y - this.down.y) ** 2,
-        );
+      } else if (currentShape.value === 'circle') {
+        const radius = Math.sqrt((this.current.x - this.down.x) ** 2 + (this.current.y - this.down.y) ** 2);
         let circle = {
-          key: "end",
-          type: "circle",
+          key: 'end',
+          type: 'circle',
           begin: this.down,
           radius,
         };
 
         shapeDataList.value.push(circle);
-      } else if (currentShape.value === "rect") {
+      } else if (currentShape.value === 'rect') {
         let rect = {
-          key: "end",
-          type: "rect",
+          key: 'end',
+          type: 'rect',
           x: this.down.x,
           y: this.down.y,
           width: this.current.x - this.down.x,
@@ -466,7 +425,7 @@ const touchDraw = {
   start: function (evt: TouchEvent) {
     this.started = true;
     this.down = getTouchPosition(evt);
-    if (["draw", "eraser"].includes(currentTool.value)) {
+    if (['draw', 'eraser'].includes(currentTool.value)) {
       ctx.beginPath();
       ctx.moveTo(this.down.x, this.down.y);
     }
@@ -476,39 +435,36 @@ const touchDraw = {
 
     if (this.started) {
       this.current = getTouchPosition(evt);
-      if (["draw", "eraser"].includes(currentTool.value)) {
+      if (['draw', 'eraser'].includes(currentTool.value)) {
         ctx.lineTo(this.current.x, this.current.y);
         ctx.stroke();
       }
-      if (currentTool.value === "shape") {
+      if (currentTool.value === 'shape') {
         ctx.fillRect(0, 0, myCanvas.width, myCanvas.height);
 
-        if (currentShape.value === "line") {
+        if (currentShape.value === 'line') {
           let line = {
-            key: "move",
-            type: "line",
+            key: 'move',
+            type: 'line',
             begin: this.down,
             end: this.current,
           };
 
           shapeDataList.value.push(line);
-        } else if (currentShape.value === "circle") {
-          const radius = Math.sqrt(
-            (this.current.x - this.down.x) ** 2 +
-              (this.current.y - this.down.y) ** 2,
-          );
+        } else if (currentShape.value === 'circle') {
+          const radius = Math.sqrt((this.current.x - this.down.x) ** 2 + (this.current.y - this.down.y) ** 2);
           let circle = {
-            key: "move",
-            type: "circle",
+            key: 'move',
+            type: 'circle',
             begin: this.down,
             radius,
           };
 
           shapeDataList.value.push(circle);
-        } else if (currentShape.value === "rect") {
+        } else if (currentShape.value === 'rect') {
           let rect = {
-            key: "move",
-            type: "rect",
+            key: 'move',
+            type: 'rect',
             x: this.down.x,
             y: this.down.y,
             width: this.current.x - this.down.x,
@@ -523,33 +479,30 @@ const touchDraw = {
   end: function (evt: TouchEvent) {
     this.started = false;
     this.up = getTouchPosition(evt);
-    if (currentTool.value === "shape") {
-      if (currentShape.value === "line") {
+    if (currentTool.value === 'shape') {
+      if (currentShape.value === 'line') {
         const line = {
-          key: "end",
-          type: "line",
+          key: 'end',
+          type: 'line',
           begin: this.down,
           end: this.up,
         };
 
         shapeDataList.value.push(line);
-      } else if (currentShape.value === "circle") {
-        const radius = Math.sqrt(
-          (this.current.x - this.down.x) ** 2 +
-            (this.current.y - this.down.y) ** 2,
-        );
+      } else if (currentShape.value === 'circle') {
+        const radius = Math.sqrt((this.current.x - this.down.x) ** 2 + (this.current.y - this.down.y) ** 2);
         let circle = {
-          key: "end",
-          type: "circle",
+          key: 'end',
+          type: 'circle',
           begin: this.down,
           radius,
         };
 
         shapeDataList.value.push(circle);
-      } else if (currentShape.value === "rect") {
+      } else if (currentShape.value === 'rect') {
         let rect = {
-          key: "end",
-          type: "rect",
+          key: 'end',
+          type: 'rect',
           x: this.down.x,
           y: this.down.y,
           width: this.current.x - this.down.x,
@@ -566,48 +519,45 @@ const touchDraw = {
 
 const drawController = new AbortController();
 
-function initCanvasDraw(
-  myCanvas: HTMLCanvasElement,
-  ctx: CanvasRenderingContext2D,
-) {
+function initCanvasDraw(myCanvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
   // Set Background Color
   ctx.fillRect(0, 0, myCanvas.width, myCanvas.height);
 
   // Mouse Events
-  myCanvas.addEventListener("mousedown", mouseDraw.mousedown, {
+  myCanvas.addEventListener('mousedown', mouseDraw.mousedown, {
     capture: false,
     signal: drawController.signal,
   });
-  myCanvas.addEventListener("mouseup", mouseDraw.mouseup, {
+  myCanvas.addEventListener('mouseup', mouseDraw.mouseup, {
     capture: false,
     signal: drawController.signal,
   });
-  myCanvas.addEventListener("mousemove", mouseDraw.mousemove, {
+  myCanvas.addEventListener('mousemove', mouseDraw.mousemove, {
     capture: false,
     signal: drawController.signal,
   });
-  myCanvas.addEventListener("mouseleave", mouseDraw.mouseleave, {
+  myCanvas.addEventListener('mouseleave', mouseDraw.mouseleave, {
     capture: false,
     signal: drawController.signal,
   });
 
   // Touch Events
-  myCanvas.addEventListener("touchstart", touchDraw.start, {
+  myCanvas.addEventListener('touchstart', touchDraw.start, {
     capture: false,
     signal: drawController.signal,
   });
-  myCanvas.addEventListener("touchend", touchDraw.end, {
+  myCanvas.addEventListener('touchend', touchDraw.end, {
     capture: false,
     signal: drawController.signal,
   });
-  myCanvas.addEventListener("touchmove", touchDraw.move, {
+  myCanvas.addEventListener('touchmove', touchDraw.move, {
     capture: false,
     signal: drawController.signal,
   });
 
   // Disable Page Move
   document.body.addEventListener(
-    "touchmove",
+    'touchmove',
     function (evt) {
       evt.stopPropagation();
     },
@@ -619,15 +569,15 @@ function initCanvasDraw(
 }
 
 window.requestAnimationFrame(function loop() {
-  if (currentTool.value === "shape") {
+  if (currentTool.value === 'shape') {
     ctx.fillRect(0, 0, myCanvas.width, myCanvas.height);
 
     shapeDataList.value.forEach((data) => {
-      if (data.type === "line") {
+      if (data.type === 'line') {
         drawLine(ctx, data);
-      } else if (data.type === "circle") {
+      } else if (data.type === 'circle') {
         drawCircle(ctx, data);
-      } else if (data.type === "rect") {
+      } else if (data.type === 'rect') {
         ctx.strokeRect(data.x, data.y, data.width, data.height);
       }
     });
@@ -644,7 +594,7 @@ onMounted(() => {
     myCanvas.height = myBoard.value.clientHeight || 297;
 
     myBoard.value.appendChild(myCanvas);
-    ctx = myCanvas.getContext("2d");
+    ctx = myCanvas.getContext('2d');
     ctx.font = `${FONT_SIZE}px serif`;
     ctx.lineWidth = lineWidth.value;
     ctx.strokeStyle = PEN_COLOR;

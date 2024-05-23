@@ -1,6 +1,6 @@
-import type { ColumnProps, ScopeProps, LinkProps, BtnProps } from "../types";
-import { ArrowDown } from "@element-plus/icons-vue";
-import { ref } from "vue";
+import type { ColumnProps, ScopeProps, LinkProps, BtnProps } from '../types';
+import { ArrowDown } from '@element-plus/icons-vue';
+import { ref } from 'vue';
 
 const btnMax = 3;
 
@@ -23,22 +23,11 @@ export const typeRenders = {
     const linkConf = config.linkAttr;
 
     let disabled =
-      linkConf.customDisabled &&
-      linkConf.customDisabled(
-        scope.row,
-        scope.column,
-        scope.value,
-        scope.$index
-      );
+      linkConf.customDisabled && linkConf.customDisabled(scope.row, scope.column, scope.value, scope.$index);
 
     let text = scope.row[config.prop];
     if (config.formatter) {
-      text = config.formatter(
-        scope.row,
-        scope.column,
-        scope.value,
-        scope.$index
-      );
+      text = config.formatter(scope.row, scope.column, scope.value, scope.$index);
     }
 
     if (disabled) {
@@ -46,9 +35,7 @@ export const typeRenders = {
     }
 
     return (
-      <el-link
-        onClick={btnClickHandler(linkConf, scope.row)}
-        {...linkConf.opts}>
+      <el-link onClick={btnClickHandler(linkConf, scope.row)} {...linkConf.opts}>
         {text}
       </el-link>
     );
@@ -83,27 +70,17 @@ export const typeRenders = {
           if (btn.formatter) {
             text = btn.formatter(scope.row);
           }
-          let opts = Object.assign(
-            { size: "small", type: "primary", plain: true },
-            btn.opts
-          );
+          let opts = Object.assign({ size: 'small', type: 'primary', plain: true }, btn.opts);
           let disabled = btn.customDisabled && btn.customDisabled(scope.row);
 
           return (
-            <el-button
-              onClick={btnClickHandler(btn, scope.row)}
-              disabled={disabled}
-              {...opts}>
+            <el-button onClick={btnClickHandler(btn, scope.row)} disabled={disabled} {...opts}>
               {text}
             </el-button>
           );
         })}
         {btnList.length > 0 ? (
-          <el-dropdown
-            trigger="click"
-            size="small"
-            onCommand={handleCommand}
-            style="margin-left: 10px;">
+          <el-dropdown trigger="click" size="small" onCommand={handleCommand} style="margin-left: 10px;">
             {{
               default: (dropdownScope: any) => {
                 return (
@@ -123,8 +100,7 @@ export const typeRenders = {
                       if (btn.formatter) {
                         text = btn.formatter(scope.row);
                       }
-                      let disabled =
-                        btn.customDisabled && btn.customDisabled(scope.row);
+                      let disabled = btn.customDisabled && btn.customDisabled(scope.row);
                       return (
                         <el-dropdown-item command={index} disabled={disabled}>
                           {text}
@@ -151,7 +127,8 @@ export const typeRenders = {
       <el-switch
         v-model={modelValue.value}
         onChange={(val: any) => switchConf.handler(scope.row, val)}
-        {...switchConf.opts}></el-switch>
+        {...switchConf.opts}
+      ></el-switch>
     );
   },
 };

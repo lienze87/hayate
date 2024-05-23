@@ -5,32 +5,15 @@
     </div>
     <div :class="`page-content${loading ? '' : ' visible'}`">
       <svg viewBox="0 0 450 450">
-        <text x="50%" y="50%" dy=".32em" text-anchor="middle" class="text-body">
-          Animation
-        </text>
-        <text
-          x="50%"
-          y="50%"
-          dy=".32em"
-          dx="2.6em"
-          text-anchor="middle"
-          class="text-body"
-        >
-          .
-        </text>
+        <text x="50%" y="50%" dy=".32em" text-anchor="middle" class="text-body">Animation</text>
+        <text x="50%" y="50%" dy=".32em" dx="2.6em" text-anchor="middle" class="text-body">.</text>
       </svg>
       <div class="btn-list">
         <button
-          :class="[
-            'submit-button',
-            submitting ? 'loading-button' : '',
-            success ? 'success-button' : '',
-          ]"
+          :class="['submit-button', submitting ? 'loading-button' : '', success ? 'success-button' : '']"
           @click="handleSubmit"
         >
-          <span v-if="!submitting" class="button-text">{{
-            success ? "Success" : "Submit"
-          }}</span>
+          <span v-if="!submitting" class="button-text">{{ success ? 'Success' : 'Submit' }}</span>
           <div v-else class="button-loader">
             <div></div>
             <div></div>
@@ -39,10 +22,7 @@
         </button>
       </div>
       <div class="icon-list">
-        <div
-          :class="['menu-icon', opening ? 'menu-open' : '']"
-          @click="handleOpenMenu"
-        >
+        <div :class="['menu-icon', opening ? 'menu-open' : '']" @click="handleOpenMenu">
           <div></div>
           <div></div>
           <div></div>
@@ -54,19 +34,11 @@
           <p>"cursorX": {{ mouseEventData.cursorX }}</p>
           <p>"boxLeft": {{ mouseEventData.boxLeft }}</p>
           <p>"cursorInsideButton": {{ mouseEventData.cursorInsideButton }}</p>
-          <p>
-            "relativeToTotalWidth": {{ mouseEventData.relativeToTotalWidth }}
-          </p>
+          <p>"relativeToTotalWidth": {{ mouseEventData.relativeToTotalWidth }}</p>
           <p>"shifted": {{ mouseEventData.shifted }}</p>
         </div>
         <button ref="magnetoRef" class="magneto" :style="magnetoTransition">
-          <div
-            ref="magnetoTextRef"
-            class="magneto-text"
-            :style="magnetoTextTransition"
-          >
-            About me
-          </div>
+          <div ref="magnetoTextRef" class="magneto-text" :style="magnetoTextTransition">About me</div>
         </button>
       </div>
     </div>
@@ -75,12 +47,13 @@
 
 <script lang="ts">
 export default {
-  name: "Animation",
+  name: 'Animation',
 };
 </script>
 
 <script lang="ts" setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted } from 'vue';
+import { debounce } from 'lodash';
 
 const loading = ref(true);
 const submitting = ref(false);
@@ -89,14 +62,14 @@ const opening = ref(false);
 
 const magnetoRef = ref();
 const magnetoTextRef = ref();
-const magnetoTransition = ref("");
-const magnetoTextTransition = ref("");
+const magnetoTransition = ref('');
+const magnetoTextTransition = ref('');
 const mouseEventData = ref({
   cursorX: 0,
   boxLeft: 0,
   cursorInsideButton: 0,
-  relativeToTotalWidth: "",
-  shifted: "",
+  relativeToTotalWidth: '',
+  shifted: '',
 });
 
 const handleSubmit = () => {
@@ -115,20 +88,14 @@ const handleOpenMenu = () => {
 function initMouseEffect(element: HTMLElement) {
   const magnetoWeight = 40;
   const magnetoTextWeight = 80;
-  element.addEventListener("mousemove", (e: MouseEvent) => {
+  element.addEventListener('mousemove', (e: MouseEvent) => {
     let boundBox = element.getBoundingClientRect();
     mouseEventData.value = {
       cursorX: e.clientX,
       boxLeft: Math.ceil(boundBox.left),
       cursorInsideButton: Math.ceil(e.clientX - boundBox.left),
-      relativeToTotalWidth: (
-        (e.clientX - boundBox.left) /
-        element.offsetWidth
-      ).toFixed(2),
-      shifted: (
-        (e.clientX - boundBox.left) / element.offsetWidth -
-        0.5
-      ).toFixed(2),
+      relativeToTotalWidth: ((e.clientX - boundBox.left) / element.offsetWidth).toFixed(2),
+      shifted: ((e.clientX - boundBox.left) / element.offsetWidth - 0.5).toFixed(2),
     };
 
     const newX = (e.clientX - boundBox.left) / element.offsetWidth - 0.5;
@@ -137,39 +104,28 @@ function initMouseEffect(element: HTMLElement) {
     magnetoTransition.value = `transform: translate(${newX * magnetoWeight}px, ${newY * magnetoWeight}px);`;
     magnetoTextTransition.value = `transform: translate(${newX * magnetoTextWeight}px, ${newY * magnetoTextWeight}px);`;
   });
-  element.addEventListener("mouseleave", (e: MouseEvent) => {
+  element.addEventListener('mouseleave', (e: MouseEvent) => {
     mouseEventData.value = {
       cursorX: 0,
       boxLeft: 0,
       cursorInsideButton: 0,
-      relativeToTotalWidth: "",
-      shifted: "",
+      relativeToTotalWidth: '',
+      shifted: '',
     };
     magnetoTransition.value = ``;
     magnetoTextTransition.value = ``;
   });
 }
 
-const lastKnownScrollPosition = ref(0);
-let ticking = false;
-const handleScrollChange = () => {};
+const handleScrollChange = () => {
+  console.log(window.screenY);
+};
 
 onMounted(() => {
-  window.addEventListener("keydown", (event) => {
+  window.addEventListener('keydown', (event) => {
     console.log(event.code);
   });
-  document.addEventListener("scroll", (event) => {
-    lastKnownScrollPosition.value = window.scrollY;
-
-    if (!ticking) {
-      window.requestAnimationFrame(() => {
-        handleScrollChange();
-        ticking = false;
-      });
-
-      ticking = true;
-    }
-  });
+  document.addEventListener('scroll', debounce(handleScrollChange, 100));
   initMouseEffect(magnetoRef.value);
   setTimeout(() => {
     loading.value = false;

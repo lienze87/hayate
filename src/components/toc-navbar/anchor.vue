@@ -7,10 +7,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref } from 'vue';
 
 export default defineComponent({
-  name: "Anchor",
+  name: 'Anchor',
   components: {},
   props: {
     title: {
@@ -18,7 +18,7 @@ export default defineComponent({
     },
   },
   setup(props: any) {
-    let title = ref(props.title || "");
+    let title = ref(props.title || '');
 
     return { title };
   },

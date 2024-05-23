@@ -12,24 +12,22 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from "vue";
-import "./style/index";
-import Toc from "./toc.vue";
+import { defineComponent, ref, onMounted } from 'vue';
+import './style/index';
+import Toc from './toc.vue';
 
 export default defineComponent({
-  name: "TocNavbar",
+  name: 'TocNavbar',
   components: { Toc },
   setup(props: any) {
-    let title = ref(props.title || "");
+    let title = ref(props.title || '');
 
     let tocMenu = ref<any[]>([]);
 
     onMounted(() => {
-      tocMenu.value = Array.from(document.querySelectorAll(".doc-title")).map(
-        (ele) => {
-          return { link: "#" + ele.id, text: ele.id };
-        },
-      );
+      tocMenu.value = Array.from(document.querySelectorAll('.doc-title')).map((ele) => {
+        return { link: '#' + ele.id, text: ele.id };
+      });
     });
     return { title, tocMenu };
   },
