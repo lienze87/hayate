@@ -41,7 +41,7 @@ Frames.init(
     frames: DataTypes.INTEGER,
     describe: DataTypes.STRING,
   },
-  { sequelize, modelName: "frames" }
+  { sequelize, modelName: "frames" },
 );
 
 class Images extends Model {}
@@ -62,7 +62,7 @@ Images.init(
     },
     describe: DataTypes.STRING,
   },
-  { sequelize, modelName: "images" }
+  { sequelize, modelName: "images" },
 );
 
 // 关系一对多
@@ -83,7 +83,7 @@ Notes.init(
     context: DataTypes.TEXT,
     describe: DataTypes.STRING,
   },
-  { sequelize, modelName: "notes" }
+  { sequelize, modelName: "notes" },
 );
 
 // Sync models with database
@@ -120,12 +120,12 @@ app.post("/upload", function (req, res) {
     if (sampleFile.name.split(".").pop() === "mp4") {
       getVideoPoster(
         filePath,
-        `./public/${sampleFile.name.split(".mp4")[0]}.jpg`
+        `./public/${sampleFile.name.split(".mp4")[0]}.jpg`,
       );
       const metaDataPath = `./metadata/${sampleFile.name.split(".mp4")[0]}.json`;
 
       if (!fs.existsSync(metaDataPath)) {
-        getVideoMetadata(basePath, () => {});
+        getVideoMetadata(filePath, () => {});
       }
     }
     res.json({
@@ -319,7 +319,7 @@ app.post("/images", async (req, res) => {
     req.body.end,
     videoPath,
     folderPath,
-    req.body.step
+    req.body.step,
   );
   await Images.create({
     frameId: req.body.frameId,
@@ -341,7 +341,7 @@ app.put("/images/:id", async (req, res) => {
         req.body.end,
         images.videoPath,
         images.folderPath,
-        req.body.step
+        req.body.step,
       );
     }
     await images.update(req.body);

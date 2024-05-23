@@ -60,7 +60,7 @@ export async function extractVideoByTime(
   begin,
   end,
   inputFileName,
-  outFileName
+  outFileName,
 ) {
   if (!fs.existsSync(inputFileName)) {
     throw Error(`${inputFileName} not exit`);
@@ -70,7 +70,7 @@ export async function extractVideoByTime(
   }
 
   await execCommand(
-    `ffmpeg -i ${inputFileName} -ss ${begin} -to ${end} -async 1 -c copy ${outFileName}`
+    `ffmpeg -i ${inputFileName} -ss ${begin} -to ${end} -async 1 -c copy ${outFileName}`,
   );
 }
 
@@ -91,7 +91,7 @@ function extractVideoByFrames(begin, end, inputFileName, outFileName) {
   }
 
   execCommand(
-    `ffmpeg -i ${inputFileName} -vf "trim=start_frame=${begin}:end_frame=${end},setpts=PTS-STARTPTS" -an ${outFileName}`
+    `ffmpeg -i ${inputFileName} -vf "trim=start_frame=${begin}:end_frame=${end},setpts=PTS-STARTPTS" -an ${outFileName}`,
   );
 }
 
@@ -101,7 +101,7 @@ export async function extractImageByFrames(
   end,
   inputFileName,
   outFolderName,
-  step = 1
+  step = 1,
 ) {
   // select="between(t\\,2\\,5)" 选择第2-5秒
   // select="between(n\\,2\\,5)" 选择第2-5帧
@@ -115,12 +115,12 @@ export async function extractImageByFrames(
 
   if (step === 1) {
     await execCommand(
-      `ffmpeg -i ${inputFileName} -vf select="between(n\\,${begin}\\,${end})" -frame_pts 1 -vsync 0 ${outFolderName}/frames%2d.png`
+      `ffmpeg -i ${inputFileName} -vf select="between(n\\,${begin}\\,${end})" -frame_pts 1 -vsync 0 ${outFolderName}/frames%2d.png`,
     );
   } else {
     // 每step帧取一次;
     await execCommand(
-      `ffmpeg -i ${inputFileName} -vf select="between(n\\,${begin}\\,${end})*not(mod(n\\,${step}))" -frame_pts 1 -vsync 0 ${outFolderName}/frames%2d.png`
+      `ffmpeg -i ${inputFileName} -vf select="between(n\\,${begin}\\,${end})*not(mod(n\\,${step}))" -frame_pts 1 -vsync 0 ${outFolderName}/frames%2d.png`,
     );
   }
 }
@@ -130,7 +130,7 @@ async function getVideoInfoByCmd(fileName) {
     throw Error(`${fileName} not exit`);
   }
   return await execCommand(
-    `ffprobe -of json -show_streams -show_format ${fileName}`
+    `ffprobe -of json -show_streams -show_format ${fileName}`,
   );
 }
 
@@ -148,7 +148,7 @@ export function getVideoMetadata(fileName, callback) {
       () => {
         if (err) throw err;
         console.log("complete");
-      }
+      },
     );
   });
 }
@@ -162,6 +162,6 @@ export async function getVideoPoster(inputFileName, outFileName) {
   }
 
   await execCommand(
-    `ffmpeg -i ${fileName} -ss 00:00:01.000 -vframes 1 ${outFileName}`
+    `ffmpeg -i ${inputFileName} -ss 00:00:01.000 -vframes 1 ${outFileName}`,
   );
 }
