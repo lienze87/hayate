@@ -61,14 +61,20 @@ const routeList: RouteRecordRaw[] = [
   {
     path: "/animation",
     name: "Animation",
-    redirect: "/animation/timeline",
+    redirect: "/animation/transition",
     meta: { title: "动画" },
     children: [
       {
-        path: "timeline",
-        name: "AnimationTimeline",
-        component: () => import("@/pages/animation/timeline.vue"),
-        meta: { title: "时间线" },
+        path: "transition",
+        name: "AnimationTransition",
+        component: () => import("@/pages/animation/transition.vue"),
+        meta: { title: "运动-过渡" },
+      },
+      {
+        path: "animation",
+        name: "AnimationAnimation",
+        component: () => import("@/pages/animation/animation.vue"),
+        meta: { title: "运动-动画" },
       },
     ],
   },

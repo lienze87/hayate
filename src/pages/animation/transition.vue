@@ -244,7 +244,7 @@
 
 <script lang="ts">
 export default {
-  name: "Timeline",
+  name: "Transition",
 };
 </script>
 
@@ -253,7 +253,8 @@ import { ref, onMounted } from "vue";
 
 const active = ref(1);
 const handleAccordionChange = (e: MouseEvent) => {
-  const index = Number(e.target?.dataset.index);
+  const element = e.target as HTMLElement;
+  const index = Number(element.dataset.index);
   if (!isNaN(index)) {
     active.value = index;
   }

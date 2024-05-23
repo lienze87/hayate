@@ -31,8 +31,12 @@ const menuList = ref([
     path: "/background",
   },
   {
-    name: "动画",
-    path: "/animation/timeline",
+    name: "动画-过渡",
+    path: "/animation/transition",
+  },
+  {
+    name: "动画-动画",
+    path: "/animation/animation",
   },
   {
     name: "导航栏",
