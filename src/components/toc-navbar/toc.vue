@@ -49,7 +49,7 @@ export default defineComponent({
 </script>
 
 <script setup lang="ts">
-import { watch, ref, defineProps, PropType } from "vue";
+import { watch, ref, PropType } from "vue";
 import { useActiveSidebarLinks } from "./active-bar";
 
 type HeadersLink = {

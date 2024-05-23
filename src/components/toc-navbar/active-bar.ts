@@ -93,8 +93,8 @@ function getAnchors(sidebarLinks: HTMLAnchorElement[]) {
   );
 }
 function getPageOffset() {
-  return (document.querySelector(".fixed-header") as HTMLElement).offsetHeight;
-  // return 0
+  // return (document.querySelector(".fixed-header") as HTMLElement).offsetHeight;
+  return 0;
 }
 function getAnchorTop(anchor: HTMLAnchorElement) {
   const pageOffset = getPageOffset();

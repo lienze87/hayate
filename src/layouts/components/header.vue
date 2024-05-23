@@ -34,6 +34,10 @@ const menuList = ref([
     name: "动画",
     path: "/animation/timeline",
   },
+  {
+    name: "导航栏",
+    path: "/sidenav",
+  },
 ]);
 </script>
 <style lang="scss" scoped>

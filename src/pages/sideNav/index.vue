@@ -84,12 +84,16 @@ export default defineComponent({
 </script>
 
 <script lang="ts" setup>
-import Anchor from "./src/anchor.vue";
-import SideBar from "./index";
+import Anchor from "@/components/toc-navbar/anchor.vue";
+import SideBar from "@/components/toc-navbar/index.vue";
 </script>
 
 <style lang="scss" scoped>
 .detail-container {
   position: relative;
+  padding: 0 20px;
+}
+.app-container {
+  border: 1px solid #ccc;
 }
 </style>

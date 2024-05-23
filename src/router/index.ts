@@ -72,6 +72,12 @@ const routeList: RouteRecordRaw[] = [
       },
     ],
   },
+  {
+    path: "/sidenav",
+    name: "SideNav",
+    component: () => import("@/pages/sideNav/index.vue"),
+    meta: { title: "导航栏" },
+  },
 ];
 
 const router = createRouter({
