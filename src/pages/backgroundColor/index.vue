@@ -2,7 +2,11 @@
   <div class="main-content" :style="`background: ${color};`">
     <div v-show="showColorPicker" :style="`color: ${oppositeColor}`">
       <span>按h键隐藏颜色选择器</span>
-      <el-color-picker v-model="color" />
+      <el-color-picker v-model="color" @active-change="handleActiveChange" />
+      <p>
+        <span>当前颜色：{{ color.toLowerCase() }} </span>/
+        <span>相反色：{{ oppositeColor }}</span>
+      </p>
     </div>
   </div>
 </template>
@@ -21,6 +25,9 @@ const showColorPicker = ref(true);
 const oppositeColor = computed(() => {
   return `#${(0xffffff - Number(`0x${color.value.slice(1)}`)).toString(16)}`;
 });
+const handleActiveChange = (val: string) => {
+  color.value = val;
+};
 onMounted(() => {
   window.addEventListener('keydown', (event) => {
     console.log(event.code);
