@@ -9,6 +9,11 @@
 - [视频截取](./src/pages/video/index.vue)
 - [笔记](./src/pages/note/index.vue)
 
+# 项目依赖
+
+- [gasp](https://gsap.com/) (A wildly robust JavaScript animation library built for professionals)
+- [Lenis](https://github.com/darkroomengineering/lenis) (Lenis is a lightweight, robust, and performant smooth scroll library)
+
 # Server
 
 使用Express+[Sequelize](https://sequelize.org/docs/v6/)(a promise-based Node.js ORM tool)+sqlite3构建
@@ -59,7 +64,7 @@ Frames.init(
     frames: DataTypes.INTEGER,
     describe: DataTypes.STRING,
   },
-  { sequelize, modelName: "frames" }
+  { sequelize, modelName: 'frames' },
 );
 ```
 
