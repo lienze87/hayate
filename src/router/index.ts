@@ -76,6 +76,12 @@ const routeList: RouteRecordRaw[] = [
         component: () => import('@/pages/animation/animation.vue'),
         meta: { title: '运动-动画' },
       },
+      {
+        path: 'scrollTrigger',
+        name: 'AnimationScrollTrigger',
+        component: () => import('@/pages/animation/scrollTrigger.vue'),
+        meta: { title: '运动-滚动' },
+      },
     ],
   },
   {

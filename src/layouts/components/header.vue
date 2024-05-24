@@ -22,25 +22,29 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { ArrowDown } from "@element-plus/icons-vue";
+import { ref } from 'vue';
+import { ArrowDown } from '@element-plus/icons-vue';
 
 const menuList = ref([
   {
-    name: "纯色背景",
-    path: "/background",
+    name: '纯色背景',
+    path: '/background',
   },
   {
-    name: "动画-过渡",
-    path: "/animation/transition",
+    name: '动画-过渡',
+    path: '/animation/transition',
   },
   {
-    name: "动画-动画",
-    path: "/animation/animation",
+    name: '动画-动画',
+    path: '/animation/animation',
   },
   {
-    name: "导航栏",
-    path: "/sidenav",
+    name: '动画-滚动',
+    path: '/animation/scrollTrigger',
+  },
+  {
+    name: '导航栏',
+    path: '/sidenav',
   },
 ]);
 </script>
