@@ -90,6 +90,12 @@ const routeList: RouteRecordRaw[] = [
     component: () => import('@/pages/sideNav/index.vue'),
     meta: { title: '导航栏' },
   },
+  {
+    path: '/scene',
+    name: 'Scene',
+    component: () => import('@/pages/world/scene.vue'),
+    meta: { title: '场景' },
+  },
 ];
 
 const router = createRouter({

@@ -46,6 +46,10 @@ const menuList = ref([
     name: '导航栏',
     path: '/sidenav',
   },
+  {
+    name: '三维场景',
+    path: '/scene',
+  },
 ]);
 </script>
 <style lang="scss" scoped>
