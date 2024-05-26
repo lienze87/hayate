@@ -1,24 +1,34 @@
 <template>
   <div class="main-content">
     <div id="controls">
-      <p>direction: {{ deviceInfo.direction }}</p>
-      <p>x: {{ deviceInfo.y }}</p>
-      <p>y: {{ deviceInfo.x }}</p>
-      <p>z: {{ deviceInfo.z }}</p>
-      <p>alpha: {{ deviceInfo.alpha }}</p>
-      <p>beta: {{ deviceInfo.beta }}</p>
-      <p>gamma: {{ deviceInfo.gamma }}</p>
+      <p>camera position</p>
+      <p>x: {{ cameraInfo.position.x }}</p>
+      <p>y: {{ cameraInfo.position.y }}</p>
+      <p>z: {{ cameraInfo.position.z }}</p>
     </div>
   </div>
 </template>
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
-import { ElMessage } from 'element-plus';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
+const CAMERA_SPEED = 0.3;
+const cameraInfo = ref({
+  fov: 75,
+  aspect: window.innerWidth / window.innerHeight,
+  near: 0.1,
+  far: 1000,
+  position: new THREE.Vector3(0, 0, 0),
+});
+
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const camera = new THREE.PerspectiveCamera(
+  cameraInfo.value.fov,
+  cameraInfo.value.aspect,
+  cameraInfo.value.near,
+  cameraInfo.value.far,
+);
 
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -53,6 +63,10 @@ function animate() {
   cube.rotation.x += 0.01;
   cube.rotation.y += 0.02;
   controls.update();
+
+  // camera.getWorldDirection(cameraInfo.value.position);
+  camera.getWorldPosition(cameraInfo.value.position);
+
   renderer.render(scene, camera);
 }
 
@@ -81,28 +95,33 @@ const deviceInfo = ref({
  */
 
 function initListener() {
-  function handleMotionEvent(event: DeviceMotionEvent) {
-    const x = event.accelerationIncludingGravity.x;
-    const y = event.accelerationIncludingGravity.y;
-    const z = event.accelerationIncludingGravity.z;
+  function handleKeyDownEvent(event: KeyboardEvent) {
+    const currentPosition = new THREE.Vector3(0, 0, 0);
+    camera.getWorldPosition(currentPosition);
 
-    deviceInfo.value = { ...deviceInfo.value, x, y, z };
-    // Do something awesome.
-    console.log(x, y, z);
+    switch (event.code) {
+      case 'KeyW':
+        currentPosition.setY(currentPosition.y + 1 * CAMERA_SPEED);
+        break;
+      case 'KeyA':
+        currentPosition.setX(currentPosition.x + 1 * CAMERA_SPEED);
+        break;
+      case 'KeyS':
+        currentPosition.setY(currentPosition.y - 1 * CAMERA_SPEED);
+        break;
+      case 'KeyD':
+        currentPosition.setX(currentPosition.x - 1 * CAMERA_SPEED);
+        break;
+      default:
+        console.log(event.code);
+        break;
+    }
+
+    camera.position.set(currentPosition.x, currentPosition.y, currentPosition.z);
+    camera.lookAt(new THREE.Vector3(0, 0, 0));
   }
-  // rotateDegrees,frontToBack, leftToRight,
-  function handleOrientationEvent(event: DeviceOrientationEvent) {
-    ElMessage.warning('是否支持运动检测：' + event.absolute);
-    const alpha = event.alpha;
-    const beta = event.beta;
-    const gamma = event.gamma;
 
-    deviceInfo.value = { ...deviceInfo.value, alpha, beta, gamma };
-  }
-
-  window.addEventListener('devicemotion', handleMotionEvent, true);
-
-  window.addEventListener('deviceorientation', handleOrientationEvent, true);
+  window.addEventListener('keydown', handleKeyDownEvent);
 }
 
 onMounted(() => {
