@@ -1,47 +1,10 @@
 <template>
   <div class="video-player">
-    <video
-      ref="videoRef"
-      class="video-content"
-      crossorigin="anonymous"
-      width="640"
-      controls
-      preload="auto"
-      v-bind="$attrs"
-    >
-      <slot />
-    </video>
-    <div class="video-control">
-      <div class="circle-button" @click="handlePlayVideo">
-        <VideoPlay v-if="showPlayIcon" />
-        <VideoPause v-else />
-      </div>
-      <el-button @click="handleReplayVideo"> 重播 </el-button>
-      <div class="volume-container">
-        <el-button @click="handleShowVideoVolume"> 音量 </el-button>
-        <div v-show="isShowVideoVolume" class="volume-slider">
-          <el-slider
-            v-model="videoInfo.volume"
-            :min="0"
-            :max="100"
-            :step="1"
-            vertical
-            height="100px"
-            @change="handleVideoVolumeChange"
-          />
-        </div>
-      </div>
-      <el-button @click="handleMuteVideo"> 静音 </el-button>
-      <el-button @click="handleFullscreenVideo"> 全屏 </el-button>
-      <div class="action-bar">
-        <el-color-picker v-model="penColor" @change="handlePenColorChange" />
-        <el-button type="primary" @click="handleStartDraw"> 绘制 </el-button>
-        <el-button @click="handleResetDraw"> 重置 </el-button>
-        <el-button type="danger" @click="handleQuitDraw"> 关闭绘制 </el-button>
-      </div>
-    </div>
-    <div class="progress-slider-container">
-      <div class="progress-slider">
+    <div class="video-content" :style="`width: ${canvasInfo.width}px;height:${canvasInfo.height}px;`">
+      <video ref="videoRef" class="my-video" crossorigin="anonymous" width="640" preload="auto" v-bind="$attrs">
+        <slot />
+      </video>
+      <div class="progress-slider-container">
         <el-slider
           v-model="videoInfo.currentTime"
           :min="0"
@@ -51,8 +14,46 @@
           @change="handleVideoProgressChange"
         />
       </div>
-      <div class="timeline">
-        {{ formatVideoTooltip(videoInfo.currentTime) }}/{{ formatVideoTooltip(videoInfo.duration) }}
+    </div>
+    <div class="video-control">
+      <div class="control-bar">
+        <div class="icon-button" @click="handlePlayVideo">
+          <VideoPlay v-if="showPlayIcon" />
+          <VideoPause v-else />
+        </div>
+        <!-- <el-button @click="handleReplayVideo"> 重播 </el-button>
+      <el-button @click="handleFullscreenVideo"> 全屏 </el-button> -->
+        <div class="volume-container">
+          <div class="icon-button" @click="handleShowVideoVolume">
+            <Mute v-if="videoInfo.muted" />
+            <Microphone v-else />
+          </div>
+          <div class="volume-slider">
+            <el-slider
+              v-model="videoInfo.volume"
+              :disabled="videoInfo.muted"
+              :min="0"
+              :max="100"
+              :step="1"
+              height="100px"
+              @change="handleVideoVolumeChange"
+            />
+          </div>
+        </div>
+        <div class="timeline">
+          {{ formatVideoTooltip(videoInfo.currentTime) }}/{{ formatVideoTooltip(videoInfo.duration) }}
+        </div>
+      </div>
+      <div class="action-bar">
+        <el-color-picker
+          v-model="penColor"
+          @active-change="handlePenColorActiveChange"
+          @change="handlePenColorChange"
+        />
+        <el-button v-if="isDrawing" type="danger" @click="handleQuitDraw"> 关闭绘制 </el-button>
+        <el-button v-else type="primary" @click="handleStartDraw"> 开始绘制 </el-button>
+        <el-button @click="handleResetDraw"> 重置 </el-button>
+        <el-button @click="handleCreateFrame"> 保存 </el-button>
       </div>
     </div>
     <div class="frame-player-container">
@@ -74,8 +75,11 @@
       <el-button type="primary" @click="handlePlayFrame">
         {{ autoPlayFrame ? '暂停' : '播放' }}
       </el-button>
+      <div v-if="frameImage">
+        <el-image :src="frameImage" class="frame-image" fit="contain" />
+      </div>
     </div>
-    <canvas ref="videoCanvasRef" class="video-canvas" width="640" height="360"> </canvas>
+    <canvas ref="videoCanvasRef" class="video-canvas" :width="canvasInfo.width" :height="canvasInfo.height"> </canvas>
   </div>
 </template>
 
@@ -86,24 +90,29 @@ export default {
 </script>
 
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue';
-import { VideoPlay, VideoPause } from '@element-plus/icons-vue';
+import { ref, onMounted, nextTick } from 'vue';
+import { VideoPlay, VideoPause, Microphone, Mute } from '@element-plus/icons-vue';
 import { initCanvasDraw } from '@/utils/canvasDraw';
 import { translateTime } from '@/utils';
 
 const FONT_SIZE = 24;
-const penColor = ref('#000000');
+const penColor = ref('#ce2121');
 
 const showPlayIcon = ref(true);
 const videoRef = ref<HTMLVideoElement>();
 const videoCanvasRef = ref<HTMLCanvasElement>();
+const canvasInfo = ref({
+  width: 640,
+  height: 360,
+});
 const videoInfo = ref({
   currentFrame: 0,
-  frameStep: 3,
+  frameStep: 1,
   frameRate: 24,
   currentTime: 0,
   duration: 0,
   maxSecond: 0,
+  muted: false,
   volume: 100,
   progress: 0,
 });
@@ -123,13 +132,9 @@ const handleReplayVideo = () => {
   videoInfo.value.progress = 0;
 };
 
-const handleMuteVideo = () => {
-  videoRef.value.muted = !videoRef.value.muted;
-};
-
-const isShowVideoVolume = ref(false);
 const handleShowVideoVolume = () => {
-  isShowVideoVolume.value = !isShowVideoVolume.value;
+  videoInfo.value.muted = !videoInfo.value.muted;
+  videoRef.value.muted = !videoRef.value.muted;
 };
 
 // volume范围0-1
@@ -193,9 +198,9 @@ const initVideoCanvas = () => {
 
   video.addEventListener('canplay', () => {
     // video.play();
-    // getFrameList();
-    videoCanvas.width = video.clientWidth;
-    videoCanvas.height = video.clientHeight;
+
+    canvasInfo.value.width = video.clientWidth;
+    canvasInfo.value.height = video.clientHeight;
   });
   video.addEventListener('play', () => {
     showPlayIcon.value = false;
@@ -216,38 +221,12 @@ const initVideoCanvas = () => {
   });
 };
 
-const frameList = ref([]);
-async function getFrameList() {
-  const video = videoRef.value;
-  frameList.value = [];
-
-  // @ts-ignore
-  if (window.MediaStreamTrackProcessor) {
-    await video.play();
-    // @ts-ignore
-    const track = await video.captureStream().getVideoTracks()[0];
-    // @ts-ignore
-    const processor = new MediaStreamTrackProcessor(track);
-    const reader = processor.readable.getReader();
-    readChunk();
-
-    function readChunk() {
-      reader.read().then(async ({ done, value }: { done: boolean; value: any }) => {
-        if (value) {
-          const bitmap = await createImageBitmap(value);
-          frameList.value.push(bitmap);
-
-          value.close();
-        }
-        if (!done) {
-          readChunk();
-        }
-      });
-    }
-  } else {
-    console.error("your browser doesn't support this API yet");
-  }
-}
+const isDrawing = ref(false);
+const frameImage = ref('');
+const handlePenColorActiveChange = (val: string) => {
+  penColor.value = val;
+  handlePenColorChange();
+};
 
 const handlePenColorChange = () => {
   const videoCanvas = videoCanvasRef.value;
@@ -256,7 +235,10 @@ const handlePenColorChange = () => {
 };
 
 const handleStartDraw = () => {
+  isDrawing.value = true;
   videoRef.value.pause();
+  handlePenColorChange();
+
   videoCanvasRef.value.setAttribute('style', 'pointer-events: auto;cursor: crosshair;');
 };
 
@@ -267,8 +249,21 @@ const handleResetDraw = () => {
 };
 
 const handleQuitDraw = () => {
+  isDrawing.value = false;
   handleResetDraw();
   videoCanvasRef.value.setAttribute('style', 'pointer-events: none;');
+};
+
+// 使用新canvas合成图像
+const handleCreateFrame = () => {
+  const videoCanvas = videoCanvasRef.value;
+  let canvas = document.createElement('canvas');
+  canvas.height = canvasInfo.value.height;
+  canvas.width = canvasInfo.value.width;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(videoRef.value, 0, 0, canvasInfo.value.width, canvasInfo.value.height);
+  ctx.drawImage(videoCanvas, 0, 0, canvasInfo.value.width, canvasInfo.value.height);
+  frameImage.value = canvas.toDataURL();
 };
 
 const autoPlayFrame = ref(false);
@@ -324,54 +319,79 @@ onMounted(() => {
 <style lang="scss" scoped>
 .video-player {
   position: relative;
+  .video-content {
+    position: relative;
+    overflow: hidden;
+  }
+  .video-content:hover {
+    .progress-slider-container {
+      display: block;
+    }
+  }
+  .progress-slider-container {
+    display: none;
+    position: absolute;
+    bottom: 0;
+    padding: 0 20px;
+    width: calc(100% - 40px);
+    z-index: 1;
+    background-color: rgba(0, 0, 0, 0.6);
+  }
+
   .video-control {
     display: flex;
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    height: 60px;
+    height: 48px;
     background-color: #f2f2f2;
-    z-index: 1;
-    .circle-button {
-      padding: 4px 0;
-      width: 32px;
-      border-radius: 50%;
-    }
-    .action-bar {
+
+    .control-bar {
       display: flex;
-      flex-direction: row;
+      justify-content: flex-start;
       align-items: center;
     }
     .volume-container {
       position: relative;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      .volume-slider {
+        width: 0;
+        padding: 0 10px;
+        opacity: 0;
+        transition: width 0.5s ease-out;
+      }
     }
-    .volume-slider {
-      position: absolute;
-      left: 0;
-      bottom: 40px;
-      padding: 10px;
-      height: 120px;
-      border-top-left-radius: 4px;
-      border-top-right-radius: 4px;
-      background-color: #ccc;
+    .volume-container:hover {
+      .volume-slider {
+        width: 120px;
+        opacity: 1;
+      }
     }
-  }
-  .progress-slider-container {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    padding: 0 20px;
 
-    .progress-slider {
-      flex-grow: 1;
-      flex-shrink: 0;
-      margin-right: 20px;
-    }
     .timeline {
-      flex-basis: 140px;
-      text-align: right;
+      margin: 0 10px;
+      line-height: 32px;
+    }
+    .action-bar {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      height: 100%;
     }
   }
+  .icon-button {
+    display: inline-flex;
+    margin: 0 10px;
+    width: 32px;
+    font-size: 32px;
+    cursor: pointer;
+  }
+  .icon-button:hover {
+    color: #409eff;
+  }
+
   .video-canvas {
     position: absolute;
     top: 0;
