@@ -7,6 +7,7 @@
         <span>当前颜色：{{ color.toLowerCase() }} </span>/
         <span>相反色：{{ oppositeColor }}</span>
       </p>
+      <p>透明度：<mouseInput v-model="alphaVal" /></p>
     </div>
   </div>
 </template>
@@ -19,6 +20,10 @@ export default {
 
 <script lang="ts" setup>
 import { ref, onMounted, computed } from 'vue';
+import mouseInput from '@/components/mouseInput.vue';
+
+const alphaVal = ref(0);
+
 const color = ref('#ffffff');
 const showColorPicker = ref(true);
 // 计算背景色的相反色
