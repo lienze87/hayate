@@ -142,7 +142,7 @@ onMounted(() => {
   position: relative;
   display: inline-flex;
   width: 120px;
-  height: 32px;
+  height: 24px;
   color: #fff;
   border-radius: 8px;
 

@@ -573,6 +573,9 @@ window.requestAnimationFrame(function loop() {
     ctx.fillRect(0, 0, myCanvas.width, myCanvas.height);
 
     shapeDataList.value.forEach((data) => {
+      if (data.key === 'end') {
+        return;
+      }
       if (data.type === 'line') {
         drawLine(ctx, data);
       } else if (data.type === 'circle') {
