@@ -2,9 +2,37 @@
   <div class="main-content">
     <div id="controls">
       <p>camera position</p>
-      <p>x: {{ cameraInfo.position.x }}</p>
-      <p>y: {{ cameraInfo.position.y }}</p>
-      <p>z: {{ cameraInfo.position.z }}</p>
+      <p>angle: {{ cameraInfo.angle }}</p>
+      <p>
+        x:
+        <el-slider
+          v-model="cameraInfo.rotate.x"
+          :min="0"
+          :max="6.28"
+          :step="0.01"
+          @input="handleRotate('x')"
+        ></el-slider>
+      </p>
+      <p>
+        y:
+        <el-slider
+          v-model="cameraInfo.rotate.y"
+          :min="0"
+          :max="6.28"
+          :step="0.1"
+          @input="handleRotate('y')"
+        ></el-slider>
+      </p>
+      <p>
+        z:
+        <el-slider
+          v-model="cameraInfo.rotate.z"
+          :min="0"
+          :max="Math.PI * 2"
+          :step="0.1"
+          @input="handleRotate('z')"
+        ></el-slider>
+      </p>
     </div>
   </div>
 </template>
@@ -19,7 +47,8 @@ const cameraInfo = ref({
   aspect: window.innerWidth / window.innerHeight,
   near: 0.1,
   far: 1000,
-  position: new THREE.Vector3(0, 0, 0),
+  rotate: new THREE.Vector3(0, 0, 0),
+  angle: 0,
 });
 
 const scene = new THREE.Scene();
@@ -35,40 +64,53 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 
 const controls = new OrbitControls(camera, renderer.domElement);
 
-const geometry = new THREE.BoxGeometry(1, 1, 1).toNonIndexed();
-const material = new THREE.MeshBasicMaterial({ vertexColors: true });
+const geometry = new THREE.BoxGeometry(2, 2, 2);
 
-const positionAttribute = geometry.getAttribute('position');
+const cube = new THREE.Mesh(geometry, [
+  new THREE.MeshBasicMaterial({ color: Math.random() * 0xffffff }),
+  new THREE.MeshBasicMaterial({ color: Math.random() * 0xffffff }),
+  new THREE.MeshBasicMaterial({ color: Math.random() * 0xffffff }),
+  new THREE.MeshBasicMaterial({ color: Math.random() * 0xffffff }),
+  new THREE.MeshBasicMaterial({ color: Math.random() * 0xffffff }),
+  new THREE.MeshBasicMaterial({ color: Math.random() * 0xffffff }),
+]);
 
-const colors = [];
-const color = new THREE.Color();
-
-for (let i = 0; i < positionAttribute.count; i += 3) {
-  color.set(Math.random() * 0xffffff);
-
-  // define the same color for each vertex of a triangle
-
-  colors.push(color.r, color.g, color.b);
-  colors.push(color.r, color.g, color.b);
-  colors.push(color.r, color.g, color.b);
-}
-geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-
-const cube = new THREE.Mesh(geometry, material);
 scene.add(cube);
 
-camera.position.z = 5;
+const axesHelper = new THREE.AxesHelper(5);
+scene.add(axesHelper);
+
+camera.position.y = 5;
+camera.position.z = 10;
+
 function animate() {
   requestAnimationFrame(animate);
-  cube.rotation.x += 0.01;
-  cube.rotation.y += 0.02;
-  controls.update();
 
-  // camera.getWorldDirection(cameraInfo.value.position);
-  camera.getWorldPosition(cameraInfo.value.position);
+  controls.update();
 
   renderer.render(scene, camera);
 }
+
+const handleRotate = (axis: string) => {
+  const x_axis = new THREE.Vector3(1, 0, 0).normalize();
+  const y_axis = new THREE.Vector3(0, 1, 0).normalize();
+  const z_axis = new THREE.Vector3(0, 0, 1).normalize();
+  let targetAxis = new THREE.Vector3(0, 0);
+  let angle = 0;
+  if (axis === 'x') {
+    targetAxis = x_axis;
+    angle = cameraInfo.value.rotate.x;
+  } else if (axis === 'y') {
+    targetAxis = y_axis;
+    angle = cameraInfo.value.rotate.y;
+  } else if (axis === 'z') {
+    targetAxis = z_axis;
+    angle = cameraInfo.value.rotate.z;
+  }
+
+  const quaternion = new THREE.Quaternion();
+  camera.position.applyQuaternion(quaternion.setFromAxisAngle(targetAxis, angle));
+};
 
 const deviceInfo = ref({
   direction: 'vertical',
@@ -96,29 +138,7 @@ const deviceInfo = ref({
 
 function initListener() {
   function handleKeyDownEvent(event: KeyboardEvent) {
-    const currentPosition = new THREE.Vector3(0, 0, 0);
-    camera.getWorldPosition(currentPosition);
-
-    switch (event.code) {
-      case 'KeyW':
-        currentPosition.setY(currentPosition.y + 1 * CAMERA_SPEED);
-        break;
-      case 'KeyA':
-        currentPosition.setX(currentPosition.x + 1 * CAMERA_SPEED);
-        break;
-      case 'KeyS':
-        currentPosition.setY(currentPosition.y - 1 * CAMERA_SPEED);
-        break;
-      case 'KeyD':
-        currentPosition.setX(currentPosition.x - 1 * CAMERA_SPEED);
-        break;
-      default:
-        console.log(event.code);
-        break;
-    }
-
-    camera.position.set(currentPosition.x, currentPosition.y, currentPosition.z);
-    camera.lookAt(new THREE.Vector3(0, 0, 0));
+    console.log(event.code);
   }
 
   window.addEventListener('keydown', handleKeyDownEvent);
@@ -127,7 +147,7 @@ function initListener() {
 onMounted(() => {
   const target = document.querySelector('.main-content');
   target.appendChild(renderer.domElement);
-  initListener();
+  // initListener();
   animate();
 });
 </script>
@@ -141,7 +161,7 @@ onMounted(() => {
 #controls {
   position: absolute;
   top: 20px;
-  left: 20px;
+  right: 20px;
   padding: 10px;
   color: #fff;
   background-color: #302d2d;
