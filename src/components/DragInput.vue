@@ -196,4 +196,12 @@ onMounted(() => {
     }
   }
 }
+
+.mouse-drag {
+  .slider-box {
+    .slider-runway {
+      background-color: #2c2c2c;
+    }
+  }
+}
 </style>
