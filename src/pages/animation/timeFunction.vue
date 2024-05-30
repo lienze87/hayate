@@ -3,10 +3,40 @@
     <div ref="containerRef" class="cubic-bezier">
       <canvas ref="canvasRef" id="main-canvas" :class="canvasClass" width="300" height="300"></canvas>
       <div class="animation-box">
-        <p>{{ easingFunction }}</p>
-        <div class="animation-ball" :style="`animation-timing-function:${easingFunction};`"></div>
+        <el-form :model="formData" label-width="auto" style="max-width: 600px">
+          <el-form-item label="animation-name">
+            <el-input v-model="formData['animation-name']" disabled />
+          </el-form-item>
+          <el-form-item label="animation-duration">
+            <el-input v-model="formData['animation-duration']" />
+          </el-form-item>
+          <el-form-item label="animation-timing-function">
+            <span>{{ easingFunction }}</span>
+          </el-form-item>
+          <el-form-item label="animation-delay">
+            <el-input v-model="formData['animation-delay']" />
+          </el-form-item>
+          <el-form-item label="animation-iteration-count">
+            <el-input v-model="formData['animation-iteration-count']" />
+          </el-form-item>
+          <el-form-item label="animation-direction">
+            <el-select v-model="formData['animation-direction']" placeholder="please select">
+              <el-option label="normal" value="normal" />
+              <el-option label="reverse" value="reverse" />
+              <el-option label="alternate" value="alternate" />
+              <el-option label="alternate-reverse" value="alternate-reverse" />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="animation-play-state">
+            <el-select v-model="formData['animation-play-state']" placeholder="please select">
+              <el-option label="running" value="running" />
+              <el-option label="paused" value="paused" />
+            </el-select>
+          </el-form-item>
+        </el-form>
       </div>
     </div>
+    <div class="animation-ball" :style="animationStyle"></div>
   </div>
 </template>
 <script lang="ts" setup>
@@ -182,6 +212,27 @@ const initCanvas = () => {
   canvasRef.value.addEventListener('mouseleave', mouseup, false);
 };
 
+const formData = ref({
+  'animation-name': 'growUp',
+  'animation-duration': '2s',
+  'animation-timing-function': 'easy',
+  'animation-delay': '0s',
+  'animation-iteration-count': 'infinite',
+  'animation-direction': 'alternate-reverse',
+  'animation-play-state': 'running',
+});
+
+const animationStyle = computed(() => {
+  return `animation-duration: ${formData.value['animation-duration']};
+  animation-timing-function: ${easingFunction.value};
+  animation-delay: ${formData.value['animation-delay']};
+  animation-iteration-count: ${formData.value['animation-iteration-count']};
+  animation-direction: ${formData.value['animation-direction']};
+  animation-play-state: ${formData.value['animation-play-state']};`;
+});
+
+const onSubmit = () => {};
+
 onMounted(() => {
   ctx = canvasRef.value.getContext('2d');
   initCanvas();
@@ -200,21 +251,27 @@ onMounted(() => {
 .cubic-bezier {
   position: relative;
   display: inline-flex;
+  align-items: center;
   margin: 20px;
   color: #353535;
-  border: 1px solid #ccc;
-  border-radius: 8px;
+
   overflow: hidden;
   user-select: none;
 }
-.animation-box {
-  padding: 10px 20px;
+#main-canvas {
   width: 300px;
+  height: 300px;
+  border: 1px solid #ccc;
+}
+.animation-box {
+  width: 500px;
+  margin-left: 20px;
+  padding: 10px 20px;
   border-left: 1px solid #ddd;
 }
 .animation-ball {
   width: 0;
-  height: 10px;
+  height: 16px;
   background-color: red;
   animation: growUp 2s ease infinite alternate-reverse;
   @keyframes growUp {
