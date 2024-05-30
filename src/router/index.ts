@@ -27,6 +27,12 @@ const routeList: RouteRecordRaw[] = [
         },
       },
       {
+        path: 'timeFunction',
+        name: 'TimeFunction',
+        component: () => import('@/pages/animation/timeFunction.vue'),
+        meta: { title: '运动-时间函数' },
+      },
+      {
         path: '/video',
         name: 'Video',
         component: () => import('@/pages/video/index.vue'),
