@@ -1,16 +1,13 @@
-import isObject from "lodash/isObject";
-import isString from "lodash/isString";
+import isObject from 'lodash/isObject';
+import isString from 'lodash/isString';
 
-const DATE_TIME_FORMAT = "YYYY-MM-DD HH:mm:ss";
+const DATE_TIME_FORMAT = 'YYYY-MM-DD HH:mm:ss';
 
-export function joinTimestamp<T extends boolean>(
-  join: boolean,
-  restful: T
-): T extends true ? string : object;
+export function joinTimestamp<T extends boolean>(join: boolean, restful: T): T extends true ? string : object;
 
 export function joinTimestamp(join: boolean, restful = false): string | object {
   if (!join) {
-    return restful ? "" : {};
+    return restful ? '' : {};
   }
   const now = new Date().getTime();
   if (restful) {
@@ -21,7 +18,7 @@ export function joinTimestamp(join: boolean, restful = false): string | object {
 
 // 格式化提交参数时间
 export function formatRequestDate(params: Record<string, any>) {
-  if (Object.prototype.toString.call(params) !== "[object Object]") {
+  if (Object.prototype.toString.call(params) !== '[object Object]') {
     return;
   }
 
@@ -47,16 +44,11 @@ export function formatRequestDate(params: Record<string, any>) {
 }
 
 // 将对象转为Url参数
-export function setObjToUrlParams(
-  baseUrl: string,
-  obj: { [index: string]: any }
-): string {
-  let parameters = "";
+export function setObjToUrlParams(baseUrl: string, obj: { [index: string]: any }): string {
+  let parameters = '';
   for (const key in obj) {
     parameters += `${key}=${encodeURIComponent(obj[key])}&`;
   }
-  parameters = parameters.replace(/&$/, "");
-  return /\?$/.test(baseUrl)
-    ? baseUrl + parameters
-    : baseUrl.replace(/\/?$/, "?") + parameters;
+  parameters = parameters.replace(/&$/, '');
+  return /\?$/.test(baseUrl) ? baseUrl + parameters : baseUrl.replace(/\/?$/, '?') + parameters;
 }

@@ -26,11 +26,11 @@ export function initCanvasDraw(myCanvas: HTMLCanvasElement, ctx: CanvasRendering
         ctx.stroke();
       }
     },
-    mouseup(evt: MouseEvent) {
+    mouseup() {
       isDown = false;
       ctx.closePath();
     },
-    mouseleave(evt: MouseEvent) {
+    mouseleave() {
       isDown = false;
       ctx.closePath();
     },
@@ -66,7 +66,7 @@ export function initCanvasDraw(myCanvas: HTMLCanvasElement, ctx: CanvasRendering
         ctx.stroke();
       }
     },
-    end(evt: TouchEvent) {
+    end() {
       this.started = false;
     },
   };
