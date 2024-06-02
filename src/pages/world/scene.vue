@@ -52,12 +52,8 @@ const cameraInfo = ref({
 });
 
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(
-  cameraInfo.value.fov,
-  cameraInfo.value.aspect,
-  cameraInfo.value.near,
-  cameraInfo.value.far,
-);
+const camera = new THREE.PerspectiveCamera(cameraInfo.value.fov, cameraInfo.value.aspect, 1, 10000);
+camera.position.z = 2500;
 
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -74,19 +70,30 @@ const cube = new THREE.Mesh(geometry, [
   new THREE.MeshBasicMaterial({ color: Math.random() * 0xffffff }),
   new THREE.MeshBasicMaterial({ color: Math.random() * 0xffffff }),
 ]);
-
+cube.position.z = 150;
 scene.add(cube);
 
 const axesHelper = new THREE.AxesHelper(5);
 scene.add(axesHelper);
 
-camera.position.y = 5;
-camera.position.z = 10;
+const cameraPerspective = new THREE.PerspectiveCamera(
+  cameraInfo.value.fov,
+  cameraInfo.value.aspect,
+  250,
+  cameraInfo.value.far,
+);
+
+cameraPerspective.lookAt(cube.position);
+scene.add(cameraPerspective);
+
+const cameraPerspectiveHelper = new THREE.CameraHelper(cameraPerspective);
+scene.add(cameraPerspectiveHelper);
 
 function animate() {
   requestAnimationFrame(animate);
 
   controls.update();
+  cameraPerspectiveHelper.update();
 
   renderer.render(scene, camera);
 }
