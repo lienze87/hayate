@@ -11,7 +11,7 @@
               <el-input v-model="addFormData.title" placeholder="请输入" clearable />
             </el-form-item>
             <el-form-item label="内容">
-              <MarkdownEditor v-model="addFormData.context"></MarkdownEditor>
+              <markdown-editor v-model="addFormData.context"></markdown-editor>
             </el-form-item>
             <el-form-item>
               <div class="form-inline-block">
@@ -24,13 +24,13 @@
       </el-collapse>
     </div>
     <div class="content-list">
-      <div class="content-item" v-for="row in dataList" :key="row.uuid">
+      <div v-for="row in dataList" :key="row.uuid" class="content-item">
         <el-card>
           <template #header>
             <div v-if="editId === row.uuid" class="form-item">
               <el-input v-model="editFormData.title" placeholder="请输入" clearable />
             </div>
-            <div class="form-inline-block" v-else>
+            <div v-else class="form-inline-block">
               <div class="card-item-title">{{ row.title }}</div>
               <div class="card-item-header">
                 <el-button type="success" @click="handleEditFormData(row)"> 修改 </el-button>
@@ -38,9 +38,9 @@
               </div>
             </div>
           </template>
-          <div class="card-item-content" v-if="editId === row.uuid">
+          <div v-if="editId === row.uuid" class="card-item-content">
             <div class="form-item">
-              <MarkdownEditor v-model="editFormData.context"></MarkdownEditor>
+              <markdown-editor v-model="editFormData.context"></markdown-editor>
             </div>
             <div class="form-inline-block">
               <div></div>
@@ -50,7 +50,7 @@
               </div>
             </div>
           </div>
-          <div class="card-item-content" v-else>
+          <div v-else class="card-item-content">
             <div class="card-item-context" v-html="getHtml(row.context)"></div>
           </div>
         </el-card>
@@ -66,10 +66,11 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
 import { ElMessage } from 'element-plus';
 import { marked } from 'marked';
-import { getDataList, addData, updateData, deleteData } from '@/api/notes';
+import { onMounted, ref } from 'vue';
+
+import { addData, deleteData, getDataList, updateData } from '@/api/notes';
 import MarkdownEditor from '@/components/MarkdownEditor.vue';
 
 const dataList = ref([]);

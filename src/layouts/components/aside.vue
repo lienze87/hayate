@@ -1,7 +1,7 @@
 <template>
   <div class="page-aside">
     <el-menu :default-active="activeMenu" class="page-aside-menu">
-      <el-menu-item v-for="item in menuList" :index="item.path" :key="item.path" @click="handleNav(item.path)">
+      <el-menu-item v-for="item in menuList" :key="item.path" :index="item.path" @click="handleNav(item.path)">
         <span>{{ item.name }}</span>
       </el-menu-item>
     </el-menu>
@@ -9,8 +9,9 @@
 </template>
 
 <script lang="ts" setup>
-import { useRoute, useRouter } from 'vue-router';
 import { computed } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+
 const menuList = [
   {
     name: '图表',
@@ -31,10 +32,6 @@ const menuList = [
   {
     name: '笔记',
     path: '/note',
-  },
-  {
-    name: '脚本',
-    path: '/script',
   },
 ];
 

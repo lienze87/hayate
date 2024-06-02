@@ -22,8 +22,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
 import { ArrowDown } from '@element-plus/icons-vue';
+import { ref } from 'vue';
 
 const menuList = ref([
   {
@@ -43,12 +43,8 @@ const menuList = ref([
     path: '/animation/scrollTrigger',
   },
   {
-    name: '导航栏',
-    path: '/sidenav',
-  },
-  {
-    name: '三维场景',
-    path: '/scene',
+    name: '游戏',
+    path: '/game',
   },
 ]);
 </script>

@@ -32,6 +32,7 @@ const routeList: RouteRecordRaw[] = [
         component: () => import('@/pages/animation/timeFunction.vue'),
         meta: { title: '运动-时间函数' },
       },
+
       {
         path: '/video',
         name: 'Video',
@@ -46,14 +47,6 @@ const routeList: RouteRecordRaw[] = [
         component: () => import('@/pages/note/index.vue'),
         meta: {
           title: '笔记',
-        },
-      },
-      {
-        path: '/script',
-        name: 'Script',
-        component: () => import('@/pages/script/index.vue'),
-        meta: {
-          title: '脚本',
         },
       },
     ],
@@ -101,6 +94,12 @@ const routeList: RouteRecordRaw[] = [
     name: 'Scene',
     component: () => import('@/pages/world/scene.vue'),
     meta: { title: '场景' },
+  },
+  {
+    path: '/game',
+    name: 'Game',
+    component: () => import('@/pages/game/pixi.vue'),
+    meta: { title: '二维游戏' },
   },
 ];
 

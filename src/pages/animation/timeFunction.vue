@@ -1,7 +1,7 @@
 <template>
   <div class="main-content">
     <div ref="containerRef" class="cubic-bezier">
-      <canvas ref="canvasRef" id="main-canvas" :class="canvasClass" width="300" height="300"></canvas>
+      <canvas id="main-canvas" ref="canvasRef" :class="canvasClass" width="300" height="300"></canvas>
       <div class="animation-box">
         <el-form :model="formData" label-width="auto" style="max-width: 600px">
           <el-form-item label="animation-name">
@@ -40,7 +40,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { computed, ref, onMounted } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 
 const CONTROL_POINT_RADIUS = 5;
 
@@ -50,14 +50,15 @@ const canvasClass = ref('');
 let ctx: CanvasRenderingContext2D | null = null;
 
 function rgbToHex(r: number, g: number, b: number) {
-  if (r > 255 || g > 255 || b > 255) throw 'Invalid color component';
+  if (r > 255 || g > 255 || b > 255) throw new Error('Invalid color component');
+  // eslint-disable-next-line no-bitwise
   const hex = ((r << 16) | (g << 8) | b).toString(16);
 
-  return '#' + ('000000' + hex).slice(-6);
+  return `#${`000000${hex}`.slice(-6)}`;
 }
 
 const getMousePosition = (evt: MouseEvent): { x: number; y: number } => {
-  let position = {
+  const position = {
     x: evt.clientX - canvasRef.value.getBoundingClientRect().left,
     y: evt.clientY - canvasRef.value.getBoundingClientRect().top,
   };
@@ -230,8 +231,6 @@ const animationStyle = computed(() => {
   animation-direction: ${formData.value['animation-direction']};
   animation-play-state: ${formData.value['animation-play-state']};`;
 });
-
-const onSubmit = () => {};
 
 onMounted(() => {
   ctx = canvasRef.value.getContext('2d');

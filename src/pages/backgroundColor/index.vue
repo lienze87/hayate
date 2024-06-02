@@ -7,7 +7,7 @@
         <span>当前颜色：{{ color.toLowerCase() }} </span>/
         <span>相反色：{{ oppositeColor }}</span>
       </p>
-      <p>透明度：<DragInput v-model="alphaVal" /></p>
+      <p>透明度：<drag-input v-model="alphaVal" /></p>
     </div>
   </div>
 </template>
@@ -19,7 +19,8 @@ export default {
 </script>
 
 <script lang="ts" setup>
-import { ref, onMounted, computed } from 'vue';
+import { computed, onMounted, ref } from 'vue';
+
 import DragInput from '@/components/DragInput.vue';
 
 const alphaVal = ref(0);

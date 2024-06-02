@@ -1,26 +1,26 @@
 <template>
   <el-container class="common-layout">
-    <el-header><Header /></el-header>
+    <el-header><layout-header /></el-header>
     <el-container>
       <el-aside width="200px">
-        <Aside />
+        <layout-aside />
       </el-aside>
       <el-main>
-        <Main />
+        <layout-main />
       </el-main>
     </el-container>
   </el-container>
 </template>
 
 <script setup lang="ts">
-  import Header from "./components/header.vue";
-  import Aside from "./components/aside.vue";
-  import Main from "./components/main.vue";
+import LayoutAside from './components/aside.vue';
+import LayoutHeader from './components/header.vue';
+import LayoutMain from './components/main.vue';
 </script>
 <style lang="scss" scoped>
-  .common-layout {
-    .el-header {
-      padding: 0;
-    }
+.common-layout {
+  .el-header {
+    padding: 0;
   }
+}
 </style>

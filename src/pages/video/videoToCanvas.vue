@@ -18,7 +18,7 @@ export default {
 </script>
 
 <script lang="ts" setup>
-import { ref, onMounted, computed } from 'vue';
+import { onMounted, ref } from 'vue';
 
 const videoRef = ref();
 const videoCanvasRef = ref();

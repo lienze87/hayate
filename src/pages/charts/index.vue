@@ -1,7 +1,7 @@
 <template>
   <div class="main-content">
     <div class="charts-container">
-      <ECharts ref="eChartsRef" :options="options" />
+      <e-charts ref="eChartsRef" :options="options" />
     </div>
     <div class="options-container">
       <el-tabs v-model="activeTab">
@@ -126,7 +126,7 @@
           </div>
         </el-form>
       </div>
-      <JsonEditor v-show="activeTab === 'editor'" :options="options" />
+      <json-editor v-show="activeTab === 'editor'" :options="options" />
     </div>
   </div>
 </template>
@@ -138,9 +138,10 @@ export default {
 </script>
 
 <script lang="ts" setup>
+import { computed, nextTick, ref } from 'vue';
+
 import ECharts from '@/components/ECharts.vue';
 import JsonEditor from '@/components/JsonEditor.vue';
-import { ref, computed, nextTick } from 'vue';
 
 const eChartsRef = ref();
 
@@ -276,7 +277,7 @@ const categoryList = computed(() => {
 
 const dataList = computed(() => {
   return dataset.value.map((group) => {
-    let data: any = { id: group.id };
+    const data: any = { id: group.id };
 
     group.values.forEach((item) => {
       data[item.name] = item.value;
@@ -321,18 +322,19 @@ const handleDeleteData = (row: any) => {
 };
 
 const options = computed(() => {
+  const nowConfig = { ...config.value };
   if (seriesType.value === 'pie') {
-    config.value.xAxis.show = false;
-    config.value.yAxis.show = false;
-    config.value.grid.show = false;
+    nowConfig.xAxis.show = false;
+    nowConfig.yAxis.show = false;
+    nowConfig.grid.show = false;
   } else {
-    config.value.xAxis.show = true;
-    config.value.yAxis.show = true;
-    config.value.grid.show = true;
+    nowConfig.xAxis.show = true;
+    nowConfig.yAxis.show = true;
+    nowConfig.grid.show = true;
   }
-  config.value.xAxis.data = categoryList.value;
+  nowConfig.xAxis.data = categoryList.value;
   return {
-    ...config.value,
+    ...nowConfig,
     series: dataset.value.map((item) => {
       const valueList = item.values.map((ele) => ele.value);
       if (seriesType.value === 'pie') {
@@ -341,8 +343,9 @@ const options = computed(() => {
           type: seriesType.value,
           data: item.values,
         };
-      } else if (seriesType.value === 'line') {
-        let tempConf = { ...lineConfig.value };
+      }
+      if (seriesType.value === 'line') {
+        const tempConf = { ...lineConfig.value };
         if (!tempConf.areaStyle.enable) {
           tempConf.areaStyle = undefined;
         }
@@ -353,9 +356,8 @@ const options = computed(() => {
           data: valueList,
           ...tempConf,
         };
-      } else {
-        return { name: item.name, type: seriesType.value, data: valueList };
       }
+      return { name: item.name, type: seriesType.value, data: valueList };
     }),
   };
 });

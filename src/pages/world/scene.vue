@@ -37,9 +37,9 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { onMounted, ref } from 'vue';
 
 const CAMERA_SPEED = 0.3;
 const cameraInfo = ref({
@@ -154,7 +154,7 @@ function initListener() {
 onMounted(() => {
   const target = document.querySelector('.main-content');
   target.appendChild(renderer.domElement);
-  // initListener();
+  initListener();
   animate();
 });
 </script>

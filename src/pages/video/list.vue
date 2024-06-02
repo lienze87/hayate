@@ -27,8 +27,9 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
 import { ElMessage } from 'element-plus';
+import { onMounted, ref } from 'vue';
+
 import { getVideoList } from '@/api/video';
 
 const emit = defineEmits(['changePageType']);

@@ -62,7 +62,7 @@
         </div>
         <el-button v-if="currentTool === 'shape'" type="danger" @click="handleShapeUndo"> 撤销 </el-button>
       </div>
-      <div class="my-board" ref="myBoard" :style="`cursor: ${cursorType}`"></div>
+      <div ref="myBoard" class="my-board" :style="`cursor: ${cursorType}`"></div>
     </div>
   </div>
 </template>
@@ -74,7 +74,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, ref, onMounted, onUnmounted } from 'vue';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
 
 const FONT_SIZE = 24;
 const BACKGROUND_COLOR = '#274c43';
@@ -101,7 +101,7 @@ const percentList = computed(() => {
 });
 
 function getDataList() {
-  let result = [];
+  const result = [];
   for (let i = formData.value.min; i <= formData.value.max; i += formData.value.step) {
     result.push(i);
   }
@@ -109,8 +109,8 @@ function getDataList() {
 }
 
 function drawXAxis() {
-  const width = myCanvas.width;
-  const height = myCanvas.height;
+  const { width } = myCanvas;
+  const { height } = myCanvas;
   const paddingLeft = 50;
   const paddingTop = Math.floor(height * 0.9);
 
@@ -124,7 +124,7 @@ function drawXAxis() {
 
   // 绘制刻度
   percentList.value.forEach((ele: number, index: number) => {
-    let offsetLeft = paddingLeft + Math.floor((width - 2 * paddingLeft) * ele);
+    const offsetLeft = paddingLeft + Math.floor((width - 2 * paddingLeft) * ele);
 
     ctx.moveTo(offsetLeft, paddingTop - 30);
     ctx.lineTo(offsetLeft, paddingTop);
@@ -134,8 +134,8 @@ function drawXAxis() {
 }
 
 function drawYAxis() {
-  const width = myCanvas.width;
-  const height = myCanvas.height;
+  const { width } = myCanvas;
+  const { height } = myCanvas;
   const paddingLeft = Math.floor(width * 0.1);
   const paddingTop = 50;
 
@@ -149,7 +149,7 @@ function drawYAxis() {
 
   // 绘制刻度
   percentList.value.forEach((ele: number, index: number) => {
-    let offsetTop = paddingTop + Math.floor((height - 2 * paddingTop) * ele);
+    const offsetTop = paddingTop + Math.floor((height - 2 * paddingTop) * ele);
 
     ctx.moveTo(paddingLeft, offsetTop);
     ctx.lineTo(paddingLeft + 30, offsetTop);
@@ -294,7 +294,7 @@ function drawCircle(
 
 const getMousePosition = (evt: MouseEvent): { x: number; y: number } => {
   const scrollTop = window.scrollY;
-  let position = {
+  const position = {
     x: evt.pageX - myCanvas.getBoundingClientRect().left,
     y: evt.pageY - myCanvas.getBoundingClientRect().top - scrollTop,
   };
@@ -308,7 +308,7 @@ const mouseDraw = {
   down: { x: 0, y: 0 },
   current: { x: 0, y: 0 },
   up: { x: 0, y: 0 },
-  mousedown: function (evt: MouseEvent) {
+  mousedown(evt: MouseEvent) {
     this.isDown = true;
     this.down = getMousePosition(evt);
 
@@ -317,7 +317,7 @@ const mouseDraw = {
       ctx.moveTo(this.down.x, this.down.y);
     }
   },
-  mousemove: function (evt: MouseEvent) {
+  mousemove(evt: MouseEvent) {
     if (this.isDown) {
       this.current = getMousePosition(evt);
 
@@ -329,7 +329,7 @@ const mouseDraw = {
         ctx.fillRect(0, 0, myCanvas.width, myCanvas.height);
 
         if (currentShape.value === 'line') {
-          let line = {
+          const line = {
             key: 'move',
             type: 'line',
             begin: this.down,
@@ -339,7 +339,7 @@ const mouseDraw = {
           shapeDataList.value.push(line);
         } else if (currentShape.value === 'circle') {
           const radius = Math.sqrt((this.current.x - this.down.x) ** 2 + (this.current.y - this.down.y) ** 2);
-          let circle = {
+          const circle = {
             key: 'move',
             type: 'circle',
             begin: this.down,
@@ -348,7 +348,7 @@ const mouseDraw = {
           shapeDataList.value.pop();
           shapeDataList.value.push(circle);
         } else if (currentShape.value === 'rect') {
-          let rect = {
+          const rect = {
             key: 'move',
             type: 'rect',
             x: this.down.x,
@@ -362,7 +362,7 @@ const mouseDraw = {
       }
     }
   },
-  mouseup: function (evt: MouseEvent) {
+  mouseup(evt: MouseEvent) {
     this.isDown = false;
     this.up = getMousePosition(evt);
     if (currentTool.value === 'shape') {
@@ -377,7 +377,7 @@ const mouseDraw = {
         shapeDataList.value.push(line);
       } else if (currentShape.value === 'circle') {
         const radius = Math.sqrt((this.current.x - this.down.x) ** 2 + (this.current.y - this.down.y) ** 2);
-        let circle = {
+        const circle = {
           key: 'end',
           type: 'circle',
           begin: this.down,
@@ -386,7 +386,7 @@ const mouseDraw = {
 
         shapeDataList.value.push(circle);
       } else if (currentShape.value === 'rect') {
-        let rect = {
+        const rect = {
           key: 'end',
           type: 'rect',
           x: this.down.x,
@@ -401,7 +401,7 @@ const mouseDraw = {
 
     ctx.closePath();
   },
-  mouseleave: function (evt: MouseEvent) {
+  mouseleave(evt: MouseEvent) {
     this.isDown = false;
     ctx.closePath();
   },
@@ -409,7 +409,7 @@ const mouseDraw = {
 
 const getTouchPosition = (evt: TouchEvent): { x: number; y: number } => {
   const scrollTop = window.scrollY;
-  let position = {
+  const position = {
     x: evt.touches[0].pageX - myCanvas.getBoundingClientRect().left,
     y: evt.touches[0].pageY - myCanvas.getBoundingClientRect().top - scrollTop,
   };
@@ -422,7 +422,7 @@ const touchDraw = {
   down: { x: 0, y: 0 },
   current: { x: 0, y: 0 },
   up: { x: 0, y: 0 },
-  start: function (evt: TouchEvent) {
+  start(evt: TouchEvent) {
     this.started = true;
     this.down = getTouchPosition(evt);
     if (['draw', 'eraser'].includes(currentTool.value)) {
@@ -430,7 +430,7 @@ const touchDraw = {
       ctx.moveTo(this.down.x, this.down.y);
     }
   },
-  move: function (evt: TouchEvent) {
+  move(evt: TouchEvent) {
     evt.preventDefault();
 
     if (this.started) {
@@ -443,7 +443,7 @@ const touchDraw = {
         ctx.fillRect(0, 0, myCanvas.width, myCanvas.height);
 
         if (currentShape.value === 'line') {
-          let line = {
+          const line = {
             key: 'move',
             type: 'line',
             begin: this.down,
@@ -453,7 +453,7 @@ const touchDraw = {
           shapeDataList.value.push(line);
         } else if (currentShape.value === 'circle') {
           const radius = Math.sqrt((this.current.x - this.down.x) ** 2 + (this.current.y - this.down.y) ** 2);
-          let circle = {
+          const circle = {
             key: 'move',
             type: 'circle',
             begin: this.down,
@@ -462,7 +462,7 @@ const touchDraw = {
 
           shapeDataList.value.push(circle);
         } else if (currentShape.value === 'rect') {
-          let rect = {
+          const rect = {
             key: 'move',
             type: 'rect',
             x: this.down.x,
@@ -476,7 +476,7 @@ const touchDraw = {
       }
     }
   },
-  end: function (evt: TouchEvent) {
+  end(evt: TouchEvent) {
     this.started = false;
     this.up = getTouchPosition(evt);
     if (currentTool.value === 'shape') {
@@ -491,7 +491,7 @@ const touchDraw = {
         shapeDataList.value.push(line);
       } else if (currentShape.value === 'circle') {
         const radius = Math.sqrt((this.current.x - this.down.x) ** 2 + (this.current.y - this.down.y) ** 2);
-        let circle = {
+        const circle = {
           key: 'end',
           type: 'circle',
           begin: this.down,
@@ -500,7 +500,7 @@ const touchDraw = {
 
         shapeDataList.value.push(circle);
       } else if (currentShape.value === 'rect') {
-        let rect = {
+        const rect = {
           key: 'end',
           type: 'rect',
           x: this.down.x,

@@ -15,18 +15,18 @@ export function translateTime(param: string | number) {
     if (!reg.test(param)) {
       throw new Error('格式错误');
     }
-    let hours = parseInt(param.split(':')[0]) * 60 * 60;
-    let minutes = parseInt(param.split(':')[1]) * 60;
-    let seconds = parseInt(param.split(':')[2]);
+    const hours = parseInt(param.split(':')[0]) * 60 * 60;
+    const minutes = parseInt(param.split(':')[1]) * 60;
+    const seconds = parseInt(param.split(':')[2]);
 
     return hours + minutes + seconds;
   }
 
   if (typeof param === 'number') {
-    let hours = Math.floor(param / (60 * 60));
-    let minutes = Math.floor((param % 3600) / 60);
-    let seconds = Math.floor(param % 60);
+    const hours = Math.floor(param / (60 * 60));
+    const minutes = Math.floor((param % 3600) / 60);
+    const seconds = Math.floor(param % 60);
 
-    return `${('0' + hours).slice(-2)}:${('0' + minutes).slice(-2)}:${('0' + seconds).slice(-2)}`;
+    return `${`0${hours}`.slice(-2)}:${`0${minutes}`.slice(-2)}:${`0${seconds}`.slice(-2)}`;
   }
 }

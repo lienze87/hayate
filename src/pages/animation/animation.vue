@@ -52,8 +52,8 @@ export default {
 </script>
 
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue';
 import { debounce } from 'lodash';
+import { onMounted, ref } from 'vue';
 
 const loading = ref(true);
 const submitting = ref(false);
@@ -89,7 +89,7 @@ function initMouseEffect(element: HTMLElement) {
   const magnetoWeight = 40;
   const magnetoTextWeight = 80;
   element.addEventListener('mousemove', (e: MouseEvent) => {
-    let boundBox = element.getBoundingClientRect();
+    const boundBox = element.getBoundingClientRect();
     mouseEventData.value = {
       cursorX: e.clientX,
       boxLeft: Math.ceil(boundBox.left),

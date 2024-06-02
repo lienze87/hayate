@@ -25,11 +25,11 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue';
 import { gsap } from 'gsap';
-import Lenis from 'lenis';
-
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import Lenis from 'lenis';
+import { onMounted, ref } from 'vue';
+
 gsap.registerPlugin(ScrollTrigger);
 
 const lenis = new Lenis();
@@ -92,8 +92,8 @@ const dataList = ref([
 onMounted(() => {
   const entries = document.querySelectorAll('.layer');
   entries.forEach((entry) => {
-    let entryDescribe = entry.querySelector('.describe');
-    let entryCard = entry.querySelector('.card');
+    const entryDescribe = entry.querySelector('.describe');
+    const entryCard = entry.querySelector('.card');
 
     /**
      * start的值表示scroller-start的位置，当目标元素的start在视口中达到此位置时开始动画
@@ -104,7 +104,7 @@ onMounted(() => {
      * markers: true表示显示scroller-start，scroller-end和元素start,end的位置
      * scrub：true表示将动画与滚动距离绑定起来，支持正向和逆向动画，暂停动画等
      */
-    let timeline = gsap.timeline({
+    const timeline = gsap.timeline({
       scrollTrigger: {
         trigger: entry,
         start: 'top center',

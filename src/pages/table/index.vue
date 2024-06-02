@@ -18,7 +18,7 @@
       <el-table-column prop="cameraOperation" label="运镜" width="180" />
       <el-table-column prop="reference" label="参考图">
         <template #default="scope">
-          <ImgUploader v-model:url="scope.row.reference" />
+          <img-uploader v-model:url="scope.row.reference" />
         </template>
       </el-table-column>
       <el-table-column prop="duration" label="时长" width="180">
@@ -47,24 +47,26 @@
         </template>
       </el-table-column>
     </el-table>
-    <SimpleTable :init-data="tableData" :columns="dataColumns">
+    <simple-table :init-data="tableData" :columns="dataColumns">
       <template #reference="scope">
-        <ImgUploader v-model:url="scope.row.reference" />
+        <img-uploader v-model:url="scope.row.reference" />
       </template>
-    </SimpleTable>
+    </simple-table>
   </div>
 </template>
 
 <script lang="ts">
 export default {
-  name: 'Script',
+  name: 'ActionScript',
 };
 </script>
 
 <script setup lang="ts">
 import { ref } from 'vue';
+
 import ImgUploader from '@/components/ImgUploader.vue';
 import SimpleTable from '@/components/simple-table';
+
 const tableData = ref([
   {
     uuid: '0',

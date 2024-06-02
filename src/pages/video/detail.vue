@@ -19,7 +19,7 @@
           <el-button type="primary" plain @click="handleAddData"> 新增 </el-button>
         </div>
         <div class="video-part-list">
-          <div class="video-part-item" v-for="item in dataList" :key="item.uuid">
+          <div v-for="item in dataList" :key="item.uuid" class="video-part-item">
             <div class="part-item-title">{{ item.name }} {{ `${item.start}-${item.end}` }}</div>
             <div class="part-item-describe">{{ item.describe }}</div>
             <div class="part-item-action">
@@ -65,9 +65,9 @@
     </el-dialog>
     <el-dialog v-model="videoDialogVisible" title="视频预览" width="672" destroy-on-close>
       <div class="dialog-container">
-        <VideoPlayer ref="videoPlayerRef">
+        <video-player ref="videoPlayerRef">
           <source :src="previewVideoUrl" type="video/mp4" />
-        </VideoPlayer>
+        </video-player>
       </div>
     </el-dialog>
     <el-dialog v-model="imageDialogVisible" title="图像预览" width="600" destroy-on-close>
@@ -115,17 +115,18 @@ export default {
 </script>
 
 <script lang="ts" setup>
-import { computed, ref, onMounted } from 'vue';
 import { ElMessage } from 'element-plus';
+import { computed, onMounted, ref } from 'vue';
+
 import {
-  getDataList,
-  getDataDetail,
   addData,
-  updateData,
   addDataImage,
-  updateDataImage,
+  getDataDetail,
   getDataImageDetail,
+  getDataList,
   getVideoInfo,
+  updateData,
+  updateDataImage,
 } from '@/api/video';
 import VideoPlayer from '@/components/VideoPlayer.vue';
 import { translateTime } from '@/utils';
@@ -245,7 +246,7 @@ const handleExtractData = async (row: any) => {
 
     if (images) {
       imageData.value = images;
-      let pathResult = await getDataImageDetail(images.id);
+      const pathResult = await getDataImageDetail(images.id);
       imageList.value = pathResult.map((ele: string) => `http://localhost:3005/${ele.replace('./public/', '')}`);
     }
 

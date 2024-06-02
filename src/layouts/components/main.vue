@@ -9,10 +9,10 @@
 </template>
 
 <script setup lang="ts">
-  import { computed } from "vue";
+import { computed } from 'vue';
 
-  const aliveViews = computed(() => {
-    return [];
-  });
+const aliveViews = computed(() => {
+  return [];
+});
 </script>
 <style lang="scss" scoped></style>

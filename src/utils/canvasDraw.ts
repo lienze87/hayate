@@ -5,10 +5,11 @@ export function initCanvasDraw(myCanvas: HTMLCanvasElement, ctx: CanvasRendering
   // Mouse Event Handlers
 
   let isDown = false;
-  let canvasX, canvasY;
+  let canvasX;
+  let canvasY;
 
   const mouseDraw = {
-    mousedown: function (evt: MouseEvent) {
+    mousedown(evt: MouseEvent) {
       isDown = true;
       ctx.beginPath();
       const scrollTop = window.scrollY;
@@ -16,7 +17,7 @@ export function initCanvasDraw(myCanvas: HTMLCanvasElement, ctx: CanvasRendering
       canvasY = evt.pageY - myCanvas.getBoundingClientRect().top - scrollTop;
       ctx.moveTo(canvasX, canvasY);
     },
-    mousemove: function (evt: MouseEvent) {
+    mousemove(evt: MouseEvent) {
       if (isDown !== false) {
         const scrollTop = window.scrollY;
         canvasX = evt.pageX - myCanvas.getBoundingClientRect().left;
@@ -25,11 +26,11 @@ export function initCanvasDraw(myCanvas: HTMLCanvasElement, ctx: CanvasRendering
         ctx.stroke();
       }
     },
-    mouseup: function (evt: MouseEvent) {
+    mouseup(evt: MouseEvent) {
       isDown = false;
       ctx.closePath();
     },
-    mouseleave: function (evt: MouseEvent) {
+    mouseleave(evt: MouseEvent) {
       isDown = false;
       ctx.closePath();
     },
@@ -44,7 +45,7 @@ export function initCanvasDraw(myCanvas: HTMLCanvasElement, ctx: CanvasRendering
   // Touch Events Handlers
   const touchDraw = {
     started: false,
-    start: function (evt: TouchEvent) {
+    start(evt: TouchEvent) {
       ctx.beginPath();
       const scrollTop = window.scrollY;
       canvasX = evt.touches[0].pageX - myCanvas.getBoundingClientRect().left;
@@ -53,7 +54,7 @@ export function initCanvasDraw(myCanvas: HTMLCanvasElement, ctx: CanvasRendering
       ctx.moveTo(canvasX, canvasY);
       this.started = true;
     },
-    move: function (evt: TouchEvent) {
+    move(evt: TouchEvent) {
       evt.preventDefault();
 
       if (this.started) {
@@ -65,7 +66,7 @@ export function initCanvasDraw(myCanvas: HTMLCanvasElement, ctx: CanvasRendering
         ctx.stroke();
       }
     },
-    end: function (evt: TouchEvent) {
+    end(evt: TouchEvent) {
       this.started = false;
     },
   };
@@ -78,7 +79,7 @@ export function initCanvasDraw(myCanvas: HTMLCanvasElement, ctx: CanvasRendering
   // Disable Page Move
   document.body.addEventListener(
     'touchmove',
-    function (evt) {
+    (evt) => {
       evt.stopPropagation();
     },
     false,

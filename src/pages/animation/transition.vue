@@ -214,13 +214,13 @@ export default {
 </script>
 
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
 
 const active = ref(1);
 const handleAccordionChange = (e: MouseEvent) => {
   const element = e.target as HTMLElement;
   const index = Number(element.dataset.index);
-  if (!isNaN(index)) {
+  if (!Number.isNaN(index)) {
     active.value = index;
   }
 };

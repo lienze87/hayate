@@ -1,7 +1,7 @@
 <template>
   <div class="detail-container">
-    <SideBar>
-      <Anchor key="模块1" :title="'模块1'">
+    <side-bar>
+      <anchor key="模块1" :title="'模块1'">
         <div class="app-container">
           <div class="base shadow">
             <div class="title">
@@ -10,8 +10,8 @@
             <div style="height: 400px">内容</div>
           </div>
         </div>
-      </Anchor>
-      <Anchor key="模块2" :title="'模块2'">
+      </anchor>
+      <anchor key="模块2" :title="'模块2'">
         <div class="app-container">
           <div class="base shadow">
             <div class="title">
@@ -20,8 +20,8 @@
             <div style="height: 300px">内容</div>
           </div>
         </div>
-      </Anchor>
-      <Anchor key="模块3" :title="'模块3'">
+      </anchor>
+      <anchor key="模块3" :title="'模块3'">
         <div class="app-container">
           <div class="base shadow">
             <div class="title">
@@ -30,8 +30,8 @@
             <div style="height: 600px">内容</div>
           </div>
         </div>
-      </Anchor>
-      <Anchor key="模块4" :title="'模块4'">
+      </anchor>
+      <anchor key="模块4" :title="'模块4'">
         <div class="app-container">
           <div class="base shadow">
             <div class="title">
@@ -40,8 +40,8 @@
             <div style="height: 200px">内容</div>
           </div>
         </div>
-      </Anchor>
-      <Anchor key="模块5" :title="'模块5'">
+      </anchor>
+      <anchor key="模块5" :title="'模块5'">
         <div class="app-container">
           <div class="base shadow">
             <div class="title">
@@ -50,8 +50,8 @@
             <div style="height: 600px">内容</div>
           </div>
         </div>
-      </Anchor>
-      <Anchor key="模块6" :title="'模块6'">
+      </anchor>
+      <anchor key="模块6" :title="'模块6'">
         <div class="app-container">
           <div class="base shadow">
             <div class="title">
@@ -60,8 +60,8 @@
             <div style="height: 400px">内容</div>
           </div>
         </div>
-      </Anchor>
-      <Anchor key="模块7" :title="'模块7'">
+      </anchor>
+      <anchor key="模块7" :title="'模块7'">
         <div class="app-container">
           <div class="base shadow">
             <div class="title">
@@ -70,8 +70,8 @@
             <div style="height: 600px">内容</div>
           </div>
         </div>
-      </Anchor>
-    </SideBar>
+      </anchor>
+    </side-bar>
   </div>
 </template>
 
