@@ -43,7 +43,11 @@ const menuList = ref([
     path: '/animation/scrollTrigger',
   },
   {
-    name: '动画-游戏',
+    name: '游戏-恐龙',
+    path: '/game/dino',
+  },
+  {
+    name: '游戏-地图',
     path: '/game',
   },
 ]);

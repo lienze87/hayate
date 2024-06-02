@@ -84,22 +84,24 @@ const routeList: RouteRecordRaw[] = [
     ],
   },
   {
-    path: '/sidenav',
-    name: 'SideNav',
-    component: () => import('@/pages/sideNav/index.vue'),
-    meta: { title: '导航栏' },
-  },
-  {
-    path: '/scene',
-    name: 'Scene',
-    component: () => import('@/pages/world/scene.vue'),
-    meta: { title: '场景' },
-  },
-  {
     path: '/game',
     name: 'Game',
-    component: () => import('@/pages/game/pixi.vue'),
-    meta: { title: '二维游戏' },
+    redirect: '/game/map',
+    meta: { title: '游戏' },
+    children: [
+      {
+        path: 'map',
+        name: 'GameMap',
+        component: () => import('@/pages/game/map.vue'),
+        meta: { title: '游戏-地图' },
+      },
+      {
+        path: 'dino',
+        name: 'GameDino',
+        component: () => import('@/pages/game/dinoJump.vue'),
+        meta: { title: '游戏-恐龙' },
+      },
+    ],
   },
 ];
 
