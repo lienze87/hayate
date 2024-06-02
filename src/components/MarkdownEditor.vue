@@ -16,8 +16,8 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
 import { marked } from 'marked';
+import { computed, ref } from 'vue';
 
 const props = defineProps({
   modelValue: {

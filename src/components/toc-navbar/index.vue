@@ -7,26 +7,28 @@
         </div>
       </div>
     </div>
-    <Toc :data="tocMenu" />
+    <toc :data="tocMenu" />
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from 'vue';
-import './style/index';
-import Toc from './toc.vue';
+import './src/side-bar.scss';
+
+import { defineComponent, onMounted, ref } from 'vue';
+
+import Toc from './src/toc.vue';
 
 export default defineComponent({
   name: 'TocNavbar',
   components: { Toc },
   setup(props: any) {
-    let title = ref(props.title || '');
+    const title = ref(props.title || '');
 
-    let tocMenu = ref<any[]>([]);
+    const tocMenu = ref<any[]>([]);
 
     onMounted(() => {
       tocMenu.value = Array.from(document.querySelectorAll('.doc-title')).map((ele) => {
-        return { link: '#' + ele.id, text: ele.id };
+        return { link: `#${ele.id}`, text: ele.id };
       });
     });
     return { title, tocMenu };

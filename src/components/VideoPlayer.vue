@@ -18,15 +18,15 @@
     <div class="video-control">
       <div class="control-bar">
         <div class="icon-button" @click="handlePlayVideo">
-          <VideoPlay v-if="showPlayIcon" />
-          <VideoPause v-else />
+          <video-play v-if="showPlayIcon" />
+          <video-pause v-else />
         </div>
         <!-- <el-button @click="handleReplayVideo"> 重播 </el-button>
       <el-button @click="handleFullscreenVideo"> 全屏 </el-button> -->
         <div class="volume-container">
           <div class="icon-button" @click="handleShowVideoVolume">
-            <Mute v-if="videoInfo.muted" />
-            <Microphone v-else />
+            <mute v-if="videoInfo.muted" />
+            <microphone v-else />
           </div>
           <div class="volume-slider">
             <el-slider
@@ -90,10 +90,11 @@ export default {
 </script>
 
 <script lang="ts" setup>
-import { ref, onMounted, nextTick } from 'vue';
-import { VideoPlay, VideoPause, Microphone, Mute } from '@element-plus/icons-vue';
-import { initCanvasDraw } from '@/utils/canvasDraw';
+import { Microphone, Mute, VideoPause, VideoPlay } from '@element-plus/icons-vue';
+import { onMounted, ref } from 'vue';
+
 import { translateTime } from '@/utils';
+import { initCanvasDraw } from '@/utils/canvasDraw';
 
 const FONT_SIZE = 24;
 const penColor = ref('#ce2121');
@@ -257,7 +258,7 @@ const handleQuitDraw = () => {
 // 使用新canvas合成图像
 const handleCreateFrame = () => {
   const videoCanvas = videoCanvasRef.value;
-  let canvas = document.createElement('canvas');
+  const canvas = document.createElement('canvas');
   canvas.height = canvasInfo.value.height;
   canvas.width = canvasInfo.value.width;
   const ctx = canvas.getContext('2d');

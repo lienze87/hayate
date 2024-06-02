@@ -4,7 +4,7 @@
       <el-button type="danger" @click="handleReset">重置</el-button>
       <span>使用鼠标进行绘制</span>
     </div>
-    <div class="white-board-content" ref="myWhiteBoard"></div>
+    <div ref="myWhiteBoard" class="white-board-content"></div>
   </div>
 </template>
 
@@ -39,11 +39,12 @@ function initHandler(myCanvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D)
   // Mouse Event Handlers
 
   let isDown = false;
-  let canvasX, canvasY;
+  let canvasX;
+  let canvasY;
   ctx.lineWidth = 2;
 
   const mouseDraw = {
-    mousedown: function (evt: MouseEvent) {
+    mousedown(evt: MouseEvent) {
       isDown = true;
       ctx.beginPath();
       const scrollTop = window.scrollY;
@@ -51,7 +52,7 @@ function initHandler(myCanvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D)
       canvasY = evt.pageY - myCanvas.getBoundingClientRect().top - scrollTop;
       ctx.moveTo(canvasX, canvasY);
     },
-    mousemove: function (evt: MouseEvent) {
+    mousemove(evt: MouseEvent) {
       if (isDown !== false) {
         const scrollTop = window.scrollY;
         canvasX = evt.pageX - myCanvas.getBoundingClientRect().left;
@@ -61,11 +62,11 @@ function initHandler(myCanvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D)
         ctx.stroke();
       }
     },
-    mouseup: function (evt: MouseEvent) {
+    mouseup() {
       isDown = false;
       ctx.closePath();
     },
-    mouseleave: function (evt: MouseEvent) {
+    mouseleave() {
       isDown = false;
       ctx.closePath();
     },
@@ -80,7 +81,7 @@ function initHandler(myCanvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D)
   // Touch Events Handlers
   const touchDraw = {
     started: false,
-    start: function (evt: TouchEvent) {
+    start(evt: TouchEvent) {
       ctx.beginPath();
       const scrollTop = window.scrollY;
       canvasX = evt.touches[0].pageX - myCanvas.getBoundingClientRect().left;
@@ -89,7 +90,7 @@ function initHandler(myCanvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D)
       ctx.moveTo(canvasX, canvasY);
       this.started = true;
     },
-    move: function (evt: TouchEvent) {
+    move(evt: TouchEvent) {
       evt.preventDefault();
 
       if (this.started) {
@@ -102,7 +103,7 @@ function initHandler(myCanvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D)
         ctx.stroke();
       }
     },
-    end: function (evt: TouchEvent) {
+    end() {
       this.started = false;
     },
   };
@@ -115,7 +116,7 @@ function initHandler(myCanvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D)
   // Disable Page Move
   document.body.addEventListener(
     'touchmove',
-    function (evt) {
+    (evt: TouchEvent) => {
       evt.stopPropagation();
     },
     false,
@@ -129,7 +130,7 @@ const handleReset = () => {
 };
 
 const getCanvasContent = () => {
-  if (!ctx) return;
+  if (!ctx) return '';
   return myCanvas.toDataURL();
 };
 

@@ -1,11 +1,12 @@
-import type { ColumnProps, ScopeProps, LinkProps, BtnProps } from '../types';
 import { ArrowDown } from '@element-plus/icons-vue';
 import { ref } from 'vue';
+
+import type { BtnProps, ColumnProps, LinkProps, ScopeProps } from '../types';
 
 const btnMax = 3;
 
 const btnClickHandler = (btn: BtnProps | LinkProps, row: any) => (e: Event) => {
-  e && e.stopPropagation();
+  e.stopPropagation();
   btn.handler(row, e);
 };
 
@@ -17,12 +18,12 @@ const restBtnClickHandler = (index: number, btnList: BtnProps[], row: any) => {
 export const typeRenders = {
   link: (scope: ScopeProps, config: ColumnProps) => {
     if (!config.linkAttr) {
-      return;
+      return '';
     }
 
     const linkConf = config.linkAttr;
 
-    let disabled =
+    const disabled =
       linkConf.customDisabled && linkConf.customDisabled(scope.row, scope.column, scope.value, scope.$index);
 
     let text = scope.row[config.prop];
@@ -42,7 +43,7 @@ export const typeRenders = {
   },
   btn: (scope: ScopeProps, config: ColumnProps) => {
     if (!config.btnList) {
-      return;
+      return '';
     }
 
     const btnList = config.btnList.filter((btn: BtnProps) => {
@@ -66,12 +67,12 @@ export const typeRenders = {
     return (
       <div class="btn-wrap">
         {showBtnList.map((btn: BtnProps) => {
-          let text = btn.text;
+          let { text } = btn;
           if (btn.formatter) {
             text = btn.formatter(scope.row);
           }
-          let opts = Object.assign({ size: 'small', type: 'primary', plain: true }, btn.opts);
-          let disabled = btn.customDisabled && btn.customDisabled(scope.row);
+          const opts = { size: 'small', type: 'primary', plain: true, ...btn.opts };
+          const disabled = btn.customDisabled && btn.customDisabled(scope.row);
 
           return (
             <el-button onClick={btnClickHandler(btn, scope.row)} disabled={disabled} {...opts}>
@@ -82,7 +83,7 @@ export const typeRenders = {
         {btnList.length > 0 ? (
           <el-dropdown trigger="click" size="small" onCommand={handleCommand} style="margin-left: 10px;">
             {{
-              default: (dropdownScope: any) => {
+              default: () => {
                 return (
                   <el-button type="primary" plain size="small">
                     更多
@@ -92,15 +93,15 @@ export const typeRenders = {
                   </el-button>
                 );
               },
-              dropdown: (dropdownScope: any) => {
+              dropdown: () => {
                 return (
                   <el-dropdown-menu>
                     {btnList.map((btn: BtnProps, index: number) => {
-                      let text = btn.text;
+                      let { text } = btn;
                       if (btn.formatter) {
                         text = btn.formatter(scope.row);
                       }
-                      let disabled = btn.customDisabled && btn.customDisabled(scope.row);
+                      const disabled = btn.customDisabled && btn.customDisabled(scope.row);
                       return (
                         <el-dropdown-item command={index} disabled={disabled}>
                           {text}
@@ -118,10 +119,10 @@ export const typeRenders = {
   },
   switch: (scope: ScopeProps, config: ColumnProps) => {
     if (!config.switchAttr) {
-      return;
+      return '';
     }
     const switchConf = config.switchAttr;
-    let modelValue = ref(scope.row[config.prop]);
+    const modelValue = ref(scope.row[config.prop]);
 
     return (
       <el-switch

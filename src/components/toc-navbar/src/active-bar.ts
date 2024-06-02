@@ -1,8 +1,8 @@
-import { onMounted, onUnmounted, onUpdated } from 'vue';
 import { isClient } from '@vueuse/core';
-import { throttleAndDebounce } from './utils';
-
 import type { Ref } from 'vue';
+import { onMounted, onUnmounted, onUpdated } from 'vue';
+
+import { throttleAndDebounce } from './utils';
 
 export function useActiveSidebarLinks(container: Ref<HTMLElement>, marker: Ref<HTMLElement>) {
   if (!isClient) return;
@@ -37,25 +37,28 @@ export function useActiveSidebarLinks(container: Ref<HTMLElement>, marker: Ref<H
   let prevActiveLink: HTMLAnchorElement | null = null;
 
   function activateLink(hash: string) {
-    deactiveLink(prevActiveLink);
+    deActiveLink(prevActiveLink);
 
-    const activeLink = (prevActiveLink =
-      hash == null
-        ? null
-        : (container.value.querySelector(`.toc-item a[href="${decodeURIComponent(hash)}"]`) as HTMLAnchorElement));
+    const activeLinkAnchor = container.value.querySelector(
+      `.toc-item a[href="${decodeURIComponent(hash)}"]`,
+    ) as HTMLAnchorElement;
 
-    if (activeLink) {
-      activeLink.classList.add('active');
+    prevActiveLink = activeLinkAnchor;
+
+    if (activeLinkAnchor) {
+      activeLinkAnchor.classList.add('active');
       marker.value.style.opacity = '1';
-      marker.value.style.top = `${activeLink.offsetTop}px`;
+      marker.value.style.top = `${activeLinkAnchor.offsetTop}px`;
     } else {
       marker.value.style.opacity = '0';
       marker.value.style.top = '33px';
     }
   }
 
-  function deactiveLink(link: HTMLElement | null) {
-    link && link.classList.remove('active');
+  function deActiveLink(link: HTMLElement | null) {
+    if (link) {
+      link.classList.remove('active');
+    }
   }
 
   onMounted(() => {
@@ -64,7 +67,9 @@ export function useActiveSidebarLinks(container: Ref<HTMLElement>, marker: Ref<H
   });
 
   onUpdated(() => {
-    activateLink(location.hash);
+    if (window.location.hash) {
+      activateLink(window.location.hash);
+    }
   });
 
   onUnmounted(() => {

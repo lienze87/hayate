@@ -43,7 +43,7 @@ const menuList = ref([
     path: '/animation/scrollTrigger',
   },
   {
-    name: '游戏',
+    name: '动画-游戏',
     path: '/game',
   },
 ]);

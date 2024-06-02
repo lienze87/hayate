@@ -4,12 +4,12 @@ import { computed } from 'vue';
 const props = defineProps({
   options: {
     type: Object,
-    default: {},
+    default: () => {},
   },
 });
 
 function syntaxHighlight(json: string) {
-  if (typeof json != 'string') {
+  if (typeof json !== 'string') {
     json = JSON.stringify(json, undefined, 2);
   }
 
@@ -32,7 +32,7 @@ function syntaxHighlight(json: string) {
 
 const config = computed(() => {
   // 第三个参数自动插入空格进行缩进
-  let json = JSON.stringify(props.options, undefined, 2);
+  const json = JSON.stringify(props.options, undefined, 2);
   return syntaxHighlight(json);
 });
 

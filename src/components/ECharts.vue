@@ -5,7 +5,7 @@ import { onMounted, watch } from 'vue';
 const props = defineProps({
   options: {
     type: Object,
-    default: {},
+    default: () => {},
   },
 });
 
@@ -17,7 +17,7 @@ function initChart(options: any) {
     return;
   }
 
-  let container = document.getElementById('main-chart');
+  const container = document.getElementById('main-chart');
   myChart = echarts.init(container);
   myChart.setOption(options, true);
 }

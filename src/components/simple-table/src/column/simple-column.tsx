@@ -1,4 +1,5 @@
 import { defineComponent, PropType } from 'vue';
+
 import type { ColumnProps, ScopeProps } from '../types';
 import { typeRenders } from './render-helper';
 
@@ -25,7 +26,7 @@ const SimpleTableColumn = defineComponent({
     },
   },
   setup({ column }) {
-    let config = column;
+    const config = column;
 
     // 设置默认值
     checkAttr(config, 'width', column.width, 80);
@@ -83,9 +84,8 @@ const SimpleTableColumn = defineComponent({
                     // 当context类型为字符串时，使用v-html模式，否则视context为v-node
                     if (typeof context === 'string') {
                       return <span class="custom-cell" v-html={context} {...customOpts}></span>;
-                    } else {
-                      return context;
                     }
+                    return context;
                   },
                 }}
               </el-table-column>
@@ -105,6 +105,7 @@ const SimpleTableColumn = defineComponent({
       } catch (e) {
         console.error('表格错误', e);
       }
+      return <span>表格错误</span>;
     };
   },
 });

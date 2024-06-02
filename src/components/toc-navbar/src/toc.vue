@@ -1,5 +1,5 @@
 <template>
-  <div ref="container" class="toc-wrapper" :key="uid">
+  <div ref="container" :key="uid" class="toc-wrapper">
     <nav class="toc-content">
       <h3 class="toc-content__heading">导航栏</h3>
       <ul class="toc-items">
@@ -22,7 +22,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, PropType, ref, watch } from 'vue';
 
 export default defineComponent({
   name: 'Toc',
@@ -30,7 +30,6 @@ export default defineComponent({
 </script>
 
 <script setup lang="ts">
-import { watch, ref, PropType } from 'vue';
 import { useActiveSidebarLinks } from './active-bar';
 
 type HeadersLink = {
@@ -41,12 +40,12 @@ type HeadersLink = {
 
 const props = defineProps({
   data: {
-    type: Object as PropType<HeadersLink[]>,
+    type: Array as PropType<HeadersLink[]>,
     default: () => [],
   },
 });
 
-let uid = ref(1);
+const uid = ref(1);
 
 watch(
   () => props.data,

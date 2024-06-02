@@ -1,25 +1,25 @@
 <template>
   <div class="home-container">
     <h3>使用整个SimpleTable</h3>
-    <SimpleTable :init-data="dataList" :columns="dataColumns" @selection-change="handleSelectionChange"></SimpleTable>
+    <simple-table :init-data="dataList" :columns="dataColumns" @selection-change="handleSelectionChange"></simple-table>
   </div>
   <div class="home-container">
     <h3>使用整个SimpleTable(使用slot)</h3>
-    <SimpleTable :init-data="dataList" :columns="dataColumns2" @selection-change="handleSelectionChange">
+    <simple-table :init-data="dataList" :columns="dataColumns2" @selection-change="handleSelectionChange">
       <template #custom="scope">
         <span>这是自定义内容{{ scope.row }}</span>
       </template>
       <template #op="scope">
         <el-button type="primary" @click="handleCustomClick(scope.row)">详情</el-button>
       </template>
-    </SimpleTable>
+    </simple-table>
   </div>
   <div class="home-container">
     <h3>只使用SimpleTableColumn</h3>
     <el-table :data="dataList" style="width: 100%">
-      <SimpleTableColumn :column="{ label: '学号', prop: 'studentNo' }" />
+      <simple-table-column :column="{ label: '学号', prop: 'studentNo' }" />
       <el-table-column prop="studentName" label="姓名" width="180" />
-      <SimpleTableColumn :column="dataColumns[3]" />
+      <simple-table-column :column="dataColumns[3]" />
       <el-table-column label="操作">
         <el-button type="primary">添加</el-button>
       </el-table-column>
@@ -28,23 +28,23 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, h, markRaw, ref } from 'vue';
 
 export default defineComponent({
-  name: 'Table',
+  name: 'SimpleTable',
 });
 </script>
 
 <script lang="ts" setup>
-import { ref, markRaw, h } from 'vue';
+import { Delete, Plus } from '@element-plus/icons-vue';
+
 import SimpleTable from './index';
 import SimpleTableColumn from './src/column';
-import { Plus, Delete } from '@element-plus/icons-vue';
 
 const deleteIcon = markRaw(Delete);
 const addIcon = markRaw(Plus);
 
-let dataList = ref([
+const dataList = ref([
   {
     uuid: '101',
     studentNo: '12345',
@@ -63,7 +63,7 @@ let dataList = ref([
   },
 ]);
 
-let dataColumns = ref<any[]>([
+const dataColumns = ref<any[]>([
   {
     type: 'selection',
     prop: '',
@@ -191,7 +191,7 @@ let dataColumns = ref<any[]>([
   },
 ]);
 
-let dataColumns2 = ref<any[]>([
+const dataColumns2 = ref<any[]>([
   {
     type: 'selection',
     prop: '',
@@ -209,7 +209,7 @@ let dataColumns2 = ref<any[]>([
 ]);
 
 const handleCustomClick = (row: any) => {
-  alert('姓名：' + row.studentName);
+  alert(`姓名：${row.studentName}`);
 };
 
 const handleSelectionChange = (rowList: any) => {

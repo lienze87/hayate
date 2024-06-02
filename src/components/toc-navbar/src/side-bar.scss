@@ -90,13 +90,13 @@ $scrollbar-size: 6px;
       padding-bottom: 48px;
     }
 
-    @media screen and (min-width: $breakpoint-max) {
+    @media screen and (min-width: $breakpoint-lg) {
       flex-grow: 1;
       flex-shrink: 1;
     }
   }
 
-  @media screen and (min-width: $breakpoint-max) {
+  @media screen and (min-width: $breakpoint-lg) {
     display: flex;
   }
 }
@@ -180,7 +180,7 @@ $scrollbar-size: 6px;
     }
   }
 
-  @media screen and (min-width: $breakpoint-max) {
+  @media screen and (min-width: $breakpoint-lg) {
     padding-left: 48px;
     display: block;
   }

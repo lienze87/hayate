@@ -1,35 +1,30 @@
 <template>
   <el-table
     ref="tableRef"
-    v-loading="loading"
+    v-bind="$attrs"
+    :key="uid"
+    v-loading="currentLoading"
     :data="dataList"
     :height="tableAutoHeight || undefined"
     :max-height="500"
-    v-bind="$attrs"
-    :key="uid"
   >
-    <template v-for="(column, index) in columns" :key="`${index}-${column.prop || 'default'}`">
+    <template v-for="(column, index) in currentColumns" :key="`${index}-${column.prop || 'default'}`">
       <template v-if="column.prop && $slots[column.prop]">
         <el-table-column :label="column.label" v-bind="column.opts">
           <template #default="scope">
-            <slot
-              :name="column.prop"
-              :row="scope.row"
-              :column="scope.column"
-              :value="scope.value"
-              :$index="scope.$index"
-            />
+            <slot :name="column.prop" :row="scope.row" :column="scope.column" :value="scope.value" />
           </template>
         </el-table-column>
       </template>
-      <SimpleColumn v-else :column="column" />
+      <simple-column v-else :column="column" />
     </template>
   </el-table>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch, nextTick, PropType } from 'vue';
 import { ElTable } from 'element-plus';
+import { defineComponent, nextTick, PropType, ref, watch } from 'vue';
+
 import SimpleColumn from './column/index';
 import type { ColumnProps } from './types';
 
@@ -61,17 +56,17 @@ export default defineComponent({
 
     const tableAutoHeight = ref(0);
 
-    let uid = ref(1);
+    const uid = ref(1);
 
-    let loading = ref(props.loading);
+    const currentLoading = ref(props.loading);
     watch(
       () => props.loading,
       (newLoading) => {
-        loading.value = newLoading;
+        currentLoading.value = newLoading;
       },
     );
 
-    let dataList = ref(props.initData);
+    const dataList = ref(props.initData);
 
     watch(
       () => props.initData,
@@ -89,12 +84,12 @@ export default defineComponent({
       },
     );
 
-    let columns = ref<ColumnProps[]>(props.columns);
+    const currentColumns = ref<ColumnProps[]>(props.columns);
     watch(
       () => props.columns,
       (newColumns: any) => {
         uid.value++;
-        columns.value = newColumns;
+        currentColumns.value = newColumns;
       },
       {
         immediate: true,
@@ -111,37 +106,37 @@ export default defineComponent({
           return result;
         }
 
-        let computedStyle = window.getComputedStyle(el.offsetParent, null);
+        const computedStyle = window.getComputedStyle(el.offsetParent, null);
 
-        let paddingBottom = parseInt(computedStyle.getPropertyValue('padding-bottom').replace('px', ''));
+        const paddingBottom = parseInt(computedStyle.getPropertyValue('padding-bottom').replace('px', ''), 10);
 
-        let marginBottom = parseInt(computedStyle.getPropertyValue('margin-bottom').replace('px', ''));
+        const marginBottom = parseInt(computedStyle.getPropertyValue('margin-bottom').replace('px', ''), 10);
 
-        let newResult = result + paddingBottom + marginBottom;
+        const newResult = result + paddingBottom + marginBottom;
 
         return getParentBottom(el.offsetParent as HTMLElement, rootClass, newResult);
       }
 
-      let rootHeight = document.body.clientHeight;
-      let rootClass = 'app-main';
-      let rootElement = document.querySelector('.' + rootClass);
-      let rootOffsetTop = rootElement
-        ? parseInt(window.getComputedStyle(rootElement, null).getPropertyValue('padding-top').replace('px', ''))
+      const rootHeight = document.body.clientHeight;
+      const rootClass = 'app-main';
+      const rootElement = document.querySelector(`.${rootClass}`);
+      const rootOffsetTop = rootElement
+        ? parseInt(window.getComputedStyle(rootElement, null).getPropertyValue('padding-top').replace('px', ''), 10)
         : 0;
-      let tableParentOffsetTop = tableRef.value?.$el.offsetParent.offsetTop;
-      let tableOffsetTop = tableRef.value?.$el.offsetTop;
+      const tableParentOffsetTop = tableRef.value?.$el.offsetParent.offsetTop;
+      const tableOffsetTop = tableRef.value?.$el.offsetTop;
 
-      let pageBoxHeight = 64;
+      const pageBoxHeight = 64;
 
-      let tableParentOffsetBottom = getParentBottom(tableRef.value?.$el, rootClass, 0);
+      const tableParentOffsetBottom = getParentBottom(tableRef.value?.$el, rootClass, 0);
 
-      let tableAutoHeight =
+      const tableAutoHeight =
         rootHeight - rootOffsetTop - tableParentOffsetTop - tableOffsetTop - pageBoxHeight - tableParentOffsetBottom;
 
       return tableAutoHeight;
     }
 
-    return { loading, dataList, columns, tableRef, uid, tableAutoHeight };
+    return { currentLoading, dataList, currentColumns, tableRef, uid, tableAutoHeight };
   },
 });
 </script>

@@ -18,7 +18,8 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { ref, computed, onMounted, nextTick } from 'vue';
+import { computed, nextTick, onMounted, ref } from 'vue';
+
 const props = defineProps({
   modelValue: {
     type: Number,
@@ -72,7 +73,7 @@ const handleTypeChange = (val: boolean) => {
 };
 
 const getMousePosition = (evt: MouseEvent): { x: number; y: number } => {
-  let position = {
+  const position = {
     x: evt.clientX,
     y: evt.clientY,
   };
@@ -89,7 +90,7 @@ const mouseDrag = {
 function mousedown(evt: MouseEvent) {
   mouseDrag.isDown = true;
   mouseDrag.down = getMousePosition(evt);
-  const left = sliderRef.value.getBoundingClientRect().left;
+  const { left } = sliderRef.value.getBoundingClientRect();
 
   handleSliderChange(mouseDrag.down.x - left);
 
@@ -101,7 +102,7 @@ function mousedown(evt: MouseEvent) {
 function mousemove(evt: MouseEvent) {
   if (mouseDrag.isDown) {
     mouseDrag.current = getMousePosition(evt);
-    const left = sliderRef.value.getBoundingClientRect().left;
+    const { left } = sliderRef.value.getBoundingClientRect();
 
     handleSliderChange(mouseDrag.current.x - left);
   }
@@ -121,7 +122,7 @@ function mouseup(evt: MouseEvent) {
 
 const handleSliderChange = (deltaX: number) => {
   if (deltaX === 0) return;
-  const width = sliderRef.value.getBoundingClientRect().width;
+  const { width } = sliderRef.value.getBoundingClientRect();
   const move = Number((deltaX / width).toFixed(2));
 
   currentValue.value = Math.min(Math.max(move, props.min), props.max);

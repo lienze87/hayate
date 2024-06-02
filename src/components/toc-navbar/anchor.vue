@@ -7,7 +7,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'Anchor',
@@ -17,11 +17,7 @@ export default defineComponent({
       type: String,
     },
   },
-  setup(props: any) {
-    let title = ref(props.title || '');
-
-    return { title };
-  },
+  setup() {},
 });
 </script>
 

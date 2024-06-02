@@ -1,7 +1,7 @@
 <template>
   <el-upload
-    class="img-uploader"
     v-model:file-list="fileList"
+    class="img-uploader"
     :action="POST_URL"
     accept=".bmp,.jpeg,.jpg,.png,.gif,.heif,.m4v,.mp4,.mov,.avi,.webm,.mkv"
     :show-file-list="false"
@@ -9,7 +9,7 @@
     v-bind="$attrs"
   >
     <el-icon v-if="fileList.length === 0" class="img-uploader-icon">
-      <Plus />
+      <plus />
     </el-icon>
     <div v-else class="img-uploader-file-item">
       <el-popover placement="bottom" trigger="hover">
@@ -31,10 +31,10 @@ export default {
 </script>
 
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue';
-import { ElMessage } from 'element-plus';
+import { Plus } from '@element-plus/icons-vue';
 import type { UploadFile, UploadUserFile } from 'element-plus';
-import { Plus, ZoomIn, Delete } from '@element-plus/icons-vue';
+import { ElMessage } from 'element-plus';
+import { onMounted, ref } from 'vue';
 
 const props = defineProps({
   url: {

@@ -13,8 +13,8 @@ export declare interface ColumnProps {
   width?: number;
   type?: 'selection' | 'index' | 'expand';
   extType?: 'link' | 'btn' | 'switch' | 'custom';
-  formatter?: (row: any, column: any, value: any, $index: number | undefined) => string;
-  render?: (row: any, column: any, value: any, $index: number | undefined) => string;
+  formatter?: (row: any, column: any, value: any, index: number | undefined) => string;
+  render?: (row: any, column: any, value: any, index: number | undefined) => string;
   linkAttr?: LinkProps;
   switchAttr?: SwitchProps;
   btnList?: Array<BtnProps>;

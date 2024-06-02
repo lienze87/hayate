@@ -558,7 +558,7 @@ function initCanvasDraw(myCanvas: HTMLCanvasElement, ctx: CanvasRenderingContext
   // Disable Page Move
   document.body.addEventListener(
     'touchmove',
-    function (evt) {
+    (evt: TouchEvent) => {
       evt.stopPropagation();
     },
     {
