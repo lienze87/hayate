@@ -25,9 +25,10 @@
           </el-table-column>
           <el-table-column label="操作" width="180">
             <template #default="scope">
-              <el-button v-if="editId === scope.row.id" type="primary" @click="handleConfirmData(scope.row)">
-                确定
-              </el-button>
+              <template v-if="editId === scope.row.id">
+                <el-button type="primary" @click="handleConfirmData(scope.row)"> 确定 </el-button>
+                <el-button @click="handleCancelData(scope.row)">取消</el-button>
+              </template>
               <template v-else>
                 <el-button type="success" @click="handleEditData(scope.row)"> 修改 </el-button>
                 <el-button type="danger" @click="handleDeleteData(scope.row)"> 删除 </el-button>
@@ -201,7 +202,7 @@ const tooltipTriggerList = [
 const dataset = ref([
   {
     id: 1,
-    name: 'Email',
+    name: 'Data',
     values: [
       { name: 'Mon', value: 120 },
       { name: 'Tue', value: 132 },
@@ -210,19 +211,6 @@ const dataset = ref([
       { name: 'Fri', value: 90 },
       { name: 'Sat', value: 130 },
       { name: 'Sun', value: 110 },
-    ],
-  },
-  {
-    id: 2,
-    name: 'Phone',
-    values: [
-      { name: 'Mon', value: 220 },
-      { name: 'Tue', value: 232 },
-      { name: 'Wed', value: 201 },
-      { name: 'Thu', value: 234 },
-      { name: 'Fri', value: 290 },
-      { name: 'Sat', value: 230 },
-      { name: 'Sun', value: 210 },
     ],
   },
 ]);
@@ -316,7 +304,11 @@ const handleConfirmData = (row: any) => {
   editId.value = 0;
 };
 
-const handleDeleteData = (row: any) => {
+const handleCancelData = (row: any) => {
+  handleDeleteData();
+};
+
+const handleDeleteData = () => {
   const targetIndex = dataset.value.findIndex((ele: any) => ele.id === editId.value);
   dataset.value.splice(targetIndex, 1);
 };
