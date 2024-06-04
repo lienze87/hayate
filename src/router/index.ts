@@ -1,6 +1,7 @@
-import { createRouter, createWebHistory } from 'vue-router';
-import Layout from '@/layouts/index.vue';
 import type { RouteRecordRaw } from 'vue-router';
+import { createRouter, createWebHistory } from 'vue-router';
+
+import Layout from '@/layouts/index.vue';
 
 const routeList: RouteRecordRaw[] = [
   {
@@ -90,16 +91,34 @@ const routeList: RouteRecordRaw[] = [
     meta: { title: '游戏' },
     children: [
       {
+        path: 'dino',
+        name: 'GameDino',
+        component: () => import('@/pages/game/dinoJump.vue'),
+        meta: { title: '游戏-恐龙' },
+      },
+      {
         path: 'map',
         name: 'GameMap',
         component: () => import('@/pages/game/map.vue'),
         meta: { title: '游戏-地图' },
       },
       {
-        path: 'dino',
-        name: 'GameDino',
-        component: () => import('@/pages/game/dinoJump.vue'),
-        meta: { title: '游戏-恐龙' },
+        path: 'reel',
+        name: 'GameReel',
+        component: () => import('@/pages/game/reel.vue'),
+        meta: { title: '游戏-卷轴' },
+      },
+      {
+        path: 'collision',
+        name: 'GameCollision',
+        component: () => import('@/pages/game/collision.vue'),
+        meta: { title: '游戏-碰撞' },
+      },
+      {
+        path: 'star',
+        name: 'GameStar',
+        component: () => import('@/pages/game/star.vue'),
+        meta: { title: '游戏-星星' },
       },
     ],
   },
