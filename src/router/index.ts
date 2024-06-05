@@ -120,6 +120,12 @@ const routeList: RouteRecordRaw[] = [
         component: () => import('@/pages/game/star.vue'),
         meta: { title: '游戏-星星' },
       },
+      {
+        path: 'ball',
+        name: 'GameBall',
+        component: () => import('@/pages/game/ball.vue'),
+        meta: { title: '游戏-小球' },
+      },
     ],
   },
 ];
