@@ -21,7 +21,7 @@ async function initApp() {
   const fov = 20;
   const baseSpeed = 0.025;
   let speed = 0;
-  let warpSpeed = 1;
+  let warpSpeed = 0;
   const starStretch = 5;
   const starBaseSize = 0.05;
 
@@ -45,6 +45,7 @@ async function initApp() {
     stars.push(star);
   }
 
+  // z轴表示距离屏幕远近,cameraZ随时间增大
   function randomizeStar(star: Star, initial?: boolean) {
     star.z = initial ? Math.random() * 2000 : cameraZ + Math.random() * 1000 + 2000;
 
@@ -59,7 +60,7 @@ async function initApp() {
   // Change flight speed every 5 seconds
   setInterval(() => {
     warpSpeed = warpSpeed > 0 ? 0 : 1;
-  }, 5000);
+  }, 10000);
 
   // Listen for animate update
   app.ticker.add((time) => {
@@ -82,7 +83,9 @@ async function initApp() {
       // Calculate star scale & rotation.
       const dxCenter = star.sprite.x - app.renderer.screen.width / 2;
       const dyCenter = star.sprite.y - app.renderer.screen.height / 2;
+      // 已运动距离
       const distanceCenter = Math.sqrt(dxCenter * dxCenter + dyCenter * dyCenter);
+      // 随z值变小而变大
       const distanceScale = Math.max(0, (2000 - z) / 2000);
 
       star.sprite.scale.x = distanceScale * starBaseSize;
