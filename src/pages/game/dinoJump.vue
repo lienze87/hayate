@@ -18,6 +18,18 @@ import { onMounted } from 'vue';
 
 let app: Application = null;
 
+function testForAABB(object1: Sprite, object2: Sprite) {
+  const bounds1 = object1.getBounds();
+  const bounds2 = object2.getBounds();
+
+  return (
+    bounds1.x < bounds2.x + bounds2.width &&
+    bounds1.x + bounds1.width > bounds2.x &&
+    bounds1.y < bounds2.y + bounds2.height &&
+    bounds1.y + bounds1.height > bounds2.y
+  );
+}
+
 async function initApp() {
   app = new Application();
   const body = document.querySelector('.main-content') as HTMLElement;
@@ -130,7 +142,14 @@ async function initApp() {
 
   startText.eventMode = 'static';
   startText.on('pointerdown', () => {
-    if (isGameOver) return;
+    // 重置背景和仙人掌
+    if (isGameOver) {
+      groundSprite.x = 0;
+      groundSprite.y = window.innerHeight - 100;
+
+      cactusSprite.x = app.screen.width / 2;
+      cactusSprite.y = window.innerHeight - 100 - 50;
+    }
     playGame();
   });
 
@@ -156,14 +175,6 @@ async function initApp() {
   }
 
   function gameOver() {
-    console.log(
-      'cactusSprite',
-      cactusSprite.position,
-      'runAnimation',
-      runAnimation.position,
-      'jumpSprite',
-      jumpSprite.position,
-    );
     isGaming = false;
     isGameOver = true;
 
@@ -199,12 +210,7 @@ async function initApp() {
           runAnimation.visible = true;
         }
       }
-      if (
-        (cactusSprite.x < runAnimation.x + 15 &&
-          cactusSprite.x > runAnimation.x - 15 &&
-          jumpSprite.visible === false) ||
-        (jumpSprite.y > cactusSprite.y - 40 && cactusSprite.x < jumpSprite.x + 15 && cactusSprite.x > jumpSprite.x - 15)
-      ) {
+      if (testForAABB(cactusSprite, runAnimation)) {
         gameOver();
         startText.visible = true;
         startText.text = `游戏结束，最后得分: ${score}`;
