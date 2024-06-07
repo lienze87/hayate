@@ -11,61 +11,42 @@
       </el-tabs>
       <div v-show="activeTab === 'data'" class="option-table">
         <div class="action_bar">
-          <el-button type="primary" @click="handleAddData">新增</el-button>
-        </div>
-        <el-table :data="dataList">
-          <el-table-column type="index" width="50" />
-          <el-table-column v-for="category in categoryList" :key="category" :prop="category" :label="category">
-            <template #default="scope">
-              <div v-if="editId === scope.row.id">
-                <el-input v-model="scope.row[category]"></el-input>
+          <el-form :model="dataForm" class="data-form-content" label-width="auto" inline>
+            <el-form-item label="表达式">
+              <div style="display: inline-flex">
+                <div>{{ dataForm.resultSymbol }}=</div>
+                <el-input v-model="dataForm.expression"></el-input>
               </div>
-              <span v-else>{{ scope.row[category] }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="操作" width="180">
-            <template #default="scope">
-              <template v-if="editId === scope.row.id">
-                <el-button type="primary" @click="handleConfirmData(scope.row)"> 确定 </el-button>
-                <el-button @click="handleCancelData(scope.row)">取消</el-button>
-              </template>
-              <template v-else>
-                <el-button type="success" @click="handleEditData(scope.row)"> 修改 </el-button>
-                <el-button type="danger" @click="handleDeleteData(scope.row)"> 删除 </el-button>
-              </template>
-            </template>
-          </el-table-column>
+            </el-form-item>
+            <el-form-item label="数量">
+              <el-input-number v-model="dataForm.number" :min="1"></el-input-number>
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" @click="handleAddData">生成数据</el-button>
+            </el-form-item>
+          </el-form>
+        </div>
+        <el-table :data="dataset.source">
+          <el-table-column prop="x" label="x" />
+          <el-table-column prop="y" label="y" />
+          <el-table-column prop="t" label="t" />
         </el-table>
       </div>
       <div v-show="activeTab === 'form'" class="options-form">
-        <el-form :model="config" label-width="auto">
+        <el-form :model="config" class="options-form-content" label-width="auto" inline>
           <el-form-item label="图表类型">
             <el-select v-model="seriesType" placeholder="请选择">
               <el-option v-for="item in seriesTypeList" :key="item.value" :label="item.name" :value="item.value" />
             </el-select>
           </el-form-item>
-          <el-form-item label="标题">
-            <el-switch v-model="config.title.show"></el-switch>
-            <el-input v-if="config.title.show" v-model="config.title.text" placeholder="请输入标题"></el-input>
-          </el-form-item>
           <el-form-item label="图例">
             <el-switch v-model="config.legend.show"></el-switch>
           </el-form-item>
           <div class="config-group">
-            <p>Series</p>
-            <div v-for="group in dataset" :key="group.id">
-              <el-form-item label="集合名称">
-                <el-input v-model="group.name" placeholder="请输入集合名称"></el-input>
-              </el-form-item>
-              <el-divider />
-            </div>
-          </div>
-          <div class="config-group">
-            <p>提示框</p>
-            <el-form-item label="启用">
+            <el-form-item label="启用提示框">
               <el-switch v-model="config.tooltip.show"></el-switch>
             </el-form-item>
-            <el-form-item label="触发类型">
+            <el-form-item label="提示框触发类型">
               <el-select v-model="config.tooltip.trigger" placeholder="请选择">
                 <el-option
                   v-for="item in tooltipTriggerList"
@@ -76,52 +57,24 @@
               </el-select>
             </el-form-item>
           </div>
-          <div class="config-group">
-            <p>网格</p>
-            <div class="form-item-inline">
-              <el-form-item label="left">
-                <el-input v-model="config.grid.left"></el-input>
-              </el-form-item>
-              <el-form-item label="top">
-                <el-input v-model="config.grid.top"></el-input>
-              </el-form-item>
-              <el-form-item label="right">
-                <el-input v-model="config.grid.right"></el-input>
-              </el-form-item>
-              <el-form-item label="bottom">
-                <el-input v-model="config.grid.bottom"></el-input>
-              </el-form-item>
-            </div>
-            <el-form-item label="包含刻度标签">
-              <el-switch v-model="config.grid.containLabel"></el-switch>
-            </el-form-item>
-          </div>
-          <div class="config-group">
-            <p>xAxis</p>
-            <el-form-item label="类型">
-              <el-select v-model="config.xAxis.type" placeholder="请选择">
-                <el-option v-for="item in axisTypeList" :key="item.value" :label="item.name" :value="item.value" />
-              </el-select>
-            </el-form-item>
-            <el-form-item label="刻度居中 ">
-              <el-switch v-model="config.xAxis.boundaryGap"></el-switch>
-            </el-form-item>
-          </div>
-          <div class="config-group">
-            <p>yAxis</p>
-            <el-form-item label="类型">
-              <el-select v-model="config.yAxis.type" placeholder="请选择">
-                <el-option v-for="item in axisTypeList" :key="item.value" :label="item.name" :value="item.value" />
-              </el-select>
-            </el-form-item>
-          </div>
+          <el-form-item label="xAxis类型">
+            <el-select v-model="config.xAxis.type" placeholder="请选择">
+              <el-option v-for="item in axisTypeList" :key="item.value" :label="item.name" :value="item.value" />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="xAxis刻度居中 ">
+            <el-switch v-model="config.xAxis.boundaryGap"></el-switch>
+          </el-form-item>
+          <el-form-item label="yAxis类型">
+            <el-select v-model="config.yAxis.type" placeholder="请选择">
+              <el-option v-for="item in axisTypeList" :key="item.value" :label="item.name" :value="item.value" />
+            </el-select>
+          </el-form-item>
           <div v-if="seriesType === 'line'" class="config-group">
-            <p>line</p>
             <el-form-item label="平滑曲线">
               <el-switch v-model="lineConfig.smooth"></el-switch>
             </el-form-item>
-            <p>区域填充</p>
-            <el-form-item label="启用">
+            <el-form-item label="启用区域填充">
               <el-switch v-model="lineConfig.areaStyle.enable"></el-switch>
             </el-form-item>
           </div>
@@ -139,7 +92,8 @@ export default {
 </script>
 
 <script lang="ts" setup>
-import { computed, nextTick, ref } from 'vue';
+import { parse } from 'mathjs';
+import { computed, onMounted, ref } from 'vue';
 
 import ECharts from '@/components/ECharts.vue';
 import JsonEditor from '@/components/JsonEditor.vue';
@@ -152,16 +106,8 @@ const seriesTypeList = [
     value: 'line',
   },
   {
-    name: '柱状图',
-    value: 'bar',
-  },
-  {
     name: '散点图',
     value: 'scatter',
-  },
-  {
-    name: '饼图',
-    value: 'pie',
   },
 ];
 
@@ -199,43 +145,67 @@ const tooltipTriggerList = [
   },
 ];
 
-const dataset = ref([
-  {
-    id: 1,
-    name: 'Data',
-    values: [
-      { name: 'Mon', value: 120 },
-      { name: 'Tue', value: 132 },
-      { name: 'Wed', value: 101 },
-      { name: 'Thu', value: 134 },
-      { name: 'Fri', value: 90 },
-      { name: 'Sat', value: 130 },
-      { name: 'Sun', value: 110 },
-    ],
-  },
-]);
-const editId = ref(0);
+const dataForm = ref({
+  expression: 'cos(x)',
+  resultSymbol: 'y',
+  variableSymbol: 'x',
+  number: 10,
+});
+
+const dataset = ref({
+  dimensions: ['x', 'y', 't'],
+  source: [],
+});
+
+const handleAddData = () => {
+  const list = [];
+  let index = 0;
+
+  function getValue(x: number) {
+    try {
+      const node = parse(dataForm.value.expression);
+      const code = node.compile();
+      const evaluate = code.evaluate({ x });
+      return evaluate;
+    } catch (e) {
+      dataForm.value.expression = 'x';
+      return x;
+    }
+  }
+
+  function formatNum(val: Number) {
+    return Number(val.toFixed(2));
+  }
+
+  while (list.length < dataForm.value.number) {
+    list.push({
+      x: index,
+      y: formatNum(getValue(index)),
+      t: formatNum((index + 1) / dataForm.value.number),
+    });
+    index++;
+  }
+
+  dataset.value.source = list;
+};
 
 const config = ref({
-  title: {
-    show: false,
-    text: '图表标题',
-    left: 'auto',
-    top: 'auto',
-    right: 'auto',
-    bottom: 'auto',
-  },
   tooltip: {
     show: true,
-    trigger: 'item',
+    trigger: 'axis',
+    axisPointer: {
+      type: 'cross',
+    },
+  },
+  axisPointer: {
+    link: { xAxisIndex: 'all' },
+    label: {
+      backgroundColor: '#777',
+    },
   },
   grid: {
     show: true,
-    left: '10%',
-    top: 60,
-    right: '10%',
-    bottom: 60,
-    containLabel: false,
+    containLabel: true,
   },
   legend: {
     show: true,
@@ -248,7 +218,6 @@ const config = ref({
     show: true,
     type: 'category',
     boundaryGap: false,
-    data: [],
   },
   yAxis: { show: true, type: 'value' },
 });
@@ -259,102 +228,32 @@ const lineConfig = ref({
   areaStyle: { enable: false },
 });
 
-const categoryList = computed(() => {
-  return dataset.value[0].values.map((ele) => ele.name);
-});
-
-const dataList = computed(() => {
-  return dataset.value.map((group) => {
-    const data: any = { id: group.id };
-
-    group.values.forEach((item) => {
-      data[item.name] = item.value;
-    });
-
-    return data;
-  });
-});
-
-const handleAddData = () => {
-  const id = Date.now();
-  dataset.value.push({
-    id,
-    name: 'Name',
-    values: categoryList.value.map((category: string) => {
-      return { name: category, value: 0 };
-    }),
-  });
-  nextTick(() => {
-    editId.value = id;
-  });
-};
-
-const handleEditData = (row: any) => {
-  editId.value = row.id;
-};
-
-const handleConfirmData = (row: any) => {
-  const targetIndex = dataset.value.findIndex((ele: any) => ele.id === editId.value);
-  dataset.value.splice(targetIndex, 1, {
-    ...dataset.value[targetIndex],
-    values: categoryList.value.map((category: string) => {
-      return { name: category, value: Number(row[category]) };
-    }),
-  });
-  editId.value = 0;
-};
-
-const handleCancelData = (row: any) => {
-  handleDeleteData();
-};
-
-const handleDeleteData = () => {
-  const targetIndex = dataset.value.findIndex((ele: any) => ele.id === editId.value);
-  dataset.value.splice(targetIndex, 1);
-};
-
 const options = computed(() => {
   const nowConfig = { ...config.value };
-  if (seriesType.value === 'pie') {
-    nowConfig.xAxis.show = false;
-    nowConfig.yAxis.show = false;
-    nowConfig.grid.show = false;
-  } else {
-    nowConfig.xAxis.show = true;
-    nowConfig.yAxis.show = true;
-    nowConfig.grid.show = true;
+
+  const tempConf = { ...lineConfig.value };
+  if (!tempConf.areaStyle.enable) {
+    tempConf.areaStyle = undefined;
   }
-  nowConfig.xAxis.data = categoryList.value;
+
   return {
     ...nowConfig,
-    series: dataset.value.map((item) => {
-      const valueList = item.values.map((ele) => ele.value);
-      if (seriesType.value === 'pie') {
-        return {
-          name: item.name,
-          type: seriesType.value,
-          data: item.values,
-        };
-      }
-      if (seriesType.value === 'line') {
-        const tempConf = { ...lineConfig.value };
-        if (!tempConf.areaStyle.enable) {
-          tempConf.areaStyle = undefined;
-        }
-
-        return {
-          name: item.name,
-          type: seriesType.value,
-          data: valueList,
-          ...tempConf,
-        };
-      }
-      return { name: item.name, type: seriesType.value, data: valueList };
-    }),
+    dataset: dataset.value,
+    series: [
+      {
+        name: `y=${dataForm.value.expression}`,
+        type: seriesType.value,
+        encode: { x: 2, y: 1 },
+        ...tempConf,
+      },
+    ],
   };
 });
 
 const activeTab = ref('form');
+onMounted(() => {
+  handleAddData();
+});
 </script>
 
 <style lang="scss" scoped>
@@ -382,5 +281,14 @@ const activeTab = ref('form');
 }
 .options-form {
   width: 80%;
+  .options-form-content {
+    .el-form-item {
+      gap: 20px;
+      flex-basis: 33%;
+    }
+  }
+  .el-select {
+    min-width: 180px;
+  }
 }
 </style>
