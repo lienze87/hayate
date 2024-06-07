@@ -5,6 +5,11 @@
 import { Application, Point, Sprite, Texture } from 'pixi.js';
 import { onMounted } from 'vue';
 
+interface PhysicSprite extends Sprite {
+  acceleration?: Point;
+  mass?: number;
+}
+
 // 参考文章
 // https://spicyyoghurt.com/tutorials/html5-javascript-game-development/collision-detection-physics
 let app: Application = null;
@@ -39,7 +44,7 @@ async function initApp() {
 
   // Calculates the results of a collision, allowing us to give an impulse that
   // shoves objects apart
-  function collisionResponse(object1: Sprite, object2: Sprite) {
+  function collisionResponse(object1: PhysicSprite, object2: PhysicSprite) {
     if (!object1 || !object2) {
       return new Point(0);
     }
@@ -70,7 +75,7 @@ async function initApp() {
   }
 
   // Calculate the distance between two given points
-  function distanceBetweenTwoPoints(p1, p2) {
+  function distanceBetweenTwoPoints(p1: Point, p2: Point) {
     const a = p1.x - p2.x;
     const b = p1.y - p2.y;
 
@@ -78,7 +83,7 @@ async function initApp() {
   }
 
   // The green square we will knock about
-  const greenSquare = new Sprite(Texture.WHITE);
+  const greenSquare: PhysicSprite = new Sprite(Texture.WHITE);
 
   greenSquare.position.set((app.screen.width - 100) / 2, (app.screen.height - 100) / 2);
   greenSquare.width = 100;
@@ -88,7 +93,7 @@ async function initApp() {
   greenSquare.mass = 3;
 
   // The square you move around
-  const redSquare = new Sprite(Texture.WHITE);
+  const redSquare: PhysicSprite = new Sprite(Texture.WHITE);
 
   redSquare.position.set(0, 0);
   redSquare.width = 100;
@@ -97,7 +102,7 @@ async function initApp() {
   redSquare.acceleration = new Point(0);
   redSquare.mass = 1;
 
-  const mouseCoords = { x: 0, y: 0 };
+  const mouseCoords = new Point(0);
 
   app.stage.eventMode = 'static';
   app.stage.hitArea = app.screen;
