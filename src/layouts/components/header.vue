@@ -39,8 +39,8 @@ const menuList = ref([
     path: '/animation/animation',
   },
   {
-    name: '动画-滚动',
-    path: '/animation/scrollTrigger',
+    name: '动画-碰撞',
+    path: '/animation/collision',
   },
   {
     name: '游戏-恐龙',
@@ -48,7 +48,7 @@ const menuList = ref([
   },
   {
     name: '游戏-地图',
-    path: '/game',
+    path: '/game/map',
   },
 ]);
 </script>
