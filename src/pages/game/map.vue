@@ -3,7 +3,7 @@
 </template>
 <script lang="ts" setup>
 import type { FederatedPointerEvent } from 'pixi.js';
-import { Application, Container, Graphics, Point, Text } from 'pixi.js';
+import { Application, Assets, Container, Graphics, Point, Text, TilingSprite } from 'pixi.js';
 import { onMounted } from 'vue';
 
 interface PhysicGraphics extends Graphics {
@@ -20,13 +20,30 @@ async function initApp() {
 
   body.appendChild(app.canvas);
 
+  const bgTexture = await Assets.load('/textures/box.png');
+
+  const tilingSprite = new TilingSprite({
+    texture: bgTexture,
+    width: app.screen.width,
+    height: app.screen.height,
+  });
+
+  app.stage.addChild(tilingSprite);
+
   const rectWidth = 100;
   const rotationSpeed = Math.PI / 18;
   let rotationAngle = 0;
   const container = new Container();
-  container.x = (app.screen.width - rectWidth / 2) / 2;
+  container.x = app.screen.width / 2;
   container.y = app.screen.height - rectWidth;
   app.stage.addChild(container);
+
+  app.ticker.add(() => {
+    if (Math.abs(rotationAngle) > 0) {
+      container.rotation += rotationAngle;
+      rotationAngle = 0;
+    }
+  });
 
   const basicText = new Text({
     text: 'Q键和E键旋转方向,空格发射小球',
@@ -57,6 +74,7 @@ async function initApp() {
   bullet.alpha = 0;
   bullet.acceleration = new Point(0, 0);
   bullet.mass = 3;
+  addMotion(app, bullet);
   app.stage.addChild(bullet);
 
   function fireGun() {
@@ -71,6 +89,8 @@ async function initApp() {
     const impulse = 3 * 9.81;
     bullet.acceleration = new Point(-impulse * vCollisionNorm.x, -impulse * vCollisionNorm.y);
     bullet.alpha = 1;
+
+    intersectCount = 0;
   }
 
   function circleIntersectRect(cx: number, cy: number, cr: number, rx: number, ry: number, rw: number, rh: number) {
@@ -127,52 +147,112 @@ async function initApp() {
     return new Point(impulse * vCollisionNorm.x, impulse * vCollisionNorm.y);
   }
 
-  const wall: PhysicGraphics = new Graphics().rect(0, 0, 500, 50).fill(0xf000f0);
-  wall.x = app.screen.width / 2 - 250;
+  const wall: PhysicGraphics = new Graphics().rect(0, 0, 800, 50).fill(0xf000f0);
+  wall.x = app.screen.width / 2 - 400;
   wall.y = 100;
   wall.acceleration = new Point(0, 0);
   wall.mass = 5;
   app.stage.addChild(wall);
 
+  const wallCenter = new Point(wall.x + wall.width * 0.5, wall.y + wall.height * 0.5);
+  const wallCenterCircle = new Graphics().circle(wallCenter.x, wallCenter.y, 2).fill({ color: 0x00ff00 });
+  app.stage.addChild(wallCenterCircle);
+
   wall.eventMode = 'static';
   wall.cursor = 'pointer';
   wall.on('pointerdown', onDragStart);
 
+  let intersectCount = 0;
+  const intersectCountText = new Text({
+    text: `碰撞次数：${intersectCount}`,
+    style: {
+      fill: 0xff0000,
+    },
+  });
+
+  intersectCountText.x = 50;
+  intersectCountText.y = 150;
+
+  app.stage.addChild(intersectCountText);
+
   app.ticker.add(() => {
     if (circleIntersectRect(bullet.x, bullet.y, bullet.width * 0.5, wall.x, wall.y, wall.width, wall.height)) {
-      const collisionPush = collisionResponse(wall, bullet);
-      console.log('new acceleration', collisionPush);
+      const collisionVelocity = collisionResponse(wall, bullet);
+      console.log('new acceleration', collisionVelocity);
+
+      const newVelocityX = collisionVelocity.x * bullet.mass;
+      const newVelocityY = collisionVelocity.y * bullet.mass;
+
+      // 旋转45°后发射新的小球
+      const childBall: PhysicGraphics = new Graphics().circle(0, 0, 25).fill({ color: Math.random() * 0xffffff });
+      childBall.mass = 3;
+      childBall.acceleration = rotateVector(new Point(newVelocityX * 0.5, newVelocityY * 0.5), Math.PI / 4);
+      childBall.x = bullet.x;
+      childBall.y = bullet.y;
+      addMotion(app, childBall);
+
+      // 旋转-45°后发射新的小球
+      const childBall2: PhysicGraphics = new Graphics().circle(0, 0, 25).fill({ color: Math.random() * 0xffffff });
+      childBall2.mass = 3;
+      childBall2.acceleration = rotateVector(new Point(newVelocityX * 0.5, newVelocityY * 0.5), -Math.PI / 4);
+      childBall2.x = bullet.x;
+      childBall2.y = bullet.y;
+      addMotion(app, childBall2);
+
+      app.stage.addChild(childBall, childBall2);
+
+      const velocityLine = new Graphics()
+        .moveTo(wallCenter.x, wallCenter.y)
+        .lineTo(wallCenter.x + newVelocityX * 20, wallCenter.y + newVelocityY * 20)
+        .lineTo(wallCenter.x + newVelocityX * 20 - 20, wallCenter.y + newVelocityY * 20 - 20)
+        .stroke(0xff0000);
+
+      app.stage.addChild(velocityLine);
 
       wall.tint = 0x456859;
-      bullet.acceleration.set(collisionPush.x * bullet.mass, collisionPush.y * bullet.mass);
+      bullet.acceleration.set(newVelocityX, newVelocityY);
+      // bullet.alpha = 0;
+
+      intersectCount++;
+      intersectCountText.text = `碰撞次数：${intersectCount}`;
     }
   });
 
   const restitution = 0.99;
-  app.ticker.add((time) => {
-    const delta = time.deltaTime;
+  function addMotion(app: Application, shape: PhysicGraphics) {
+    app.ticker.add((time) => {
+      const delta = time.deltaTime;
 
-    if (Math.abs(bullet.acceleration.x) > 0.01 || Math.abs(bullet.acceleration.y) > 0.01) {
-      bullet.acceleration.set(bullet.acceleration.x * restitution, bullet.acceleration.y * restitution);
-    } else {
-      bullet.acceleration.set(0, 0);
-    }
+      if (Math.abs(shape.acceleration.x) > 0.01 || Math.abs(shape.acceleration.y) > 0.01) {
+        shape.acceleration.set(shape.acceleration.x * restitution, shape.acceleration.y * restitution);
+      } else {
+        shape.acceleration.set(0, 0);
+      }
 
-    if (bullet.x < 0 || bullet.x > app.screen.width - bullet.width / 2) {
-      bullet.acceleration.x = -bullet.acceleration.x;
-    }
-    if (bullet.y < 0 || bullet.y > app.screen.height - bullet.height / 2) {
-      bullet.acceleration.y = -bullet.acceleration.y;
-    }
+      if (shape.x < 0 || shape.x > app.screen.width - shape.width / 2) {
+        shape.acceleration.x = -shape.acceleration.x;
+      }
+      if (shape.y < 0 || shape.y > app.screen.height - shape.height / 2) {
+        shape.acceleration.y = -shape.acceleration.y;
+      }
 
-    if (Math.abs(rotationAngle) > 0) {
-      container.rotation += rotationAngle;
-      rotationAngle = 0;
-    }
+      shape.x += shape.acceleration.x * delta;
+      shape.y += shape.acceleration.y * delta;
+    });
+  }
 
-    bullet.x += bullet.acceleration.x * delta;
-    bullet.y += bullet.acceleration.y * delta;
-  });
+  /**
+   * 向量旋转矩阵
+   * [cosθ sinθ ]
+   * [-sinθ cosθ ]
+   */
+
+  function rotateVector(vector: Point, angle: number) {
+    return new Point(
+      vector.x * Math.cos(angle) - vector.y * Math.sin(angle),
+      vector.x * Math.sin(angle) + vector.y * Math.cos(angle),
+    );
+  }
 
   let dragTarget: Container | null = null;
   const beginPosition = new Point(0, 0);
@@ -237,6 +317,8 @@ onMounted(() => {
   width: 100vw;
   height: 100vh;
   overflow: hidden;
+}
+.grid-background {
   background-image: repeating-linear-gradient(-90deg, transparent 0 50px, rgb(82, 82, 82) 50px 52px),
     repeating-linear-gradient(0deg, transparent, transparent 0 50px, rgb(82, 82, 82) 50px 52px);
 }
