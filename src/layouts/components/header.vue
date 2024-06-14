@@ -39,16 +39,16 @@ const menuList = ref([
     path: '/animation/animation',
   },
   {
-    name: '动画-碰撞',
-    path: '/animation/collision',
-  },
-  {
     name: '游戏-恐龙',
     path: '/game/dino',
   },
   {
     name: '游戏-地图',
     path: '/game/map',
+  },
+  {
+    name: '游戏-平滑',
+    path: '/game/smooth',
   },
 ]);
 </script>

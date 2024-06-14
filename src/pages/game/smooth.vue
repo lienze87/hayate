@@ -12,7 +12,7 @@ let app: Application | null = null;
 async function initApp() {
   app = new Application();
   const body = document.querySelector('.main-content') as HTMLElement;
-  await app.init({ background: '#1099bb', resizeTo: body });
+  await app.init({ background: '#f2f2f2', resizeTo: body });
   body.appendChild(app.canvas);
   const bgTexture = await Assets.load('/textures/box.png');
 
@@ -65,50 +65,91 @@ async function initApp() {
     line.stroke({ color: 0x00ff00, width: 2 });
   };
 
-  const center = new Graphics().circle(0, 0, 100).fill(0xff0000);
-  center.x = app.screen.width / 2;
-  center.y = app.screen.height / 2;
-  app.stage.addChild(center);
+  const centerCircle = new Graphics().circle(0, 0, 20).fill(0x0000ff);
+  centerCircle.x = app.screen.width / 2 + 200;
+  centerCircle.y = 300;
+  centerCircle.motion = 1;
+  app.stage.addChild(centerCircle);
 
-  center.eventMode = 'static';
-  center.cursor = 'pointer';
-  center.on('pointerdown', onDragStart);
+  centerCircle.eventMode = 'static';
+  centerCircle.cursor = 'pointer';
+  centerCircle.on('pointerdown', onDragStart);
+
+  app.ticker.add(() => {
+    centerCircle.scale.set(centerCircle.motion, centerCircle.motion);
+  });
 
   const circles: Graphics[] = [];
   const circleContainer = new Container();
-  const CIRCLE_COUNT = 2;
+  circleContainer.x = app.screen.width / 2;
+  circleContainer.y = app.screen.height / 2;
+  const CIRCLE_COUNT = 3;
 
   for (let i = 0; i < CIRCLE_COUNT; i++) {
-    const circle = new Graphics().arc(0, 0, 50, Math.PI / 2, -Math.PI / 2, true).stroke(0x00ff00);
-    circle.x = center.x;
-    circle.y = center.y;
-    circle.motion = 1;
+    const circle = new Graphics().circle(0, 0, 8).fill(0x00ff00);
+
+    circle.x = i * 150;
+    circle.eventMode = 'static';
+    circle.cursor = 'pointer';
+    circle.on('pointerdown', onDragStart);
 
     circles.push(circle);
     circleContainer.addChild(circle);
   }
 
-  app.ticker.add(() => {
-    for (let i = 0; i < circles.length; i++) {
-      const c = circles[i];
-      c.scale.set(c.motion, c.motion * 0.5);
-    }
-  });
+  const circleLine = new Graphics();
+  circleContainer.addChild(circleLine);
 
   app.stage.addChild(circleContainer);
 
+  let centerCircleToCircles = 0;
+  app.ticker.add(() => {
+    circleLine.clear();
+
+    circles.forEach((ele: Graphics, index: number) => {
+      if (index === 0) {
+        circleLine.moveTo(ele.x, ele.y);
+      } else if (index === 1) {
+        circleLine.lineTo(ele.x, ele.y);
+      } else if (index === 2) {
+        circleLine.lineTo(ele.x, ele.y);
+      }
+    });
+
+    // 中间点到控制点的向量
+    const vCollision = new Point(
+      centerCircle.x - circleContainer.x - circles[1].x,
+      centerCircle.y - circleContainer.y - circles[1].y,
+    );
+    const distance = Math.sqrt(vCollision.x * vCollision.x + vCollision.y * vCollision.y);
+
+    // 中间点到终点的距离
+    const distance2 = Math.sqrt(
+      (circles[2].x - circles[1].x) * (circles[2].x - circles[1].x) +
+        (circles[2].y - circles[1].y) * (circles[2].y - circles[1].y),
+    );
+
+    if (centerCircleToCircles !== distance) {
+      centerCircleToCircles = distance;
+
+      circles[2].position.set(
+        circles[1].x + (vCollision.x / distance) * distance2,
+        circles[1].y + (vCollision.y / distance) * distance2,
+      );
+    }
+    // circleLine.moveTo(circles[1].x, circles[1].y);
+    // circleLine.lineTo(centerCircle.x - circleContainer.x, centerCircle.y - circleContainer.y);
+
+    circleLine.stroke({ color: 0xff0000, width: 4 });
+  });
+
   let running = false;
-  function fireCircle() {
+
+  function startMotion() {
     if (running) return;
     running = true;
 
-    for (let i = 0; i < circles.length; i++) {
-      circles[i].x = center.x;
-      circles[i].y = center.y;
-      circles[i].motion = 1;
-
-      tweenTo(circles[i], 'motion', 2 + i * 2, 1000, Ease.circOut, null, reelsComplete);
-    }
+    tweenTo(centerCircle, 'motion', 5, 1000, Ease.circOut, null, reelsComplete);
   }
 
   // Reels done handler.
@@ -150,7 +191,7 @@ async function initApp() {
     console.log(event.code);
     switch (event.code) {
       case 'Space':
-        fireCircle();
+        startMotion();
         break;
       default:
         break;
@@ -215,6 +256,19 @@ async function initApp() {
 // Basic lerp funtion.
 function lerp(a1: number, a2: number, t: number) {
   return a1 * (1 - t) + a2 * t;
+}
+
+/**
+ * 向量旋转矩阵
+ * [cosθ sinθ ]
+ * [-sinθ cosθ ]
+ */
+
+function rotateVector(vector: Point, angle: number) {
+  return new Point(
+    vector.x * Math.cos(angle) - vector.y * Math.sin(angle),
+    vector.x * Math.sin(angle) + vector.y * Math.cos(angle),
+  );
 }
 
 onMounted(() => {
