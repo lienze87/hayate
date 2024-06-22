@@ -2,7 +2,7 @@
   <div class="main-content"></div>
 </template>
 <script lang="ts" setup>
-import type { FederatedPointerEvent } from 'pixi.js';
+import type { Bounds, FederatedPointerEvent } from 'pixi.js';
 import { Application, Assets, Container, Graphics, Point, Text, TilingSprite } from 'pixi.js';
 import { onMounted } from 'vue';
 
@@ -68,7 +68,10 @@ async function initApp() {
   ball.y = -ballToRectCenter;
   ball.zIndex = -1;
 
-  const bullet: PhysicGraphics = new Graphics().circle(0, 0, rectWidth / 4).fill(0x0000ff);
+  const bullet: PhysicGraphics = new Graphics()
+    .circle(0, 0, rectWidth / 4)
+    .fill(0x0000ff)
+    .stroke({ color: 0xff0000, width: 2 });
   bullet.x = ball.getGlobalPosition().x;
   bullet.y = ball.getGlobalPosition().y;
   bullet.alpha = 0;
@@ -112,6 +115,15 @@ async function initApp() {
     const distance = Math.sqrt((cx - testX) * (cx - testX) + (cy - testY) * (cy - testY));
 
     return distance <= cr;
+  }
+
+  function testForAABB(bounds1: Bounds, bounds2: Bounds) {
+    return (
+      bounds1.x < bounds2.x + bounds2.width &&
+      bounds1.x + bounds1.width > bounds2.x &&
+      bounds1.y < bounds2.y + bounds2.height &&
+      bounds1.y + bounds1.height > bounds2.y
+    );
   }
 
   const impulsePower = 5;
@@ -162,6 +174,22 @@ async function initApp() {
   wall.cursor = 'pointer';
   wall.on('pointerdown', onDragStart);
 
+  const dustbin = new Graphics().rect(0, 0, 100, 100).fill(0xf0ff00);
+  dustbin.x = app.screen.width - 150;
+  dustbin.y = app.screen.height - 150;
+
+  let dustbinCount = 0;
+  const dustbinCountText = new Text({
+    text: `移除数量: ${dustbinCount}`,
+    style: {
+      fontSize: 14,
+    },
+  });
+  dustbinCountText.x = dustbin.x;
+  dustbinCountText.y = dustbin.y;
+
+  app.stage.addChild(dustbin, dustbinCountText);
+
   let intersectCount = 0;
   const intersectCountText = new Text({
     text: `碰撞次数：${intersectCount}`,
@@ -199,6 +227,14 @@ async function initApp() {
       childBall2.y = bullet.y;
       addMotion(app, childBall2);
 
+      childBall.eventMode = 'static';
+      childBall.cursor = 'pointer';
+      childBall.on('pointerdown', onDragStart);
+
+      childBall2.eventMode = 'static';
+      childBall2.cursor = 'pointer';
+      childBall2.on('pointerdown', onDragStart);
+
       app.stage.addChild(childBall, childBall2);
 
       const velocityLine = new Graphics()
@@ -215,6 +251,12 @@ async function initApp() {
 
       intersectCount++;
       intersectCountText.text = `碰撞次数：${intersectCount}`;
+    }
+    // 检测小球是否被拖入垃圾桶
+    if (dragTarget && testForAABB(dragTarget.getBounds(), dustbin.getBounds())) {
+      dustbin.tint = 0xf0aa00;
+    } else {
+      dustbin.tint = 0xffffff;
     }
   });
 
@@ -284,6 +326,13 @@ async function initApp() {
     if (dragTarget) {
       app.stage.off('pointermove', onDragMove);
       dragTarget.alpha = 1;
+
+      // 检测小球是否被拖入垃圾桶
+      if (dragTarget && testForAABB(dragTarget.getBounds(), dustbin.getBounds())) {
+        app.stage.removeChild(dragTarget);
+
+        dustbinCountText.text = `移除数量: ${++dustbinCount}`;
+      }
       dragTarget = null;
     }
   }
