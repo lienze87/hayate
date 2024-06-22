@@ -25,10 +25,11 @@ async function initApp() {
   app.stage.addChild(tilingSprite);
 
   const elasticLine = new Graphics();
-  elasticLine.x = 300;
-  elasticLine.y = 300;
+  const elasticLineOffset = 300;
+  elasticLine.x = elasticLineOffset;
+  elasticLine.y = elasticLineOffset;
 
-  const elasticLineControl = new Graphics().circle(0, 0, 4).fill(0xff0000);
+  const elasticLineControl = new Graphics().circle(0, 0, 8).fill(0x0000ff);
   elasticLineControl.x = elasticLine.x + elasticLine.x / 2;
   elasticLineControl.y = elasticLine.y + elasticLine.y / 2;
 
@@ -40,12 +41,20 @@ async function initApp() {
   app.ticker.add(() => {
     elasticLine.clear();
 
-    elasticLine.circle(0, 0, 2).stroke({ color: 0x0000ff, width: 2 });
+    elasticLine.circle(0, 0, 2).stroke({ color: 0xff0000, width: 2 });
 
-    smoothLine(elasticLine, new Point(0, 0), new Point(elasticLineControl.x - 300, elasticLineControl.y - 300));
-    smoothLine(elasticLine, new Point(elasticLineControl.x - 300, elasticLineControl.y - 300), new Point(300, 0));
+    smoothLine(
+      elasticLine,
+      new Point(0, 0),
+      new Point(elasticLineControl.x - elasticLineOffset, elasticLineControl.y - elasticLineOffset),
+    );
+    smoothLine(
+      elasticLine,
+      new Point(elasticLineControl.x - elasticLineOffset, elasticLineControl.y - elasticLineOffset),
+      new Point(elasticLineOffset, 0),
+    );
 
-    elasticLine.circle(300, 0, 2).stroke({ color: 0x0000ff, width: 2 });
+    elasticLine.circle(elasticLineOffset, 0, 2).stroke({ color: 0xff0000, width: 2 });
 
     elasticLine.stroke({ color: 0x00ff00, width: 2 });
   });
