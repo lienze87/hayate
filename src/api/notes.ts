@@ -1,8 +1,8 @@
-import { request } from "@/utils/request";
+import { request } from '@/utils/request';
 
 export function getDataList() {
   return request.get<any>({
-    url: "/notes",
+    url: '/notes',
   });
 }
 
@@ -14,7 +14,7 @@ export function getDataDetail(id: string) {
 
 export function addData(params: any) {
   return request.post<any>({
-    url: "/notes",
+    url: '/notes',
     data: params,
   });
 }

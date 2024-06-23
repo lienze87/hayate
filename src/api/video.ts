@@ -1,8 +1,8 @@
-import { request } from "@/utils/request";
+import { request } from '@/utils/request';
 
 export function getVideoList() {
   return request.get<any>({
-    url: "/upload/mp4",
+    url: '/upload/mp4',
   });
 }
 
@@ -14,7 +14,7 @@ export function getVideoInfo(id: string) {
 
 export function getDataList(params: any) {
   return request.get<any>({
-    url: "/frames",
+    url: '/frames',
     params,
   });
 }
@@ -27,7 +27,7 @@ export function getDataDetail(id: string) {
 
 export function addData(params: any) {
   return request.post<any>({
-    url: "/frames",
+    url: '/frames',
     data: params,
   });
 }
@@ -47,7 +47,7 @@ export function deleteData(id: string) {
 
 export function addDataImage(params: any) {
   return request.post<any>({
-    url: "/images",
+    url: '/images',
     data: params,
   });
 }
