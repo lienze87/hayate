@@ -6,4 +6,6 @@ store.use(createPersistedState());
 
 export { store };
 
+export * from './modules/common';
+
 export default store;

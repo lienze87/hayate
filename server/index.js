@@ -52,6 +52,13 @@ app.use(commonRouter);
 app.use(framesRouter);
 app.use(notesRouter);
 
+app.get('/check', (req, res) => {
+  res.json({
+    data: 200,
+    message: 'success',
+  });
+});
+
 app.listen(port, () => {
   console.log(`Example app listening on: http://localhost:${port}`);
 });

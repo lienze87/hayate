@@ -2,6 +2,7 @@
   <div class="page-header">
     <div class="header-title">Hayate</div>
     <div class="header-nav">
+      <div class="server-status" :style="`color: ${serverStatus === '在线' ? 'blue' : 'red'}`">{{ serverStatus }}</div>
       <el-dropdown trigger="click">
         <span class="el-dropdown-link">
           更多页面
@@ -23,7 +24,16 @@
 
 <script setup lang="ts">
 import { ArrowDown } from '@element-plus/icons-vue';
-import { ref } from 'vue';
+import { computed, onBeforeMount, ref } from 'vue';
+
+import { checkServer } from '@/api/common';
+import { useCommonStore } from '@/store';
+
+const store = useCommonStore();
+
+const serverStatus = computed(() => {
+  return store.online ? '在线' : '离线';
+});
 
 const menuList = ref([
   {
@@ -31,6 +41,16 @@ const menuList = ref([
     path: '/background',
   },
 ]);
+
+onBeforeMount(() => {
+  checkServer()
+    .then((res: any) => {
+      store.setServerStatus(res.data);
+    })
+    .catch(() => {
+      store.setServerStatus(500);
+    });
+});
 </script>
 <style lang="scss" scoped>
 .page-header {
@@ -46,6 +66,11 @@ const menuList = ref([
 }
 .header-nav {
   display: flex;
+}
+.server-status {
+  display: flex;
+  align-items: center;
+  margin-right: 20px;
 }
 .el-dropdown-link {
   cursor: pointer;
