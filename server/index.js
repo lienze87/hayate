@@ -2,7 +2,9 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import express from 'express';
 import fileUpload from 'express-fileupload';
+import { dirname, join } from 'path';
 import { Sequelize } from 'sequelize';
+import { fileURLToPath } from 'url';
 
 import { Frames, FramesModel } from './src/models/frames.js';
 import { Images, ImagesModel } from './src/models/images.js';
@@ -11,13 +13,18 @@ import commonRouter from './src/router/common.js';
 import framesRouter from './src/router/frames.js';
 import notesRouter from './src/router/notes.js';
 
+// eslint-disable-next-line no-underscore-dangle
+const __filename = fileURLToPath(import.meta.url);
+// eslint-disable-next-line no-underscore-dangle
+const __dirname = dirname(__filename);
+
 const app = express();
 const port = 3005;
 
 // Create Sequelize instance
 const sequelize = new Sequelize({
   dialect: 'sqlite',
-  storage: './info.sqlite',
+  storage: join(__dirname, './info.sqlite'),
 });
 
 // 第二个参数可以传入{ sequelize, paranoid: true, modelName: "frames" }
