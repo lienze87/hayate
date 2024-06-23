@@ -1,11 +1,11 @@
-import sqlite3 from "sqlite3";
+import sqlite3 from 'sqlite3';
 
 const sqlite = sqlite3.verbose();
-const db = new sqlite.Database("./info.db", sqlite.OPEN_READWRITE, (err) => {
+const db = new sqlite.Database('./info.db', sqlite.OPEN_READWRITE, (err) => {
   if (err) {
     console.error(err.message);
   }
-  console.log("Connect to the info database.");
+  console.log('Connect to the info database.');
 });
 
 db.serialize(() => {
@@ -24,14 +24,13 @@ db.serialize(() => {
     if (err) {
       throw err;
     }
-    console.log("init table");
+    console.log('init table');
   });
-  dbReady = true;
 });
 
 function queryData() {
   const sql = `SELECT * from frames`;
-  let resultSet = [];
+  const resultSet = [];
   // all()加载全部数据到内存,each()加载单条数据到内存
   // get()查询结果为一条或零条
   db.all(sql, (err, rows) => {
@@ -40,7 +39,7 @@ function queryData() {
     }
     resultSet.concat(rows);
   });
-  console.log("resultSet", resultSet);
+  console.log('resultSet', resultSet);
   return resultSet;
 }
 

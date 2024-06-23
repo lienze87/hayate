@@ -126,7 +126,7 @@ export function getVideoMetadata(fileName, callback) {
   ffmpeg.ffprobe(fileName, function (err, data) {
     callback(data);
     const json = JSON.stringify(data);
-    fs.writeFile(`./metadata/${fileName.split('/').slice(-1)[0].split('.mp4')[0]}.json`, json, 'utf8', () => {
+    fs.writeFile(`./data/metadata/${fileName.split('/').slice(-1)[0].split('.mp4')[0]}.json`, json, 'utf8', () => {
       if (err) throw err;
       console.log('complete');
     });
