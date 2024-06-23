@@ -4,7 +4,7 @@
     <div class="header-nav">
       <el-dropdown trigger="click">
         <span class="el-dropdown-link">
-          Page List
+          更多页面
           <el-icon class="el-icon--right"><arrow-down /></el-icon>
         </span>
         <template #dropdown>
@@ -29,26 +29,6 @@ const menuList = ref([
   {
     name: '纯色背景',
     path: '/background',
-  },
-  {
-    name: '动画-过渡',
-    path: '/animation/transition',
-  },
-  {
-    name: '动画-动画',
-    path: '/animation/animation',
-  },
-  {
-    name: '游戏-恐龙',
-    path: '/game/dino',
-  },
-  {
-    name: '游戏-地图',
-    path: '/game/map',
-  },
-  {
-    name: '游戏-平滑',
-    path: '/game/smooth',
   },
 ]);
 </script>

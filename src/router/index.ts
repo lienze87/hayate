@@ -28,12 +28,21 @@ const routeList: RouteRecordRaw[] = [
         },
       },
       {
-        path: 'timeFunction',
-        name: 'TimeFunction',
-        component: () => import('@/pages/animation/timeFunction.vue'),
-        meta: { title: '运动-时间函数' },
+        path: '/animationNav',
+        name: 'AnimationNav',
+        component: () => import('@/pages/animation/index.vue'),
+        meta: {
+          title: '动画',
+        },
       },
-
+      {
+        path: '/gameNav',
+        name: 'GameNav',
+        component: () => import('@/pages/game/index.vue'),
+        meta: {
+          title: '游戏',
+        },
+      },
       {
         path: '/video',
         name: 'Video',
@@ -82,6 +91,12 @@ const routeList: RouteRecordRaw[] = [
         component: () => import('@/pages/animation/scrollTrigger.vue'),
         meta: { title: '运动-滚动' },
       },
+      {
+        path: 'timeFunction',
+        name: 'TimeFunction',
+        component: () => import('@/pages/animation/timeFunction.vue'),
+        meta: { title: '运动-时间函数' },
+      },
     ],
   },
   {
@@ -95,12 +110,6 @@ const routeList: RouteRecordRaw[] = [
         name: 'GameDino',
         component: () => import('@/pages/game/dinoJump.vue'),
         meta: { title: '游戏-恐龙' },
-      },
-      {
-        path: 'map',
-        name: 'GameMap',
-        component: () => import('@/pages/game/map.vue'),
-        meta: { title: '游戏-地图' },
       },
       {
         path: 'reel',
@@ -119,6 +128,12 @@ const routeList: RouteRecordRaw[] = [
         name: 'GameStar',
         component: () => import('@/pages/game/star.vue'),
         meta: { title: '游戏-星星' },
+      },
+      {
+        path: 'map',
+        name: 'GameMap',
+        component: () => import('@/pages/game/map.vue'),
+        meta: { title: '游戏-地图' },
       },
       {
         path: 'smooth',

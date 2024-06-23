@@ -23,7 +23,11 @@ const menuList = [
   },
   {
     name: '动画',
-    path: '/timeFunction',
+    path: '/animationNav',
+  },
+  {
+    name: '游戏',
+    path: '/gameNav',
   },
   {
     name: '视频',
