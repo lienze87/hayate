@@ -1,8 +1,8 @@
-import https from 'https';
-import fs from 'fs';
-import express from 'express';
-import cors from 'cors';
 import bodyParser from 'body-parser';
+import cors from 'cors';
+import express from 'express';
+import fs from 'fs';
+import https from 'https';
 
 const options = {
   key: fs.readFileSync('./certificates/server.key'),

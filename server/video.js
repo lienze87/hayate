@@ -1,8 +1,8 @@
 import { exec } from 'child_process';
-import process from 'process';
-import fs from 'fs';
-import util from 'util';
 import ffmpeg from 'fluent-ffmpeg';
+import fs from 'fs';
+import process from 'process';
+import util from 'util';
 
 const promiseExec = util.promisify(exec);
 
@@ -14,7 +14,7 @@ function printProgress(string) {
 }
 
 function emptyDir(folderPath) {
-  const files = fs.readdirSync(folderPath); //读取该文件夹
+  const files = fs.readdirSync(folderPath); // 读取该文件夹
   files.forEach((file) => {
     const nextFilePath = `${folderPath}/${file}`;
     const states = fs.statSync(nextFilePath);

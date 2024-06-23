@@ -1,11 +1,12 @@
-import fs from 'fs';
-import express from 'express';
-import cors from 'cors';
 import bodyParser from 'body-parser';
+import cors from 'cors';
+import express from 'express';
 import fileUpload from 'express-fileupload';
-import { Sequelize, Model, DataTypes } from 'sequelize';
-import { extractImageByFrames, getVideoMetadata, getVideoPoster, extractVideoByTime } from './video.js';
+import fs from 'fs';
+import { DataTypes, Model, Sequelize } from 'sequelize';
+
 import { getFileExtension } from './utils.js';
+import { extractImageByFrames, extractVideoByTime, getVideoMetadata, getVideoPoster } from './video.js';
 
 const app = express();
 const port = 3005;
@@ -98,7 +99,7 @@ app.use(express.static('public'));
 
 app.post('/upload', function (req, res) {
   let sampleFile;
-  let uploadPath = './upload/';
+  const uploadPath = './upload/';
 
   if (!req.files || Object.keys(req.files).length === 0) {
     return res.status(400).send('No files were uploaded.');
@@ -309,8 +310,8 @@ app.post('/images', async (req, res) => {
   await extractImageByFrames(req.body.begin, req.body.end, videoPath, folderPath, req.body.step);
   await Images.create({
     frameId: req.body.frameId,
-    folderPath: folderPath,
-    videoPath: videoPath,
+    folderPath,
+    videoPath,
     begin: req.body.begin,
     end: req.body.end,
     describe: req.body.describe,
