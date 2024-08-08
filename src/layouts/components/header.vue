@@ -2,7 +2,13 @@
   <div class="page-header">
     <div class="header-title">Hayate</div>
     <div class="header-nav">
-      <div class="server-status" :style="`color: ${serverStatus === '在线' ? 'blue' : 'red'}`">{{ serverStatus }}</div>
+      <div
+        class="server-status"
+        :style="`color: ${serverStatus === '在线' ? 'blue' : 'red'}`"
+        @click="handleCheckServer"
+      >
+        {{ serverStatus }}
+      </div>
       <el-dropdown trigger="click">
         <span class="el-dropdown-link">
           更多页面
@@ -42,14 +48,25 @@ const menuList = ref([
   },
 ]);
 
-onBeforeMount(() => {
+const refreshing = ref(false);
+
+function handleCheckServer() {
+  if (refreshing.value) return;
+  refreshing.value = true;
   checkServer()
     .then((res: any) => {
       store.setServerStatus(res.data);
     })
     .catch(() => {
       store.setServerStatus(500);
+    })
+    .finally(() => {
+      refreshing.value = false;
     });
+}
+
+onBeforeMount(() => {
+  handleCheckServer();
 });
 </script>
 <style lang="scss" scoped>
@@ -71,6 +88,7 @@ onBeforeMount(() => {
   display: flex;
   align-items: center;
   margin-right: 20px;
+  cursor: pointer;
 }
 .el-dropdown-link {
   cursor: pointer;
