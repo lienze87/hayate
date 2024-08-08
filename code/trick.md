@@ -23,3 +23,12 @@
 ```js
    obj && obj.func() // obj?.func()
 ```
+
+### 移动端事件拦截
+
+```css
+.disabled{
+  pointer-events: none;
+  touch-action: none; // 拦截touch事件
+}
+```
