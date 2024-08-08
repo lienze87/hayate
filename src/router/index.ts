@@ -20,6 +20,14 @@ const routeList: RouteRecordRaw[] = [
         },
       },
       {
+        path: '/gradient',
+        name: 'Gradient',
+        component: () => import('@/pages/gradient/index.vue'),
+        meta: {
+          title: '颜色渐变',
+        },
+      },
+      {
         path: '/board',
         name: 'Board',
         component: () => import('@/pages/board/index.vue'),

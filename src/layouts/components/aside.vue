@@ -18,6 +18,10 @@ const menuList = [
     path: '/charts',
   },
   {
+    name: '渐变',
+    path: '/gradient',
+  },
+  {
     name: '画板',
     path: '/board',
   },
