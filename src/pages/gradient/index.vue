@@ -48,11 +48,16 @@
               class="picker-color"
               :style="`background-color: hsl(${currentHue},${currentSaturation}%,${currentLightness}%)`"
             />
+            <span>{{ `hsl(${currentHue},${currentSaturation}%,${currentLightness}%)` }}</span>
           </div>
         </div>
       </div>
       <div class="config-color">
-        <div ref="panelRef" class="color-panel" :style="`background-color: hsl(${currentHue},100%,50%)`">
+        <div
+          ref="panelRef"
+          class="color-panel color-hsl-panel"
+          :style="`--panel-width: ${wheelWidth / 2}px;background-color: hsl(${currentHue},100%,50%)`"
+        >
           <div class="color-panel__white" />
           <div class="color-panel__black" />
           <div class="color-panel__cursor" :style="`top:${cursorTop}px;left:${cursorLeft}px;`">
@@ -68,9 +73,10 @@
             class="color-wheel__cursor"
             :style="`top: ${rotateTop}px;left:${rotateLeft}px;transform:rotate(${rotateAngle}deg);`"
           >
-            <div class="color-wheel__line" />
+            <div class="color-panel__point" />
           </div>
         </div>
+
         <!-- <div class="color-slider"></div> -->
       </div>
     </div>
@@ -116,7 +122,7 @@ const width = ref(640);
 const height = ref(60);
 
 const colorFormat = ref('hsl');
-function handleColorFormatChange() {}
+function handleColorFormatChange(val: string) {}
 
 const beginColor = ref('hsl(0, 100%, 50%)');
 const showMiddle = ref(true);
@@ -166,8 +172,8 @@ const currentHue = ref(90);
 const currentSaturation = ref(100);
 const currentLightness = ref(50);
 
-const cursorLeft = ref(50);
-const cursorTop = ref(50);
+const cursorLeft = ref(180);
+const cursorTop = ref(90);
 function handlePanelMouseMove(e: MouseEvent) {
   const offsetX = Math.min(Math.max(0, e.pageX - rectOffsetLeft.value), rectWidth.value);
   const offsetY = Math.min(Math.max(0, e.pageY - rectOffsetTop.value), rectHeight.value);
@@ -205,7 +211,7 @@ const hslToRgb = (h: number, s: number, l: number) => {
 
 const wheelRef = ref<HTMLElement>();
 const wheelWidth = 360;
-const wheelCursorWidth = 60;
+const wheelCursorWidth = 30;
 const rotateTop = ref(wheelWidth / 2);
 const rotateLeft = ref(wheelWidth - wheelCursorWidth);
 const rotateAngle = ref(0);
@@ -232,8 +238,8 @@ function handleWheelMouseMove(e: MouseEvent) {
 
   rotateAngle.value = degree;
   // 鼠标方向的标准向量乘以色环半径得到浮标向量
-  rotateLeft.value = Math.ceil(normalVector[0] * wheelWidth * 0.33) + wheelWidth / 2;
-  rotateTop.value = Math.ceil(normalVector[1] * wheelWidth * 0.33) + wheelWidth / 2;
+  rotateLeft.value = Math.ceil(normalVector[0] * wheelWidth * 0.41) + wheelWidth / 2;
+  rotateTop.value = Math.ceil(normalVector[1] * wheelWidth * 0.41) + wheelWidth / 2;
 
   currentHue.value = (degree + 90) % 360;
 }
@@ -299,8 +305,8 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  width: 100%;
-  height: calc(100vh - 100px);
+  width: 100vw;
+  height: 100vh;
   overflow: hidden;
 }
 
@@ -309,8 +315,8 @@ onMounted(() => {
   justify-content: flex-start;
   margin: 20px;
   padding: 20px;
+  box-shadow: 0 0 8px 4px #e6e6e6;
 }
-
 .config-form {
   flex: 1;
 }
@@ -340,17 +346,21 @@ onMounted(() => {
 }
 
 .config-color {
+  position: relative;
   flex: 1;
   display: flex;
   justify-content: flex-start;
 }
 
 .color-panel {
-  position: relative;
-  flex-grow: 1;
-  flex-shrink: 0;
-  height: 100%;
+  position: absolute;
+  width: var(--panel-width);
+  height: var(--panel-width);
+  left: var(--panel-width);
+  top: var(--panel-width);
+  transform: translate(-50%, -50%);
   user-select: none;
+  z-index: 1;
 
   .color-panel__white,
   .color-panel__black {
@@ -369,25 +379,22 @@ onMounted(() => {
   .color-panel__cursor {
     position: absolute;
   }
-  .color-panel__point {
-    width: 4px;
-    height: 4px;
-    box-shadow:
-      0 0 0 1.5px #fff,
-      inset 0 0 1px 1px #0000004d,
-      0 0 1px 2px #0006;
-    border-radius: 50%;
-    transform: translate(-2px, -2px);
+}
+
+.color-hsl-panel {
+  .color-panel__black {
+    background: linear-gradient(to bottom, white 0, rgba(255, 255, 255, 0) 50%, rgba(0, 0, 0, 0) 50%, black 100%);
   }
 }
+
 .color-wheel {
   position: relative;
-  margin-left: 10px;
   width: var(--wheel-width);
   height: var(--wheel-width);
   border-radius: 50%;
   mask: radial-gradient(transparent 50%, #000 50%);
   background: conic-gradient(red, #ff0 17%, #0f0 33%, #0ff, #00f 67%, #f0f 83%, red);
+  // background: conic-gradient(red, yellow, lime, aqua, blue, magenta, red);
   .color-wheel__cursor {
     position: absolute;
     transform-origin: left;
@@ -408,6 +415,17 @@ onMounted(() => {
       border-top-color: red;
     }
   }
+}
+
+.color-panel__point {
+  width: 4px;
+  height: 4px;
+  box-shadow:
+    0 0 0 1.5px #fff,
+    inset 0 0 1px 1px #0000004d,
+    0 0 1px 2px #0006;
+  border-radius: 50%;
+  transform: translate(-2px, -2px);
 }
 
 .color-slider {
