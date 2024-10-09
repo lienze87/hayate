@@ -116,6 +116,10 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
 
+defineOptions({
+  name: 'Gradient',
+});
+
 const colorFormatEnum = ['hsl', 'hex', 'rgb'];
 
 const width = ref(640);
@@ -305,7 +309,7 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  width: 100vw;
+  width: 100%;
   height: 100vh;
   overflow: hidden;
 }
@@ -315,7 +319,21 @@ onMounted(() => {
   justify-content: flex-start;
   margin: 20px;
   padding: 20px;
+  width: calc(100% - 40px);
   box-shadow: 0 0 8px 4px #e6e6e6;
+  // 在绘制时，背景图像以 z 方向堆叠的方式进行。先指定的图像会在之后指定的图像上面绘制。
+  background:
+    linear-gradient(to bottom, #4671ff 10px, transparent 10px 100%),
+    linear-gradient(
+        to right,
+        #1e2c4f 10px,
+        #b2b6c9 10px 20px,
+        transparent 20px calc(100% - 40px),
+        #b2b6c9 calc(100% - 40px) calc(100% - 30px),
+        #1e2c4f calc(100% - 30px) 100%
+      )
+      0 0 / 100% 100%,
+    linear-gradient(to top, #4671ff 10px, transparent 10px 100%);
 }
 .config-form {
   flex: 1;
