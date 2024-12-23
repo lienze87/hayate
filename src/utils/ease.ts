@@ -1,3 +1,5 @@
+/* eslint-disable no-return-assign */
+/* eslint-disable no-cond-assign */
 /*
  * Ease
  * Visit http://createjs.com/ for documentation, updates and examples.

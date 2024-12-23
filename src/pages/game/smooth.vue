@@ -6,7 +6,7 @@ import type { FederatedPointerEvent } from 'pixi.js';
 import { Application, Assets, Container, Graphics, Point, TilingSprite } from 'pixi.js';
 import { onMounted } from 'vue';
 
-import Ease from '@/utils/ease.ts';
+import Ease from '@/utils/ease';
 
 let app: Application | null = null;
 async function initApp() {
