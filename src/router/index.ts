@@ -30,7 +30,7 @@ const routeList: RouteRecordRaw[] = [
       {
         path: '/board',
         name: 'Board',
-        component: () => import('@/pages/board/index.vue'),
+        component: () => import('@/pages/board/brush.vue'),
         meta: {
           title: '画板',
         },
