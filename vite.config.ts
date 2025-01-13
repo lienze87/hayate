@@ -1,3 +1,4 @@
+/// <reference types="vitest/config" />
 import path from 'node:path';
 
 import vue from '@vitejs/plugin-vue';
@@ -24,6 +25,15 @@ export default defineConfig({
       resolvers: [ElementPlusResolver()],
     }),
   ],
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    server: {
+      deps: {
+        inline: ['element-plus'],
+      },
+    },
+  },
   server: {
     port: 3003,
     open: true,
