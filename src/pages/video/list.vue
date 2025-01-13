@@ -4,7 +4,7 @@
       <el-upload
         v-model:file-list="uploadFileList"
         class="upload-demo"
-        action="http://localhost:3005/upload"
+        action="/api/upload"
         :show-file-list="false"
         :on-success="handleUploadSuccess"
       >
@@ -50,10 +50,11 @@ const videoList = ref<
 async function getDataList() {
   try {
     const res = await getVideoList();
-    videoList.value = res.map((ele: string) => {
+
+    videoList.value = res.data.map((ele: string) => {
       return {
         filename: ele,
-        poster: `http://localhost:3005/${ele.split('.mp4')[0]}.jpg`,
+        poster: `/static/${ele.split('.mp4')[0]}.jpg`,
       };
     });
   } catch (e: any) {

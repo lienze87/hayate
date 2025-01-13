@@ -22,7 +22,7 @@ import { onMounted, ref } from 'vue';
 
 const videoRef = ref();
 const videoCanvasRef = ref();
-const previewVideoUrl = ref('http://localhost:3005/videoPart/1');
+const previewVideoUrl = ref('/api/videoPart/1');
 
 const initVideoCanvas = () => {
   const videoCanvas = videoCanvasRef.value;

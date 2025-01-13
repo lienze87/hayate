@@ -44,7 +44,7 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['update:url']);
-const POST_URL = 'http://localhost:3005/upload';
+const POST_URL = '/api/upload';
 const fileList = ref<UploadUserFile[]>([]);
 
 const handleUploadSuccess = (response: any, file: UploadFile) => {

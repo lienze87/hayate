@@ -144,8 +144,9 @@ const goBack = () => {
 };
 
 const sourceVideoPath = computed(() => {
-  return `http://localhost:3005/video/${props.filename}`;
+  return `/static/mp4/${props.filename}`;
 });
+
 const sourceVideoStreams = ref([]);
 async function getVideoMetaData(id: string) {
   try {
@@ -228,7 +229,7 @@ const previewVideoUrl = ref('');
 const videoPlayerRef = ref();
 
 const handlePreviewData = (row: any) => {
-  previewVideoUrl.value = `http://localhost:3005/videoPart/${row.id}`;
+  previewVideoUrl.value = `/api/videoPart/${row.id}`;
   if (sourceVideoStreams.value.length === 0) {
     getVideoMetaData(row.id);
   }
@@ -255,7 +256,7 @@ const handleExtractData = async (row: any) => {
     if (images) {
       imageData.value = images;
       const pathResult = await getDataImageDetail(images.id);
-      imageList.value = pathResult.map((ele: string) => `http://localhost:3005/${ele.replace('./public/', '')}`);
+      imageList.value = pathResult.map((ele: string) => `/static/${ele.replace('./public/', '')}`);
     }
 
     imageDialogVisible.value = true;
