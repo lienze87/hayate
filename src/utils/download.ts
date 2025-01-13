@@ -3,10 +3,8 @@ import { AxiosResponse } from 'axios';
 export function downloadFile(response: AxiosResponse, fileName: string) {
   // 获得接口返回的文件名
 
-  let attachmentName = response.headers
-    // @ts-ignore
-    .get('Content-Disposition')
-    ?.split('=')[1];
+  // @ts-expect-error
+  let attachmentName = response.headers?.get('Content-Disposition')?.split('=')[1];
   if (attachmentName) attachmentName = decodeURIComponent(attachmentName);
 
   const href = URL.createObjectURL(response.data);

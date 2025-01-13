@@ -147,12 +147,14 @@ defineExpose({
   .action-bar {
     padding: 10px;
   }
+
   .white-board-content {
     width: 502px;
     min-height: 202px;
-    border: 1px solid rgb(240, 109, 109);
     cursor: crosshair;
+    border: 1px solid rgb(240, 109, 109);
   }
+
   .image-list {
     margin-top: 10px;
     border: 1px solid rgb(60, 224, 115);

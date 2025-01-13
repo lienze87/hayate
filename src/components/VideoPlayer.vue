@@ -21,8 +21,8 @@
           <video-play v-if="showPlayIcon" />
           <video-pause v-else />
         </div>
-        <!-- <el-button @click="handleReplayVideo"> 重播 </el-button>
-      <el-button @click="handleFullscreenVideo"> 全屏 </el-button> -->
+        <el-button @click="handleReplayVideo"> 重播 </el-button>
+        <el-button @click="handleFullscreenVideo"> 全屏 </el-button>
         <div class="volume-container">
           <div class="icon-button" @click="handleShowVideoVolume">
             <mute v-if="videoInfo.muted" />
@@ -117,35 +117,40 @@ const videoInfo = ref({
   volume: 100,
   progress: 0,
 });
-const requestFrameList = ref([]);
+const requestFrameList = ref<number[]>([]);
 const requestFrameObj: Record<string, ImageBitmap> = {};
 
 const handlePlayVideo = () => {
+  if (!videoRef.value) return;
   if (videoRef.value.paused || videoRef.value.ended) {
     videoRef.value.play();
   } else {
     videoRef.value.pause();
   }
 };
+
 const handleReplayVideo = () => {
+  if (!videoRef.value) return;
   videoRef.value.pause();
   videoRef.value.currentTime = 0;
   videoInfo.value.progress = 0;
 };
 
 const handleShowVideoVolume = () => {
+  if (!videoRef.value) return;
   videoInfo.value.muted = !videoInfo.value.muted;
   videoRef.value.muted = !videoRef.value.muted;
 };
 
 // volume范围0-1
 const handleVideoVolumeChange = (val: number) => {
+  if (!videoRef.value) return;
   videoRef.value.volume = val / 100;
 };
 
 const handleVideoProgressChange = (val: number) => {
   // const targetVal = (val / videoInfo.value.maxSecond) * videoInfo.value.duration;
-
+  if (!videoRef.value) return;
   videoRef.value.currentTime = val;
 };
 
@@ -154,6 +159,7 @@ const formatVideoTooltip = (val: number) => {
 };
 
 const handleFullscreenVideo = () => {
+  if (!videoRef.value) return;
   if (document.fullscreenElement !== null) {
     // The document is in fullscreen mode
     document.exitFullscreen();
@@ -168,8 +174,10 @@ const handleFullscreenVideo = () => {
 const initVideoCanvas = () => {
   const videoCanvas = videoCanvasRef.value;
   const video = videoRef.value;
+  if (!videoCanvas || !video) return;
 
   const ctx = videoCanvas.getContext('2d');
+  if (!ctx) return;
 
   ctx.font = `${FONT_SIZE}px serif`;
   ctx.lineWidth = 1;
@@ -230,12 +238,17 @@ const handlePenColorActiveChange = (val: string) => {
 };
 
 const handlePenColorChange = () => {
+  if (!videoCanvasRef.value) return;
   const videoCanvas = videoCanvasRef.value;
   const ctx = videoCanvas.getContext('2d');
+  if (!ctx) return;
   ctx.strokeStyle = penColor.value;
 };
 
 const handleStartDraw = () => {
+  if (!videoRef.value) return;
+  if (!videoCanvasRef.value) return;
+
   isDrawing.value = true;
   videoRef.value.pause();
   handlePenColorChange();
@@ -245,23 +258,29 @@ const handleStartDraw = () => {
 
 const handleResetDraw = () => {
   const videoCanvas = videoCanvasRef.value;
+  if (!videoCanvas) return;
   const ctx = videoCanvas.getContext('2d');
+  if (!ctx) return;
   ctx.clearRect(0, 0, videoCanvas.width, videoCanvas.height);
 };
 
 const handleQuitDraw = () => {
   isDrawing.value = false;
   handleResetDraw();
+  if (!videoCanvasRef.value) return;
   videoCanvasRef.value.setAttribute('style', 'pointer-events: none;');
 };
 
 // 使用新canvas合成图像
 const handleCreateFrame = () => {
+  if (!videoRef.value || !videoCanvasRef.value) return;
+
   const videoCanvas = videoCanvasRef.value;
   const canvas = document.createElement('canvas');
   canvas.height = canvasInfo.value.height;
   canvas.width = canvasInfo.value.width;
   const ctx = canvas.getContext('2d');
+  if (!ctx) return;
   ctx.drawImage(videoRef.value, 0, 0, canvasInfo.value.width, canvasInfo.value.height);
   ctx.drawImage(videoCanvas, 0, 0, canvasInfo.value.width, canvasInfo.value.height);
   frameImage.value = canvas.toDataURL();
@@ -292,14 +311,17 @@ const handlePlayFrame = () => {
     }, 1000 / videoInfo.value.frameRate);
   } else {
     handleQuitDraw();
+    if (!videoRef.value) return;
     videoRef.value.currentTime = videoInfo.value.currentTime;
   }
 };
 
 const handleFrameChange = () => {
   const videoCanvas = videoCanvasRef.value;
+  if (!videoCanvas) return;
 
   const ctx = videoCanvas.getContext('2d');
+  if (!ctx) return;
   if (requestFrameList.value[videoInfo.value.currentFrame]) {
     ctx.drawImage(
       requestFrameObj[requestFrameList.value[videoInfo.value.currentFrame]],
@@ -320,43 +342,48 @@ onMounted(() => {
 <style lang="scss" scoped>
 .video-player {
   position: relative;
+
   .video-content {
     position: relative;
     overflow: hidden;
   }
+
   .video-content:hover {
     .progress-slider-container {
       display: block;
     }
   }
+
   .progress-slider-container {
-    display: none;
     position: absolute;
     bottom: 0;
-    padding: 0 20px;
-    width: calc(100% - 40px);
     z-index: 1;
-    background-color: rgba(0, 0, 0, 0.6);
+    display: none;
+    width: calc(100% - 40px);
+    padding: 0 20px;
+    background-color: rgba(0, 0, 0, 60%);
   }
 
   .video-control {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
     width: 100%;
     height: 48px;
     background-color: #f2f2f2;
 
     .control-bar {
       display: flex;
-      justify-content: flex-start;
       align-items: center;
+      justify-content: flex-start;
     }
+
     .volume-container {
       position: relative;
       display: flex;
       flex-direction: row;
       align-items: center;
+
       .volume-slider {
         width: 0;
         padding: 0 10px;
@@ -364,6 +391,7 @@ onMounted(() => {
         transition: width 0.5s ease-out;
       }
     }
+
     .volume-container:hover {
       .volume-slider {
         width: 120px;
@@ -375,20 +403,23 @@ onMounted(() => {
       margin: 0 10px;
       line-height: 32px;
     }
+
     .action-bar {
       display: flex;
-      justify-content: flex-start;
       align-items: center;
+      justify-content: flex-start;
       height: 100%;
     }
   }
+
   .icon-button {
     display: inline-flex;
-    margin: 0 10px;
     width: 32px;
+    margin: 0 10px;
     font-size: 32px;
     cursor: pointer;
   }
+
   .icon-button:hover {
     color: #409eff;
   }

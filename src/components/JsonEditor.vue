@@ -14,8 +14,9 @@ function syntaxHighlight(json: string) {
   }
 
   json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-
-  const lineList = json.match(/.+\n/g).map((line: string) => {
+  const lineArr = json.match(/.+\n/g);
+  if (!lineArr) return '';
+  const lineList = lineArr.map((line: string) => {
     const keys = line.split(' ').map((key: string) => {
       if (key !== ' ' && key.slice(-1)[0] === ':') {
         return `<span class="key">${key}</span>`;
@@ -73,14 +74,16 @@ const onCopy = () => {
   .editor-content {
     padding: 20px 10px;
     color: #ce9178;
-    border-radius: 4px;
-    background-color: #263238;
     white-space: pre;
+    background-color: #263238;
+    border-radius: 4px;
   }
+
   :deep(.editor-content) {
     .key {
       color: #569ccb;
     }
+
     .pattern {
       color: #d46ed6;
     }

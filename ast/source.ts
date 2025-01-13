@@ -1,9 +1,9 @@
 declare type OptionId = string | number;
 declare type OptionName = string | number;
 declare type ZRColor = string;
-declare type ZRLineType = "solid" | "dotted" | "dashed" | number | number[];
-declare type TextAlign = "left" | "center" | "right";
-declare type TextVerticalAlign = "top" | "middle" | "bottom";
+declare type ZRLineType = 'solid' | 'dotted' | 'dashed' | number | number[];
+declare type TextAlign = 'left' | 'center' | 'right';
+declare type TextVerticalAlign = 'top' | 'middle' | 'bottom';
 
 declare type ZRTextAlign = TextAlign;
 declare type ZRTextVerticalAlign = TextVerticalAlign;
@@ -36,21 +36,18 @@ interface BoxLayoutOptionMixin {
   left?: number | string;
 }
 
-interface TitleOption
-  extends ComponentOption,
-    BoxLayoutOptionMixin,
-    BorderOptionMixin {
-  mainType?: "title";
+interface TitleOption extends ComponentOption, BoxLayoutOptionMixin, BorderOptionMixin {
+  mainType?: 'title';
   show?: boolean;
   text?: string;
   /**
    * Link to url
    */
   link?: string;
-  target?: "self" | "blank";
+  target?: 'self' | 'blank';
   subtext?: string;
   sublink?: string;
-  subtarget?: "self" | "blank";
+  subtarget?: 'self' | 'blank';
   textAlign?: ZRTextAlign;
   textVerticalAlign?: ZRTextVerticalAlign;
   /**

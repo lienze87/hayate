@@ -26,18 +26,19 @@ export default defineComponent({
   position: relative;
   display: flex;
   align-items: center;
-  opacity: 0;
   margin: 0;
+  opacity: 0;
 
   .header-anchor {
     position: absolute;
+    padding-right: 0.23em;
     margin-top: 0.125em;
     margin-left: -0.87em;
-    padding-right: 0.23em;
     font-size: 0.85em;
     opacity: 0;
   }
 }
+
 .doc-title:hover {
   .header-anchor {
     opacity: 1;

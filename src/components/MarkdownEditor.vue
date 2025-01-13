@@ -60,21 +60,25 @@ defineExpose({});
   flex-direction: column;
   justify-content: flex-start;
   width: 100%;
+
   .markdown-editor-actions {
-    margin-bottom: 5px;
     width: 100%;
+    margin-bottom: 5px;
   }
+
   .markdown-text-input {
     width: 100%;
   }
 }
+
 .markdown-preview {
   position: relative;
+
   .markdown-preview-html {
     min-height: 100px;
     max-height: 600px;
-    border-top: 1px solid #ccc;
     overflow: auto;
+    border-top: 1px solid #ccc;
   }
 }
 </style>

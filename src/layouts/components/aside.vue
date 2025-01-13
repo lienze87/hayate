@@ -60,15 +60,15 @@ const handleNav = (path: string) => {
 
 <style lang="scss" scoped>
 .page-aside {
-  padding: 20px 0;
   height: calc(100vh - 100px);
+  padding: 20px 0;
 
   .page-aside-menu {
     height: 100%;
   }
 
   :deep(.is-active) {
-    background-color: rgba(64, 158, 255, 0.1);
+    background-color: rgba(64, 158, 255, 10%);
   }
 }
 </style>

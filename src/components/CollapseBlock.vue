@@ -55,9 +55,9 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .transition {
+  overflow: hidden;
   transition: max-height 0.5s ease-in-out;
   will-change: max-height;
-  overflow: hidden;
 }
 
 .expand-btn {

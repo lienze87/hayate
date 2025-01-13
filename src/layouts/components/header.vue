@@ -73,27 +73,31 @@ onBeforeMount(() => {
 .page-header {
   display: flex;
   justify-content: space-between;
-  padding: 0 20px;
   height: 100%;
+  padding: 0 20px;
   border-bottom: 1px solid #d6d6d6;
 }
+
 .header-title {
-  line-height: 60px;
   font-size: 32px;
+  line-height: 60px;
 }
+
 .header-nav {
   display: flex;
 }
+
 .server-status {
   display: flex;
   align-items: center;
   margin-right: 20px;
   cursor: pointer;
 }
+
 .el-dropdown-link {
-  cursor: pointer;
-  color: var(--el-color-primary);
   display: flex;
   align-items: center;
+  color: var(--el-color-primary);
+  cursor: pointer;
 }
 </style>

@@ -79,9 +79,10 @@ onUnmounted(() => {
   --line-height: 24px;
 
   position: relative;
+  overflow-x: hidden;
   font-size: 14px;
   line-height: var(--line-height);
-  overflow-x: hidden;
+
   :deep(img) {
     width: 100%;
     object-fit: contain;
@@ -91,31 +92,35 @@ onUnmounted(() => {
     overflow: hidden;
     text-overflow: ellipsis;
   }
+
   .open {
     position: absolute;
-    bottom: 0;
     right: 0;
+    bottom: 0;
     color: #1989fa;
     background: #fff;
+
     &::before {
-      content: '\002026';
       color: #323233;
+      content: '\002026';
     }
   }
+
   .text-transition {
     position: absolute;
-    top: 0px;
+    top: 0;
     left: -40px;
-    margin: 0px;
-    min-width: 0px;
-    width: 40px;
-    height: var(--line-height);
-    background: linear-gradient(to right, rgba(255, 255, 255, 0), rgb(255, 255, 255));
     box-sizing: border-box;
+    width: 40px;
+    min-width: 0;
+    height: var(--line-height);
+    margin: 0;
+    background: linear-gradient(to right, rgba(255, 255, 255, 0%), rgb(255, 255, 255));
   }
+
   .close {
-    text-align: right;
     color: #1989fa;
+    text-align: right;
   }
 }
 </style>

@@ -134,8 +134,8 @@ onMounted(() => {
 </script>
 <style lang="scss">
 .mouse-drag {
-  user-select: none;
   cursor: ew-resize;
+  user-select: none;
 }
 </style>
 <style lang="scss" scoped>
@@ -144,27 +144,28 @@ onMounted(() => {
   display: inline-flex;
   width: 120px;
   height: 24px;
+  overflow: hidden;
   color: #fff;
   border-radius: 8px;
 
-  overflow: hidden;
   .input-box {
     display: inline-flex;
-    justify-content: center;
     align-items: center;
-    padding: 0 10px;
+    justify-content: center;
     width: calc(100% - 20px);
     height: 100%;
+    padding: 0 10px;
     background-color: #373737;
+
     .input-inner {
       width: 100%;
       height: 100%;
       font-size: 16px;
       color: #fff;
-      border: none;
-      outline: none;
-      border-radius: 8px;
       background-color: #373737;
+      border: none;
+      border-radius: 8px;
+      outline: none;
     }
   }
 
@@ -174,26 +175,29 @@ onMounted(() => {
     width: 100%;
     height: 100%;
     cursor: ew-resize;
+
     .slider-runway {
-      flex: 1;
-      height: 100%;
       display: flex;
-      justify-content: center;
+      flex: 1;
       align-items: center;
+      justify-content: center;
+      height: 100%;
       background-color: #999b9e;
     }
+
     .slider-bar {
       position: absolute;
       left: 0;
       height: 32px;
       background-color: #409eff;
     }
+
     .slider-value {
-      pointer-events: none;
-      user-select: none;
+      z-index: 1;
       font-size: 16px;
       color: #fff;
-      z-index: 1;
+      pointer-events: none;
+      user-select: none;
     }
   }
 }

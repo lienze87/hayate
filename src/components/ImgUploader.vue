@@ -67,37 +67,41 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .img-uploader {
-  border: 1px dashed var(--el-border-color);
-  border-radius: 6px;
-  cursor: pointer;
   position: relative;
   overflow: hidden;
+  cursor: pointer;
+  border: 1px dashed var(--el-border-color);
+  border-radius: 6px;
+
   :deep(.el-upload) {
     width: 100%;
+
     .img-uploader-icon {
-      font-size: 28px;
-      color: #8c939d;
       width: 100%;
       height: 76px;
+      font-size: 28px;
+      color: #8c939d;
       text-align: center;
     }
+
     .img-uploader-file-item {
       position: relative;
       width: 100%;
 
       .item-actions {
         position: absolute;
+        top: 0;
+        left: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         width: 100%;
         height: 100%;
-        left: 0;
-        top: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        color: #fff;
         font-size: 20px;
+        color: #fff;
+        background-color: rgba(0, 0, 0, 50%);
         opacity: 0;
-        background-color: rgba(0, 0, 0, 0.5);
+
         span {
           display: none;
           cursor: pointer;
@@ -106,15 +110,16 @@ onMounted(() => {
 
       .item-actions:hover {
         opacity: 1;
+
         span {
           display: inline-flex;
         }
       }
 
       .item-thumbnail {
+        display: block;
         width: 100%;
         height: 76px;
-        display: block;
       }
     }
   }

@@ -221,6 +221,7 @@ const handleSelectionChange = (rowList: any) => {
 .home-container {
   padding: 10px 20px;
 }
+
 .el-table :deep(.line-break .cell) {
   white-space: pre;
 }
