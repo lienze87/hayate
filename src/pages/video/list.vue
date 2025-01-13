@@ -40,7 +40,12 @@ const handleUploadSuccess = () => {
   getDataList();
 };
 
-const videoList = ref([]);
+const videoList = ref<
+  {
+    filename: string;
+    poster: string;
+  }[]
+>([]);
 
 async function getDataList() {
   try {
@@ -51,7 +56,7 @@ async function getDataList() {
         poster: `http://localhost:3005/${ele.split('.mp4')[0]}.jpg`,
       };
     });
-  } catch (e) {
+  } catch (e: any) {
     ElMessage.error(e.message);
   }
 }
@@ -67,28 +72,32 @@ onMounted(() => {
 .main-content {
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
   align-items: flex-start;
+  justify-content: flex-start;
   width: 100%;
   height: calc(100vh - 100px);
 }
+
 .content-nav {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 10px;
-  padding-bottom: 10px;
   width: 100%;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
   border-bottom: 1px solid #ccc;
 }
+
 .video-list {
   display: flex;
-  justify-content: flex-start;
+  flex-flow: wrap;
   align-items: flex-start;
-  flex-wrap: wrap;
+  justify-content: flex-start;
+
   .video-item {
+    width: 384px;
     margin-right: 10px;
     margin-bottom: 10px;
-    width: 384px;
+
     img {
       width: 100%;
       object-fit: contain;

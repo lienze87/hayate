@@ -17,7 +17,7 @@ import {
 } from 'pixi.js';
 import { onMounted } from 'vue';
 
-let app: Application = null;
+let app: Application | null = null;
 
 async function initApp() {
   app = new Application();

@@ -183,6 +183,7 @@ html.lenis body {
   min-height: 100%;
   overflow: hidden;
 }
+
 .page-header {
   position: relative;
   display: grid;
@@ -191,44 +192,53 @@ html.lenis body {
   height: 100vh;
   color: #fff;
   background:
-    linear-gradient(rgba(255, 255, 255, 0.5), rgba(0, 0, 0, 0.8)),
-    center/cover no-repeat url(../../assets/Logo_3_0.png);
+    linear-gradient(rgba(255, 255, 255, 50%), rgba(0, 0, 0, 80%)),
+    center/cover no-repeat url('@/assets/Logo_3_0.png');
 
   .title {
     font-size: 72px;
   }
 }
+
 .page-content {
   width: 100%;
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: rgba(0, 0, 0, 80%);
+
   .layer {
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
     width: 100%;
     height: 100vh;
     color: beige;
+
     .describe {
       margin-right: 120px;
+
       .describe-element {
         font-size: 32px;
       }
+
       .describe-positive {
         line-height: 48px;
         color: #28bdca;
       }
+
       .describe-reverse {
         color: #d74235;
       }
+
       .inline-title {
-        line-height: 48px;
         margin-right: 10px;
+        line-height: 48px;
       }
     }
+
     .card {
       padding: 20px;
-      border-radius: 10px;
       background-color: rgb(26, 26, 26);
+      border-radius: 10px;
+
       .card-image {
         object-fit: contain;
       }

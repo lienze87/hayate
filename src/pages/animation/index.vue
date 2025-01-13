@@ -44,12 +44,14 @@ function handleCheckDetail(path: string) {
   min-height: 100%;
   overflow: hidden;
 }
+
 .card-list {
   display: flex;
+  flex-flow: wrap;
   flex-direction: flex-start;
-  justify-content: flex-start;
   align-items: center;
-  flex-wrap: wrap;
+  justify-content: flex-start;
+
   .card-item {
     margin-right: 20px;
     cursor: pointer;

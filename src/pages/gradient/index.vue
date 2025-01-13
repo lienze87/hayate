@@ -86,21 +86,21 @@
         <el-color-picker
           v-model="beginColor"
           :color-format="colorFormat"
-          @active-change="(color: string) => handlePickColor(color, 'begin')"
+          @active-change="(color: string | null) => handlePickColor(color, 'begin')"
         />
       </div>
       <div v-if="showMiddle" class="gradient-color gradient-middle">
         <el-color-picker
           v-model="middleColor"
           :color-format="colorFormat"
-          @active-change="(color: string) => handlePickColor(color, 'middle')"
+          @active-change="(color: string | null) => handlePickColor(color, 'middle')"
         />
       </div>
       <div class="gradient-color gradient-end">
         <el-color-picker
           v-model="endColor"
           :color-format="colorFormat"
-          @active-change="(color: string) => handlePickColor(color, 'end')"
+          @active-change="(color: string | null) => handlePickColor(color, 'end')"
         />
       </div>
     </div>
@@ -126,7 +126,7 @@ const width = ref(640);
 const height = ref(60);
 
 const colorFormat = ref('hsl');
-function handleColorFormatChange(val: string) {}
+function handleColorFormatChange() {}
 
 const beginColor = ref('hsl(0, 100%, 50%)');
 const showMiddle = ref(true);
@@ -143,7 +143,8 @@ const computedStyle = computed(
     } ${endColor.value});`,
 );
 
-function handlePickColor(color: string, type: string) {
+function handlePickColor(color: string | null, type: string) {
+  if (!color) return;
   if (type === 'begin') {
     beginColor.value = color;
   } else if (type === 'end') {
@@ -317,10 +318,10 @@ onMounted(() => {
 .config-box {
   display: flex;
   justify-content: flex-start;
-  margin: 20px;
-  padding: 20px;
   width: calc(100% - 40px);
-  box-shadow: 0 0 8px 4px #e6e6e6;
+  padding: 20px;
+  margin: 20px;
+
   // 在绘制时，背景图像以 z 方向堆叠的方式进行。先指定的图像会在之后指定的图像上面绘制。
   background:
     linear-gradient(to bottom, #4671ff 10px, transparent 10px 100%),
@@ -334,7 +335,9 @@ onMounted(() => {
       )
       0 0 / 100% 100%,
     linear-gradient(to top, #4671ff 10px, transparent 10px 100%);
+  box-shadow: 0 0 8px 4px #e6e6e6;
 }
+
 .config-form {
   flex: 1;
 }
@@ -342,20 +345,21 @@ onMounted(() => {
 .form-item {
   display: flex;
   justify-content: flex-start;
-  margin: 6px 8px;
   padding: 10px 16px;
+  margin: 6px 8px;
 
   .form-item-label {
     flex-basis: 100px;
   }
 
   .form-item-content {
+    display: flex;
     flex-grow: 1;
     flex-shrink: 0;
-    display: flex;
-    justify-content: flex-start;
-    align-items: flex-start;
     gap: 20px;
+    align-items: flex-start;
+    justify-content: flex-start;
+
     .el-input,
     .el-select {
       width: 180px;
@@ -365,35 +369,34 @@ onMounted(() => {
 
 .config-color {
   position: relative;
-  flex: 1;
   display: flex;
-  justify-content: flex-start;
+  flex: 1;
 }
 
 .color-panel {
   position: absolute;
+  top: var(--panel-width);
+  left: var(--panel-width);
+  z-index: 1;
   width: var(--panel-width);
   height: var(--panel-width);
-  left: var(--panel-width);
-  top: var(--panel-width);
-  transform: translate(-50%, -50%);
   user-select: none;
-  z-index: 1;
+  transform: translate(-50%, -50%);
 
   .color-panel__white,
   .color-panel__black {
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    inset: 0;
   }
+
   .color-panel__white {
     background: linear-gradient(to right, #fff, #fff0);
   }
+
   .color-panel__black {
     background: linear-gradient(to top, #000, #0000);
   }
+
   .color-panel__cursor {
     position: absolute;
   }
@@ -401,7 +404,7 @@ onMounted(() => {
 
 .color-hsl-panel {
   .color-panel__black {
-    background: linear-gradient(to bottom, white 0, rgba(255, 255, 255, 0) 50%, rgba(0, 0, 0, 0) 50%, black 100%);
+    background: linear-gradient(to bottom, white 0, rgba(255, 255, 255, 0%) 50%, rgba(0, 0, 0, 0%) 50%, black 100%);
   }
 }
 
@@ -409,9 +412,9 @@ onMounted(() => {
   position: relative;
   width: var(--wheel-width);
   height: var(--wheel-width);
+  background: conic-gradient(red, #ff0 17%, #0f0 33%, #0ff, #00f 67%, #f0f 83%, red);
   border-radius: 50%;
   mask: radial-gradient(transparent 50%, #000 50%);
-  background: conic-gradient(red, #ff0 17%, #0f0 33%, #0ff, #00f 67%, #f0f 83%, red);
   // background: conic-gradient(red, yellow, lime, aqua, blue, magenta, red);
   .color-wheel__cursor {
     position: absolute;
@@ -422,13 +425,14 @@ onMounted(() => {
       height: 4px;
       background-color: #000;
     }
+
     .color-wheel__line::before {
-      content: '';
       position: relative;
       top: 3px;
       left: 30px;
       width: 0;
       height: 0;
+      content: '';
       border: 4px solid transparent;
       border-top-color: red;
     }
@@ -438,21 +442,21 @@ onMounted(() => {
 .color-panel__point {
   width: 4px;
   height: 4px;
+  border-radius: 50%;
   box-shadow:
     0 0 0 1.5px #fff,
     inset 0 0 1px 1px #0000004d,
     0 0 1px 2px #0006;
-  border-radius: 50%;
   transform: translate(-2px, -2px);
 }
 
 .color-slider {
   position: relative;
-  margin-left: 10px;
   width: 12px;
   height: 100%;
-  background: linear-gradient(to bottom, red, #ff0 17%, #0f0 33%, #0ff, #00f 67%, #f0f 83%, red);
+  margin-left: 10px;
   user-select: none;
+  background: linear-gradient(to bottom, red, #ff0 17%, #0f0 33%, #0ff, #00f 67%, #f0f 83%, red);
 }
 
 .gradient {
@@ -480,25 +484,27 @@ onMounted(() => {
 }
 
 .cover-gray {
-  filter: grayscale(1);
   z-index: 1;
+  filter: grayscale(1);
 }
+
 .slider {
   position: absolute;
   top: -10%;
+  z-index: 2;
   width: 4px;
   height: 120%;
-  background-color: #000000;
-  z-index: 2;
   user-select: none;
+  background-color: #000;
 }
+
 .slider::before {
-  content: '';
   position: relative;
   top: -2px;
   left: -2px;
   width: 0;
   height: 0;
+  content: '';
   border: 4px solid transparent;
   border-top-color: red;
 }

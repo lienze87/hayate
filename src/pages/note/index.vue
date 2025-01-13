@@ -73,7 +73,7 @@ import { onMounted, ref } from 'vue';
 import { addData, deleteData, getDataList, updateData } from '@/api/notes';
 import MarkdownEditor from '@/components/MarkdownEditor.vue';
 
-const dataList = ref([]);
+const dataList = ref<{ uuid: string; title: string; context: string }[]>([]);
 const editId = ref('');
 const activeNames = ref('');
 
@@ -108,7 +108,7 @@ const handleDeleteData = async (row: any) => {
     queryData();
     editId.value = '';
     activeNames.value = '';
-  } catch (e) {
+  } catch (e: any) {
     ElMessage.error(e.message);
   }
 };
@@ -128,7 +128,7 @@ const handleConfirmData = async (type: string) => {
 
     queryData();
     handleCancelAdd();
-  } catch (e) {
+  } catch (e: any) {
     ElMessage.error(e.message);
   }
 };
@@ -147,7 +147,7 @@ async function queryData() {
   try {
     const res = await getDataList();
     dataList.value = res;
-  } catch (e) {
+  } catch (e: any) {
     ElMessage.error(e.message);
   }
 }
@@ -164,28 +164,33 @@ onMounted(() => {
   width: 100%;
   height: calc(100vh - 100px);
 }
+
 .content-header {
   position: sticky;
   top: -20px;
   width: 100%;
   min-height: 60px;
 }
+
 .content-list {
+  display: flex;
   flex-grow: 1;
   flex-shrink: 0;
-  display: flex;
   flex-direction: column;
   align-items: flex-start;
   width: 100%;
+
   .content-item {
-    margin-bottom: 10px;
     width: 100%;
+    margin-bottom: 10px;
   }
 }
+
 .form-item {
   display: flex;
   margin-bottom: 18px;
 }
+
 .form-inline-block {
   display: flex;
   justify-content: space-between;

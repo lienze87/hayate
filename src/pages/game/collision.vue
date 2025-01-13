@@ -6,13 +6,13 @@ import { Application, Point, Sprite, Texture } from 'pixi.js';
 import { onMounted } from 'vue';
 
 interface PhysicSprite extends Sprite {
-  acceleration?: Point;
-  mass?: number;
+  acceleration: Point;
+  mass: number;
 }
 
 // 参考文章
 // https://spicyyoghurt.com/tutorials/html5-javascript-game-development/collision-detection-physics
-let app: Application = null;
+let app: Application | null = null;
 
 async function initApp() {
   app = new Application();

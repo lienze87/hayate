@@ -91,7 +91,7 @@ const formData = ref({
   step: 1,
   direction: 'vertical',
 });
-const dataList = ref([]);
+const dataList = ref<number[]>([]);
 const percentList = computed(() => {
   const range = formData.value.max - formData.value.min;
   const result = dataList.value.map((ele: number) => {
@@ -114,6 +114,7 @@ function drawXAxis() {
   const paddingLeft = 50;
   const paddingTop = Math.floor(height * 0.9);
 
+  if (!ctx) return;
   ctx.fillStyle = PEN_COLOR;
   ctx.beginPath();
 
@@ -126,6 +127,7 @@ function drawXAxis() {
   percentList.value.forEach((ele: number, index: number) => {
     const offsetLeft = paddingLeft + Math.floor((width - 2 * paddingLeft) * ele);
 
+    if (!ctx) return;
     ctx.moveTo(offsetLeft, paddingTop - 30);
     ctx.lineTo(offsetLeft, paddingTop);
     ctx.stroke();
@@ -139,6 +141,7 @@ function drawYAxis() {
   const paddingLeft = Math.floor(width * 0.1);
   const paddingTop = 50;
 
+  if (!ctx) return;
   ctx.fillStyle = PEN_COLOR;
   ctx.beginPath();
 
@@ -150,7 +153,7 @@ function drawYAxis() {
   // 绘制刻度
   percentList.value.forEach((ele: number, index: number) => {
     const offsetTop = paddingTop + Math.floor((height - 2 * paddingTop) * ele);
-
+    if (!ctx) return;
     ctx.moveTo(paddingLeft, offsetTop);
     ctx.lineTo(paddingLeft + 30, offsetTop);
     ctx.stroke();
@@ -172,6 +175,7 @@ function onDrawAxis() {
 
 const onResetCanvas = () => {
   shapeDataList.value = [];
+  if (!ctx) return;
   ctx.fillStyle = BACKGROUND_COLOR;
   ctx.fillRect(0, 0, myCanvas.width, myCanvas.height);
 };
@@ -186,6 +190,7 @@ const currentLineWidth = computed({
   },
   set(val) {
     lineWidth.value = val;
+    if (!ctx) return;
     ctx.lineWidth = val;
   },
 });
@@ -195,23 +200,31 @@ const handleToolChange = (tool: string) => {
     case 'mouse':
       cursorType.value = 'default';
       currentLineWidth.value = 1;
-      ctx.strokeStyle = PEN_COLOR;
+      if (ctx) {
+        ctx.strokeStyle = PEN_COLOR;
+      }
       break;
     case 'shape':
       currentShape.value = 'line';
       currentLineWidth.value = 1;
-      ctx.strokeStyle = PEN_COLOR;
+      if (ctx) {
+        ctx.strokeStyle = PEN_COLOR;
+      }
       onResetCanvas();
       break;
     case 'draw':
       cursorType.value = 'crosshair';
       currentLineWidth.value = 1;
-      ctx.strokeStyle = PEN_COLOR;
+      if (ctx) {
+        ctx.strokeStyle = PEN_COLOR;
+      }
       break;
     case 'eraser':
       // 通过绘制背景色线条实现橡皮功能
       currentLineWidth.value = 20;
-      ctx.strokeStyle = BACKGROUND_COLOR;
+      if (ctx) {
+        ctx.strokeStyle = BACKGROUND_COLOR;
+      }
       cursorType.value = 'cell';
       break;
     default:
@@ -226,7 +239,7 @@ const shapeObj: Record<string, string> = {
   circle: '圆',
   rect: '方形',
 };
-const shapeDataList = ref([]);
+const shapeDataList = ref<any[]>([]);
 const currentShapeName = computed(() => {
   return currentShape.value ? `形状-${shapeObj[currentShape.value]}` : '形状';
 });
@@ -313,6 +326,7 @@ const mouseDraw = {
     this.down = getMousePosition(evt);
 
     if (['draw', 'eraser'].includes(currentTool.value)) {
+      if (!ctx) return;
       ctx.beginPath();
       ctx.moveTo(this.down.x, this.down.y);
     }
@@ -322,10 +336,12 @@ const mouseDraw = {
       this.current = getMousePosition(evt);
 
       if (['draw', 'eraser'].includes(currentTool.value)) {
+        if (!ctx) return;
         ctx.lineTo(this.current.x, this.current.y);
         ctx.stroke();
       }
       if (currentTool.value === 'shape') {
+        if (!ctx) return;
         ctx.fillRect(0, 0, myCanvas.width, myCanvas.height);
 
         if (currentShape.value === 'line') {
@@ -398,11 +414,12 @@ const mouseDraw = {
         shapeDataList.value.push(rect);
       }
     }
-
+    if (!ctx) return;
     ctx.closePath();
   },
   mouseleave(evt: MouseEvent) {
     this.isDown = false;
+    if (!ctx) return;
     ctx.closePath();
   },
 };
@@ -426,6 +443,7 @@ const touchDraw = {
     this.started = true;
     this.down = getTouchPosition(evt);
     if (['draw', 'eraser'].includes(currentTool.value)) {
+      if (!ctx) return;
       ctx.beginPath();
       ctx.moveTo(this.down.x, this.down.y);
     }
@@ -436,10 +454,12 @@ const touchDraw = {
     if (this.started) {
       this.current = getTouchPosition(evt);
       if (['draw', 'eraser'].includes(currentTool.value)) {
+        if (!ctx) return;
         ctx.lineTo(this.current.x, this.current.y);
         ctx.stroke();
       }
       if (currentTool.value === 'shape') {
+        if (!ctx) return;
         ctx.fillRect(0, 0, myCanvas.width, myCanvas.height);
 
         if (currentShape.value === 'line') {
@@ -512,7 +532,7 @@ const touchDraw = {
         shapeDataList.value.push(rect);
       }
     }
-
+    if (!ctx) return;
     ctx.closePath();
   },
 };
@@ -570,6 +590,7 @@ function initCanvasDraw(myCanvas: HTMLCanvasElement, ctx: CanvasRenderingContext
 
 window.requestAnimationFrame(function loop() {
   if (currentTool.value === 'shape') {
+    if (!ctx) return;
     ctx.fillRect(0, 0, myCanvas.width, myCanvas.height);
 
     shapeDataList.value.forEach((data) => {
@@ -577,10 +598,13 @@ window.requestAnimationFrame(function loop() {
         return;
       }
       if (data.type === 'line') {
+        if (!ctx) return;
         drawLine(ctx, data);
       } else if (data.type === 'circle') {
+        if (!ctx) return;
         drawCircle(ctx, data);
       } else if (data.type === 'rect') {
+        if (!ctx) return;
         ctx.strokeRect(data.x, data.y, data.width, data.height);
       }
     });
@@ -598,6 +622,7 @@ onMounted(() => {
 
     myBoard.value.appendChild(myCanvas);
     ctx = myCanvas.getContext('2d');
+    if (!ctx) return;
     ctx.font = `${FONT_SIZE}px serif`;
     ctx.lineWidth = lineWidth.value;
     ctx.strokeStyle = PEN_COLOR;
@@ -616,23 +641,26 @@ onUnmounted(() => {
 .main-content {
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
   align-items: flex-start;
+  justify-content: flex-start;
   width: 100%;
   height: calc(100vh - 100px);
 }
+
 .canvas-action {
   display: flex;
-  justify-content: flex-start;
   align-items: center;
+  justify-content: flex-start;
   margin: 10px 0;
+
   .action-bar {
     display: flex;
-    justify-content: flex-start;
     align-items: center;
+    justify-content: flex-start;
     margin: 0 10px;
   }
 }
+
 .my-board {
   width: 100%;
   height: 594px;

@@ -16,7 +16,7 @@ import {
 } from 'pixi.js';
 import { onMounted } from 'vue';
 
-let app: Application = null;
+let app: Application | null = null;
 
 function testForAABB(object1: Sprite, object2: Sprite) {
   const bounds1 = object1.getBounds();

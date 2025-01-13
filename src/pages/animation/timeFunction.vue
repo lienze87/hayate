@@ -51,7 +51,7 @@ let ctx: CanvasRenderingContext2D | null = null;
 
 function rgbToHex(r: number, g: number, b: number) {
   if (r > 255 || g > 255 || b > 255) throw new Error('Invalid color component');
-  // eslint-disable-next-line no-bitwise
+
   const hex = ((r << 16) | (g << 8) | b).toString(16);
 
   return `#${`000000${hex}`.slice(-6)}`;
@@ -170,6 +170,7 @@ const mouseDrag = {
 function mousedown(evt: MouseEvent) {
   mouseDrag.isDown = true;
   mouseDrag.down = getMousePosition(evt);
+  if (!ctx) return;
   const pickColor = ctx.getImageData(mouseDrag.down.x, mouseDrag.down.y, 1, 1).data;
   mouseDrag.pickColor = rgbToHex(pickColor[0], pickColor[1], pickColor[2]);
   if (['#0aa344', '#009ad6', '#f20c00', '#e9bb1d'].includes(mouseDrag.pickColor)) {
@@ -204,6 +205,7 @@ function mouseup(evt: MouseEvent) {
 }
 
 const initCanvas = () => {
+  if (!ctx) return;
   ctx.clearRect(0, 0, canvasRef.value.width, canvasRef.value.height);
   drawBaseLine(ctx);
   drawCubicBezier(ctx, startPoint.value, controlPoint1.value, controlPoint2.value, endPoint.value);
@@ -242,41 +244,46 @@ onMounted(() => {
 .main-content {
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
   align-items: flex-start;
+  justify-content: flex-start;
   width: 100%;
   height: calc(100vh - 100px);
 }
+
 .cubic-bezier {
   position: relative;
   display: inline-flex;
   align-items: center;
   margin: 20px;
-  color: #353535;
-
   overflow: hidden;
+  color: #353535;
   user-select: none;
 }
+
 #main-canvas {
   width: 300px;
   height: 300px;
   border: 1px solid #ccc;
 }
+
 .animation-box {
   width: 500px;
-  margin-left: 20px;
   padding: 10px 20px;
+  margin-left: 20px;
   border-left: 1px solid #ddd;
 }
+
 .animation-ball {
   width: 0;
   height: 16px;
   background-color: red;
-  animation: growUp 2s ease infinite alternate-reverse;
-  @keyframes growUp {
+  animation: grow-up 2s ease infinite alternate-reverse;
+
+  @keyframes grow-up {
     from {
       width: 0;
     }
+
     to {
       width: 100%;
     }
@@ -286,6 +293,7 @@ onMounted(() => {
 .drag-point {
   cursor: grab;
 }
+
 .dragging-point {
   cursor: grabbing;
 }

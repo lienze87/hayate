@@ -151,17 +151,25 @@ async function getVideoMetaData(id: string) {
   try {
     const res = await getVideoInfo(id);
     sourceVideoStreams.value = res;
-  } catch (e) {
+  } catch (e: any) {
     ElMessage.error(e.message);
   }
 }
 
-const dataList = ref([]);
+const dataList = ref<
+  {
+    uuid: string;
+    name: string;
+    start: string;
+    end: string;
+    describe: string;
+  }[]
+>([]);
 async function queryData() {
   try {
     const res = await getDataList({ sourceName: props.filename });
     dataList.value = res;
-  } catch (e) {
+  } catch (e: any) {
     ElMessage.error(e.message);
   }
 }
@@ -210,7 +218,7 @@ const handleConfirmData = async () => {
     }
     partDialogVisible.value = false;
     queryData();
-  } catch (e) {
+  } catch (e: any) {
     ElMessage.error(e.message);
   }
 };
@@ -251,7 +259,7 @@ const handleExtractData = async (row: any) => {
     }
 
     imageDialogVisible.value = true;
-  } catch (e) {
+  } catch (e: any) {
     ElMessage.error(e.message);
   }
 };
@@ -267,7 +275,7 @@ const handleSubmitImage = async () => {
     }
 
     imageDialogVisible.value = false;
-  } catch (e) {
+  } catch (e: any) {
     ElMessage.error(e.message);
   }
 };
@@ -283,48 +291,53 @@ onMounted(() => {
 .main-content {
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
   align-items: flex-start;
+  justify-content: flex-start;
   width: 100%;
   height: calc(100vh - 100px);
 }
+
 .content-nav {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 10px;
-  padding-bottom: 10px;
   width: 100%;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
   border-bottom: 1px solid #ccc;
 }
 
 .content-container {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
   width: 80%;
   margin: 0 10%;
-  display: flex;
-  justify-content: flex-start;
-  align-items: flex-start;
+
   .video-container {
     flex-grow: 1;
     flex-shrink: 0;
     margin-right: 20px;
   }
+
   .video-aside {
     flex-basis: 280px;
-    padding-left: 10px;
     height: 100%;
+    padding-left: 10px;
     border-left: 1px solid #ccc;
 
     .video-part-header {
-      margin-bottom: 10px;
       padding-bottom: 10px;
+      margin-bottom: 10px;
       border-bottom: 1px solid #ccc;
     }
+
     .video-part-list {
       max-height: 500px;
       overflow-y: auto;
+
       .video-part-item {
-        margin-bottom: 10px;
         padding-bottom: 10px;
+        margin-bottom: 10px;
         border-bottom: 1px solid #ccc;
       }
     }
@@ -334,18 +347,21 @@ onMounted(() => {
 .dialog-container {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   align-items: flex-start;
+  justify-content: space-between;
+
   .el-collapse {
     width: 100%;
   }
 }
+
 .dialog-images {
   max-height: 250px;
   overflow-y: auto;
+
   .frame-image {
-    margin-right: 10px;
     width: 100px;
+    margin-right: 10px;
   }
 }
 </style>

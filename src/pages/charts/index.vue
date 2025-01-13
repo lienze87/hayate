@@ -154,7 +154,7 @@ const dataForm = ref({
 
 const dataset = ref({
   dimensions: ['x', 'y', 't'],
-  source: [],
+  source: [] as { x: number; y: number; t: number }[],
 });
 
 const handleAddData = () => {
@@ -173,7 +173,7 @@ const handleAddData = () => {
     }
   }
 
-  function formatNum(val: Number) {
+  function formatNum(val: number) {
     return Number(val.toFixed(2));
   }
 
@@ -259,15 +259,17 @@ onMounted(() => {
 <style lang="scss" scoped>
 .main-content {
   display: flex;
-  justify-content: space-around;
   align-items: flex-start;
+  justify-content: space-around;
   width: 100%;
   height: calc(100vh - 100px);
 }
+
 .charts-container {
   flex-basis: 640px;
   padding: 20px;
 }
+
 .options-container {
   flex-grow: 1;
   flex-shrink: 0;
@@ -279,14 +281,17 @@ onMounted(() => {
   display: flex;
   justify-content: space-around;
 }
+
 .options-form {
   width: 80%;
+
   .options-form-content {
     .el-form-item {
-      gap: 20px;
       flex-basis: 33%;
+      gap: 20px;
     }
   }
+
   .el-select {
     min-width: 180px;
   }

@@ -142,45 +142,50 @@ onMounted(() => {
 .main-content {
   position: relative;
 }
+
 .loading-box {
   position: absolute;
+  z-index: 9;
   display: grid;
   place-content: center;
   width: 100vw;
   height: 100vh;
-  z-index: 9;
+
   .loader {
     width: 4em;
     height: 4em;
     border: 10px solid #f27541;
-    border-left-color: transparent;
     border-right-color: transparent;
+    border-left-color: transparent;
     border-radius: 50%;
     animation: 0.8s loading-rotate ease infinite alternate;
   }
 }
+
 .loading-box.hidden {
-  opacity: 0;
   visibility: hidden;
+  opacity: 0;
 }
+
 @keyframes loading-rotate {
   from {
     transform: rotate(0) scale(1);
   }
+
   to {
     transform: rotate(360deg) scale(1.2);
   }
 }
+
 .page-content {
   padding: 20px;
   text-align: center;
-
   background-color: rgb(22, 24, 23);
   opacity: 0;
-  transform: translate3d(0, -1rem, 0);
   transition:
     opacity 0.6s ease-in-out,
     transform 0.6s ease-in-out;
+  transform: translate3d(0, -1rem, 0);
 
   svg {
     width: 20rem;
@@ -190,89 +195,96 @@ onMounted(() => {
       font-size: 5rem;
       stroke-width: 2;
     }
+
     text.text-body {
       stroke: var(--loader-text-color);
       animation: animate-stroke 4s infinite alternate;
     }
   }
+
   @keyframes animate-stroke {
     0% {
       fill: transparent;
       stroke: var(--loader-text-color);
-      stroke-width: 3;
-      stroke-dashoffset: 25%;
       stroke-dasharray: 0 32%;
+      stroke-dashoffset: 25%;
+      stroke-width: 3;
     }
+
     50% {
       fill: transparent;
       stroke: var(--loader-text-color);
       stroke-width: 3;
     }
+
     80%,
     100% {
       fill: var(--loader-text-color);
       stroke: transparent;
-      stroke-width: 0;
-      stroke-dashoffset: -25%;
       stroke-dasharray: 32% 0;
+      stroke-dashoffset: -25%;
+      stroke-width: 0;
     }
   }
 
   .btn-list {
     display: grid;
-    place-content: center;
     gap: 20px;
+    place-content: center;
     width: 100%;
   }
 
   .submit-button {
     display: flex;
-    justify-content: center;
     align-items: center;
-
+    justify-content: center;
     width: 240px;
     height: 48px;
-
     font-size: 21px;
     line-height: 48px;
     color: #fff;
-
+    cursor: pointer;
+    background-color: #409eff;
     border: none;
     border-radius: 12px;
-    background-color: #409eff;
-
-    cursor: pointer;
   }
+
   .loading-button {
     color: #409eff;
   }
+
   .success-button {
     background-color: #67c23a;
   }
+
   .button-loader {
     display: flex;
-    justify-content: space-around;
     align-items: center;
+    justify-content: space-around;
+
     div {
       width: 0.8rem;
       height: 0.8rem;
       background-color: #fff;
       border-radius: 50%;
-      animation: scaleUp 1.2s infinite ease-in-out;
+      animation: scale-up 1.2s infinite ease-in-out;
     }
+
     div:nth-child(1) {
       animation-delay: -0.4s;
     }
+
     div:nth-child(2) {
       animation-delay: -0.2s;
     }
 
-    @keyframes scaleUp {
+    @keyframes scale-up {
       0%,
       80%,
       100% {
         transform: scale(0);
       }
+
       40% {
         transform: scale(1);
       }
@@ -282,11 +294,13 @@ onMounted(() => {
   .mouse-effect {
     display: flex;
     justify-content: center;
+
     .mouse-info {
-      margin-right: 20px;
       min-width: 240px;
-      text-align: left;
+      margin-right: 20px;
       color: #fff;
+      text-align: left;
+
       p {
         margin: 5px;
       }
@@ -295,20 +309,22 @@ onMounted(() => {
 
   .magneto {
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
     width: 10rem;
     height: 10rem;
     color: white;
-    border-radius: 50%;
-    border: none;
-    background-color: #383434;
     cursor: pointer;
+    background-color: #383434;
+    border: none;
+    border-radius: 50%;
     transition: transform 1s ease-out;
+
     .magneto-text {
       transition: transform 1s ease-out;
     }
   }
+
   .magneto:hover {
     background-color: #409eff;
   }
@@ -317,52 +333,58 @@ onMounted(() => {
     display: flex;
     justify-content: center;
   }
+
   .menu-icon {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    margin-top: 20px;
     width: 60px;
     height: 32px;
+    margin-top: 20px;
 
     div {
       width: 100%;
       height: 5px;
-      border-radius: 2px;
       background-color: #fff;
+      border-radius: 2px;
       transition:
         transform 0.5s ease-in-out,
         opacity 0.5s ease-in-out;
     }
   }
+
   .menu-open {
     div:nth-child(1) {
       transform: translate3d(0, 14px, 0) rotate(45deg);
     }
+
     div:nth-child(2) {
-      transform: scaleX(0);
       opacity: 0;
+      transform: scaleX(0);
     }
+
     div:nth-child(3) {
       transform: translate3d(0, -14px, 0) rotate(-45deg);
     }
   }
 
   .walking {
-    margin: 20px auto;
     width: 240px;
     height: 200px;
-    background-image: url(../../assets/purple-mountains.jpg);
-    background-size: cover;
+    margin: 20px auto;
+    background-image: url('@/assets/purple-mountains.jpg');
     background-repeat: no-repeat;
+    background-size: cover;
     animation: walking 2s steps(5) infinite alternate;
   }
+
   @keyframes walking {
     to {
       background-position: 100%;
     }
   }
 }
+
 .page-content.visible {
   opacity: 1;
   transform: translate3d(0, 0, 0);

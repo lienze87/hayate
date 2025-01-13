@@ -236,16 +236,16 @@ onMounted(() => {
 .main-content {
   position: relative;
 }
+
 .scroll-watcher {
   position: fixed;
   top: 0;
+  z-index: 9;
   width: 100%;
   height: 10px;
   background-color: lime;
-  z-index: 9;
-  scale: 0 1;
   transform-origin: left;
-
+  scale: 0 1;
   animation: scroll-watcher linear;
   animation-timeline: scroll();
 }
@@ -262,7 +262,7 @@ onMounted(() => {
   place-items: center center;
   width: 100%;
   height: 100vh;
-  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(../../assets/header-bg.jpg);
+  background-image: linear-gradient(rgba(0, 0, 0, 50%), rgba(0, 0, 0, 50%)), url('@/assets/header-bg.jpg');
   background-position: center center;
   background-size: cover;
   // filter: brightness(0.5);
@@ -274,15 +274,15 @@ onMounted(() => {
 
 @keyframes fade-out {
   to {
-    background-image: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), url(../../assets/header-bg.jpg);
+    background-image: linear-gradient(rgba(0, 0, 0, 80%), rgba(0, 0, 0, 80%)), url('@/assets/header-bg.jpg');
   }
 }
 
 .header-content {
   width: 720px;
-  color: #fff;
   font-size: 16px;
   line-height: 1.4;
+  color: #fff;
 
   .article-title {
     font-size: 48px;
@@ -294,35 +294,37 @@ onMounted(() => {
   display: flex;
   justify-content: space-around;
   color: #f2f2f2;
+
   .accordion-item {
-    flex-basis: 125px;
+    box-sizing: border-box;
     display: flex;
+    flex-basis: 125px;
     flex-direction: column;
     justify-content: space-between;
-    margin-right: 20px;
-    padding: 10px;
     height: 300px;
-    border-radius: 8px;
-    box-sizing: border-box;
-
-    background: center/28rem no-repeat url(../../assets/weather-1.jpg);
-
-    transition-property: flex-basis, padding, background-size;
+    padding: 10px;
+    margin-right: 20px;
     overflow: hidden;
+    background: center/28rem no-repeat url('@/assets/weather-1.jpg');
+    border-radius: 8px;
+    transition-property: flex-basis, padding, background-size;
   }
+
   .accordion-item,
   .accordion-item-week {
-    transition-duration: 0.5s;
     transition-timing-function: ease-in-out;
+    transition-duration: 0.5s;
   }
+
   .accordion-item:nth-child(2n) {
-    background-image: url(../../assets/weather-2.jpg);
+    background-image: url('@/assets/weather-2.jpg');
   }
 
   .accordion-item.active {
     flex-basis: 300px;
     cursor: auto;
   }
+
   .accordion-item:not(.active):hover {
     padding: 20px 10px;
     background-size: 36rem;
@@ -331,8 +333,8 @@ onMounted(() => {
 
 .article-content {
   padding: 20px 20%;
-  text-align: left;
   color: #fff;
+  text-align: left;
   background-color: #0e0e0e;
 
   .article-image {
@@ -344,20 +346,21 @@ onMounted(() => {
 
   @keyframes fade-in {
     from {
-      scale: 0.8;
       opacity: 0;
+      scale: 0.8;
     }
+
     to {
-      scale: 1;
       opacity: 1;
+      scale: 1;
     }
   }
 
   blockquote {
-    margin: 0.5em;
     padding: 0.5em 1em;
-    border-left: 5px solid #455a64;
+    margin: 0.5em;
     background: #212121;
+    border-left: 5px solid #455a64;
   }
 
   .scroller {
@@ -370,7 +373,6 @@ onMounted(() => {
       flex-wrap: nowrap;
       width: max-content;
       list-style: none;
-
       animation: scrolling linear;
       animation-timeline: scroll(root);
 
@@ -378,18 +380,20 @@ onMounted(() => {
         from {
           transform: translate(-10%);
         }
+
         to {
           transform: translate(-50%);
         }
       }
 
       li {
-        margin-right: 10px;
         padding: 10px;
-        border-radius: 4px;
+        margin-right: 10px;
         background-color: #212121;
+        border-radius: 4px;
       }
     }
+
     .scroller-inline-reverse {
       animation-direction: reverse;
     }
@@ -398,42 +402,44 @@ onMounted(() => {
   .image-list {
     display: flex;
     justify-content: space-around;
+
     .image-item {
       position: relative;
       flex: 1;
       overflow: hidden;
+
       .image-info {
         position: absolute;
+        z-index: 2;
         display: flex;
         flex-direction: column;
-        justify-content: center;
         align-items: center;
+        justify-content: center;
         width: 100%;
         height: 100%;
         opacity: 0;
-        z-index: 2;
 
         .image-info-header {
           font-size: 24px;
           font-weight: 600;
-          transform: translate3d(0, -3rem, 0);
           transition-property: opacity, transform;
+          transform: translate3d(0, -3rem, 0);
         }
+
         .image-info-footer {
-          width: 100%;
           display: inline-flex;
           justify-content: center;
-
+          width: 100%;
           font-size: 14px;
-          transform: translate3d(0, 3rem, 0);
           transition-property: opacity, transform;
+          transform: translate3d(0, 3rem, 0);
 
           .image-info-footer-icon {
             margin-left: 40px;
             opacity: 0;
-            transform: translate3d(-2rem, 0, 0);
-            transition-property: opacity, transform;
             transition-delay: 0.5s;
+            transition-property: opacity, transform;
+            transform: translate3d(-2rem, 0, 0);
           }
         }
       }
@@ -441,36 +447,43 @@ onMounted(() => {
       img {
         width: 100%;
         object-fit: contain;
-        transform: scale(1.2);
         transition-property: transform;
+        transform: scale(1.2);
       }
+
       .image-info-header,
       .image-info-footer,
       .image-info-footer-icon,
       img {
-        transition-duration: 0.5s;
         transition-timing-function: ease-in-out;
+        transition-duration: 0.5s;
       }
     }
+
     .image-item:hover {
       .image-info {
-        background: linear-gradient(180deg, rgba(21, 22, 24, 0.24) 0%, rgba(21, 22, 24, 1) 100%);
+        background: linear-gradient(180deg, rgba(21, 22, 24, 24%) 0%, rgba(21, 22, 24, 100%) 100%);
         opacity: 1;
+
         .image-info-header {
           transform: translate3d(0, 0, 0);
         }
+
         .image-info-footer {
           transform: translate3d(0, 0, 0);
         }
+
         .image-info-footer-icon {
           opacity: 1;
           transform: translate3d(0, 0, 0);
         }
       }
+
       img {
         transform: scale(1);
       }
     }
+
     .image-item + .image-item {
       margin-left: 10px;
     }

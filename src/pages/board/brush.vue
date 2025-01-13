@@ -60,12 +60,13 @@ const handleEraser = () => {
       autoIndex++;
     } else {
       clearInterval(timer);
-      context.clearRect(0, 0, 800, 600);
+      context?.clearRect(0, 0, 800, 600);
     }
   }, 500);
 };
 
 const continueStroke = (newPoint: number[]) => {
+  if (!context) return;
   context.beginPath();
   context.moveTo(latestPoint[0], latestPoint[1]);
   context.strokeStyle = color;
@@ -100,6 +101,7 @@ const mouseDown = (evt: MouseEvent) => {
     return;
   }
   evt.preventDefault();
+  if (!myCanvas.value) return;
   myCanvas.value.addEventListener('mousemove', mouseMove, false);
   startStroke([evt.offsetX, evt.offsetY]);
 };
@@ -111,17 +113,19 @@ const mouseEnter = (evt: MouseEvent) => {
   mouseDown(evt);
 };
 
-const endStroke = (evt: MouseEvent) => {
+const endStroke = () => {
   if (!drawing) {
     return;
   }
   drawing = false;
+  if (!myCanvas.value) return;
   myCanvas.value.removeEventListener('mousemove', mouseMove, false);
 };
 
 onMounted(() => {
   if (myCanvas.value) {
     context = myCanvas.value.getContext('2d');
+    if (!context) return;
     context.fillStyle = '#ffffff';
     context.fillRect(0, 0, 800, 600);
     context.globalCompositeOperation = 'destination-out';
@@ -137,6 +141,7 @@ onMounted(() => {
 <style lang="scss" scoped>
 .page-container {
   background: center/cover no-repeat url('@/assets/header-bg.jpg');
+
   canvas {
     border: 1px solid #000;
   }

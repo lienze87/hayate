@@ -11,7 +11,7 @@ interface PhysicGraphics extends Graphics {
   mass?: number;
 }
 
-let app: Application = null;
+let app: Application | null = null;
 
 async function initApp() {
   app = new Application();
@@ -367,6 +367,7 @@ onMounted(() => {
   height: 100vh;
   overflow: hidden;
 }
+
 .grid-background {
   background-image: repeating-linear-gradient(-90deg, transparent 0 50px, rgb(82, 82, 82) 50px 52px),
     repeating-linear-gradient(0deg, transparent, transparent 0 50px, rgb(82, 82, 82) 50px 52px);
