@@ -1,6 +1,9 @@
 import { Router } from 'express';
 
-import { Notes } from '../models/notes.js';
+import { sequelize } from '../../data/init.js';
+import { Notes, NotesModel } from '../models/notes.js';
+
+Notes.init(NotesModel, { sequelize, modelName: 'notes' });
 
 const notesRouter = new Router();
 

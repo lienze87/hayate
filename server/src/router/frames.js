@@ -1,9 +1,19 @@
 import { Router } from 'express';
 import fs from 'fs';
 
-import { Frames } from '../models/frames.js';
-import { Images } from '../models/images.js';
-import { extractImageByFrames, extractVideoByTime, getVideoMetadata } from '../video.js';
+import { sequelize } from '../../data/init.js';
+import { Frames, FramesModel } from '../models/frames.js';
+import { Images, ImagesModel } from '../models/images.js';
+import { extractImageByFrames, extractVideoByTime, getVideoMetadata } from '../utils/video.js';
+
+// 第二个参数可以传入{ sequelize, paranoid: true, modelName: "frames" }
+// paranoid：true表示软删除
+Frames.init(FramesModel, { sequelize, modelName: 'frames' });
+Images.init(ImagesModel, { sequelize, modelName: 'images' });
+// 关系一对多
+Frames.hasMany(Images);
+// 自动插入外键 frameId
+Images.belongsTo(Frames);
 
 const framesRouter = new Router();
 
@@ -53,49 +63,10 @@ framesRouter.delete('/frames/:id', async (req, res) => {
   }
 });
 
-framesRouter.get('/video/:filename', async (req, res) => {
-  const videoPath = `./upload/${req.params.filename}`;
-
-  if (!fs.existsSync(videoPath)) {
-    res.status(404).json({ message: 'video not found' });
-    return;
-  }
-
-  const videoStat = fs.statSync(videoPath);
-  const videoSize = videoStat.size;
-
-  const videoRange = req.headers.range;
-  if (videoRange) {
-    const parts = videoRange.replace(/bytes=/, '').split('-');
-    const start = parseInt(parts[0], 10);
-    const end = parts[1] ? parseInt(parts[1], 10) : videoSize - 1;
-    const chunksize = end - start + 1;
-
-    const headers = {
-      'Content-Range': `bytes ${start}-${end}/${videoSize}`,
-      'Accept-Ranges': 'bytes',
-      'Content-Length': chunksize,
-      'Content-Type': 'video/mp4',
-    };
-    res.writeHead(206, headers);
-
-    const videoStream = fs.createReadStream(videoPath, { start, end });
-    videoStream.pipe(res);
-  } else {
-    const headers = {
-      'Content-Length': videoSize,
-      'Content-Type': 'video/mp4',
-    };
-    res.writeHead(200, headers);
-    const videoStream = fs.createReadStream(videoPath);
-    videoStream.pipe(res);
-  }
-});
-
 framesRouter.get('/videoPart/:id', async (req, res) => {
   const frame = await Frames.findByPk(req.params.id);
 
-  const basePath = `./upload/${frame.sourceName}`;
+  const basePath = `./upload/mp4/${frame.sourceName}`;
 
   const resultFileName = `${frame.sourceName.split('.mp4')[0]}-${frame.startIndex}-${frame.endIndex}.mp4`;
   const videoPath = `./public/${resultFileName}`;
@@ -138,7 +109,7 @@ framesRouter.get('/videoPart/:id', async (req, res) => {
 framesRouter.get('/video/info/:id', async (req, res) => {
   const frame = await Frames.findByPk(req.params.id);
 
-  const basePath = `./upload/${frame.sourceName}`;
+  const basePath = `./upload/mp4/${frame.sourceName}`;
 
   const metaDataPath = `./data/metadata/${frame.sourceName.split('.mp4')[0]}.json`;
 

@@ -1,14 +1,21 @@
 import { Router } from 'express';
 import fs from 'fs';
+import path from 'path';
 
-import { getFileExtension } from '../utils.js';
-import { getVideoMetadata, getVideoPoster } from '../video.js';
+import { __dirname } from '../../common.js';
+import { getVideoMetadata, getVideoPoster } from '../utils/video.js';
 
 const commonRouter = new Router();
 
+commonRouter.get('/check', (req, res) => {
+  res.json({
+    data: 200,
+    message: 'server is running',
+  });
+});
+
 commonRouter.post('/upload', (req, res) => {
   let sampleFile = null;
-  const uploadPath = './upload/';
 
   if (!req.files || Object.keys(req.files).length === 0) {
     return res.status(400).send('No files were uploaded.');
@@ -16,6 +23,12 @@ commonRouter.post('/upload', (req, res) => {
 
   // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
   sampleFile = req.files.file;
+
+  const fileExtension = sampleFile.name.split('.').pop();
+  const uploadPath = path.join(__dirname, `./upload/${fileExtension}/`);
+  if (!fs.existsSync(uploadPath)) {
+    fs.mkdirSync(uploadPath);
+  }
 
   const filePath = uploadPath + sampleFile.name;
 
@@ -38,13 +51,26 @@ commonRouter.post('/upload', (req, res) => {
 });
 
 commonRouter.get('/upload/:extension', (req, res) => {
-  const folderPath = './upload/';
-  const files = fs.readdirSync(folderPath);
-  const result = files.filter((file) => {
-    return getFileExtension(file) === req.params.extension;
-  });
-
-  res.json(result);
+  const folderPath = path.join(__dirname, `./upload/${req.params.extension}`);
+  if (fs.existsSync(folderPath)) {
+    const files = fs.readdirSync(folderPath);
+    res.json({
+      data: files.sort((a, b) => {
+        const aNum = a.match(/\d+/);
+        const bNum = b.match(/\d+/);
+        if (!aNum || !bNum) {
+          return a.localeCompare(b);
+        }
+        return parseInt(aNum[0]) - parseInt(bNum[0]);
+      }),
+      message: 'success',
+    });
+  } else {
+    res.json({
+      data: [],
+      message: 'success',
+    });
+  }
 });
 
 export default commonRouter;
